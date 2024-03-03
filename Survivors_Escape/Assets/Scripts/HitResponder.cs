@@ -5,7 +5,9 @@ using UnityEngine;
 public class HitResponder : MonoBehaviour, IHitResponder
 {
     [SerializeField] private bool _attack;
-    [SerializeField] private int _damage = 10;
+    [SerializeField] private int _lifedamage = 20;
+    [SerializeField] private int _wooddamage = 20;
+    [SerializeField] private int _rockdamage = 20;
     [SerializeField] private SEHitBox _hitBox;
 
     private void Start()
@@ -21,7 +23,9 @@ public class HitResponder : MonoBehaviour, IHitResponder
         }
     }
 
-    int IHitResponder.Damage { get => _damage; }
+    int IHitResponder.LifeDamage { get => _lifedamage; }
+    int IHitResponder.WoodDamage { get => _wooddamage; }
+    int IHitResponder.RockDamage { get => _rockdamage; }
 
     bool IHitResponder.CheckHit(HitInteraction data)
     {

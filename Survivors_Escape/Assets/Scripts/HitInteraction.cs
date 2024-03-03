@@ -47,7 +47,9 @@ public enum HurtBoxMask
 
 public interface IHitResponder
 {
-    int Damage { get; }
+    int LifeDamage { get; }
+    int WoodDamage { get; }
+    int RockDamage { get; }
 
     public bool CheckHit(HitInteraction data);
 
@@ -70,6 +72,8 @@ public interface IHurtResponder
 
 public interface IHurtBox
 {
+    public int OType { get; }
+
     public bool Active { get; }
 
     public GameObject Owner { get; }

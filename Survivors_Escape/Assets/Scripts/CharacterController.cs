@@ -27,7 +27,9 @@ namespace SurvivorsEscape
         [SerializeField] private Vector3 _crouchingCapsule = Vector3.zero;
 
         [Header("Attacking")]
-        [SerializeField] private int _damage = 10;
+        [SerializeField] private int _lifeDamage = 5;
+        [SerializeField] private int _woodDamage = 12;
+        [SerializeField] private int _rockDamage = 7;
         [SerializeField] private SEHitBox _hitBox;
 
         [Header("Sharpness")]
@@ -93,7 +95,7 @@ namespace SurvivorsEscape
 
         private void Start()
         {
-            _hasGun = true;
+            _hasGun = false;
 
             _animator = GetComponent<Animator>();
             _cameraController = IsOwner ? GetComponent<CameraController>() : null;
@@ -101,36 +103,33 @@ namespace SurvivorsEscape
             _eventHandler = GetComponent<EventHandler>();
             _capsuleCollider = GetComponent<CapsuleCollider>();
 
-            int id = SurvivorsEscapeMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId);
-            //SurvivorsEscapeMultiplayer.Instance.SetPlayerReference(id, gameObject);
+            //_handVessel = GameObject.Find("mixamorig1:RightHand");
+            //if (_handVessel != null)
+            //{
+            //    Debug.Log("GOT THE BONE");
+            //    _handVessel.AddComponent<NetworkObject>();
 
-            _handVessel = GameObject.Find("mixamorig1:RightHand");
-            if (_handVessel != null)
-            {
-                Debug.Log("GOT THE BONE");
-                _handVessel.AddComponent<NetworkObject>();
-
-                var nw = _handVessel.GetComponent<NetworkObject>();
-                if (nw != null)
-                {
-                   // nw.Spawn(true);
-                    Debug.Log("Spawned HAND VESSEL");
-                }
-            }
+            //    var nw = _handVessel.GetComponent<NetworkObject>();
+            //    if (nw != null)
+            //    {
+            //       // nw.Spawn(true);
+            //        Debug.Log("Spawned HAND VESSEL");
+            //    }
+            //}
             
-            _handBone = GameObject.Find("WeaponAttach");
-            if (_handBone != null)
-            {
-                Debug.Log("GOT THE HAND BRI");
-                var nw = _handBone.GetComponent<NetworkObject>();
-                if (nw != null)
-                {
-                    nw.Spawn(true);
-                    Debug.Log("SPAWNED THE HAND BROSK");
-                }
-            }
+            //_handBone = GameObject.Find("WeaponAttach");
+            //if (_handBone != null)
+            //{
+            //    Debug.Log("GOT THE HAND BRI");
+            //    var nw = _handBone.GetComponent<NetworkObject>();
+            //    if (nw != null)
+            //    {
+            //        nw.Spawn(true);
+            //        Debug.Log("SPAWNED THE HAND BROSK");
+            //    }
+            //}
 
-            ReparentHandClientRpc();
+            //ReparentHandClientRpc();
 
             _runSpeed = _standingSpeed.x;
             _sprintSpeed = _standingSpeed.y;
@@ -333,6 +332,13 @@ namespace SurvivorsEscape
             }
         }
 
+        public void SetDMG(int ld, int wd, int rd)
+        {
+            _lifeDamage = ld;
+            _woodDamage = wd;
+            _rockDamage = rd;
+        }
+
         private void OnAnimatorMove()
         {
             if (!IsOwner) return;
@@ -481,7 +487,18 @@ namespace SurvivorsEscape
             item.gameObject.transform.eulerAngles = _handVessel.transform.eulerAngles;
         }
 
-        int IHitResponder.Damage { get => _damage; }
+        int IHitResponder.LifeDamage
+        {
+            get => _lifeDamage;
+        }
+        int IHitResponder.WoodDamage
+        {
+            get => _woodDamage;
+        }
+        int IHitResponder.RockDamage
+        {
+            get => _rockDamage;
+        }
 
         bool IHitResponder.CheckHit(HitInteraction data)
         {

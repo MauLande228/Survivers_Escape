@@ -8,7 +8,7 @@ public class STR_Main : MonoBehaviour
     public STR_Slot sslotPrefab;
     public int chestSize = 14;
     public bool opened;
-    public int bh = 0;
+    public int bh = 0; // 0 for Normal // 1 for Repository
 
     // Start is called before the first frame update
     void Start()
@@ -93,6 +93,10 @@ public class STR_Main : MonoBehaviour
                         case "Pressure Gauge":
                             stob.UpPressG(ns);
                             //Debug.Log("Stored Pressure Gauge (" + ns.ToString() + ")");
+                            break;
+                        case "Wood":
+                            break;
+                        case "Rock":
                             break;
                     }
                 }

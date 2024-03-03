@@ -20,7 +20,9 @@ public class STR_UI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        op = false; inrange = false;
         inv = GetComponentInParent<INV_ScreenManager>();
+        stob = inv.GetComponentInChildren<STR_Objectives>();
     }
 
     // Update is called once per frame

@@ -15,14 +15,18 @@ MonoBehaviour:
   itType: 3
   itName: Mango
   itDesc: Obtained from trees in the woods. Delicious!
-  itEqup: 1
+  itEqup: 0
   itIcon: {fileID: 21300000, guid: 3133355ea1fa29b49bbc04d71be7bd8a, type: 3}
   itPrefab: {fileID: 6167492646647746805, guid: b1303b03ae052e74c8d0027f424f9a24,
     type: 3}
   isStackable: 1
   maxStack: 10
+  value: 0
   plusHB: 20
   plusHP: 10
+  act: 0
   WepDmg: 0
   StoneDmg: 0
   WoodDmg: 0
+  dropPos: {fileID: 0}
+  efx: 0

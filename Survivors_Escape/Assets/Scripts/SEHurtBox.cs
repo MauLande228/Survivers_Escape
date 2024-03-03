@@ -7,8 +7,11 @@ public class SEHurtBox : MonoBehaviour, IHurtBox
     [SerializeField] private bool _active = true;
     [SerializeField] private GameObject _owner = null;
     [SerializeField] private HurtBoxType _hurtBoxType = HurtBoxType.ENEMY;
+    [SerializeField] private int _otype = 0; // 0 : Life // 1 : Wood // 2 : Rock
 
     private IHurtResponder _hurtResponder;
+
+    public int OType { get => _otype; }
 
     public bool Active { get => _active; }
 

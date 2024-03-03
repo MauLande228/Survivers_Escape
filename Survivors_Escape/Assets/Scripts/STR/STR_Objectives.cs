@@ -20,13 +20,7 @@ public class STR_Objectives : MonoBehaviour
     {
         inrange = false;
 
-        //UpTitle();
-        //UpGBarrel(5);
-        //UpElecEng(1);
-        //UpWood(285);
-        //UpGear(4);
-        //UpPressG(1);
-        //UpStone(185);
+        //UpTitle(); //UpGBarrel(5); //UpElecEng(1); //UpWood(285); //UpGear(4); //UpPressG(1); //UpStone(185);
     }
 
     // Update is called once per frame

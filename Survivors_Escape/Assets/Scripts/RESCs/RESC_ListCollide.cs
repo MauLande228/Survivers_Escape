@@ -14,14 +14,19 @@ public class RESC_ListCollide : NetworkBehaviour
         {
             objslist = other.GetComponentInChildren<STR_Objectives>();
             alerts = other.GetComponentInChildren<UI_Alerts>();
+            GameObject go = other.gameObject;
+            SurvivorsEscape.CharacterController cc = go.GetComponent<SurvivorsEscape.CharacterController>();
 
-            if (objslist != null)
+            if (objslist != null && cc != null)
             {
-                if (!objslist.inrange)
+                if (cc.IsOwner)
                 {
-                    //Debug.Log("LIST RANGE ENTERED");
-                    objslist.inrange = true;
-                    alerts.inObjList = true;
+                    if (!objslist.inrange)
+                    {
+                        //Debug.Log("LIST RANGE ENTERED");
+                        objslist.inrange = true;
+                        alerts.inObjList = true;
+                    }
                 }
             }
         }

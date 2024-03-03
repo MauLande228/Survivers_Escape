@@ -14,14 +14,19 @@ public class STR_Collide : NetworkBehaviour
             STR_Main storage = GetComponent<STR_Main>();
             alerts = other.GetComponentInChildren<UI_Alerts>();
             strshow = other.GetComponentInChildren<STR_UI>();
+            GameObject go = other.gameObject;
+            SurvivorsEscape.CharacterController cc = go.GetComponent<SurvivorsEscape.CharacterController>();
 
-            if (storage != null)
+            if (storage != null && cc != null)
             {
-                if (!strshow.inrange)
+                if (cc.IsOwner)
                 {
-                    strshow.inv.setCurrentStorage(storage);
-                    strshow.inrange = true;
-                    alerts.inAnyChest = true;
+                    if (!strshow.inrange)
+                    {
+                        strshow.inv.setCurrentStorage(storage);
+                        strshow.inrange = true;
+                        alerts.inAnyChest = true;
+                    }
                 }
                 //if (!storage.opened)
                 //{

@@ -29,7 +29,7 @@ public class Target : MonoBehaviour, ITargetable, IHurtResponder
         return true;
     }
 
-   void IHurtResponder.Response(HitInteraction data)
+    void IHurtResponder.Response(HitInteraction data)
     {
         Debug.Log("Hurt Response");
     }

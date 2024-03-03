@@ -1911,6 +1911,7 @@ GameObject:
   - component: {fileID: 433172546}
   - component: {fileID: 433172545}
   - component: {fileID: 433172550}
+  - component: {fileID: 433172551}
   m_Layer: 0
   m_Name: CHEST
   m_TagString: Untagged
@@ -1935,6 +1936,7 @@ MonoBehaviour:
     type: 3}
   chestSize: 14
   opened: 0
+  bh: 0
 --- !u!65 &433172546
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2033,6 +2035,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00958cb0bf2847d4bab6155a8148e26b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &433172551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433172544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3327236562
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &436031373
 GameObject:
   m_ObjectHideFlags: 0
@@ -2811,10 +2829,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alldrops: {fileID: 11400000, guid: b9e0e8c4a50844d42beaa73f2e1cccf7, type: 2}
   hp: 33
-  droptype: 0
+  structype: 0
   droploc: {fileID: 583758401}
   luck: 0
-  bhv: 0
   _isTargetable: 1
   _targetTransform: {fileID: 1908824674}
   _RbTarget: {fileID: 1908824670}
@@ -3103,10 +3120,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allslots: []
   storageO: {fileID: 0}
+  stob: {fileID: 0}
   slotPrefab: {fileID: 3034110843577371543, guid: 40fadfb8dfb52e04c9cbef37063d508e,
     type: 3}
   content: {fileID: 862901934}
+  inv: {fileID: 0}
   op: 0
+  inrange: 0
   oppos: {x: 0, y: 0, z: 0}
 --- !u!1 &614556664
 GameObject:
@@ -3393,11 +3413,17 @@ MonoBehaviour:
   Crouch:
     _primary: 122
     _alternate: 0
-  Aim:
-    _primary: 101
+  Draw:
+    _primary: 0
     _alternate: 0
   Attack:
     _primary: 323
+    _alternate: 0
+  Aim:
+    _primary: 101
+    _alternate: 0
+  CursosrEnable:
+    _primary: 0
     _alternate: 0
 --- !u!136 &636976548
 CapsuleCollider:
@@ -3436,16 +3462,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _standingSpeed: {x: 6, y: 8, z: 2}
   _crouchingSpeed: {x: 2, y: 3}
-  _proningSpeed: {x: 0.5, y: 1}
   _standingCapsule: {x: 0.25, y: 1.8, z: 0.9}
   _crouchingCapsule: {x: 0.35, y: 1.35, z: 0.675}
-  _proningCapsule: {x: 0.4, y: 0.4, z: 0.4}
-  _damage: 10
+  _lifeDamage: 5
+  _woodDamage: 12
+  _rockDamage: 7
   _hitBox: {fileID: 1257016086}
   _moveSharpness: 10
   _standingRotationSharpness: 7
   _crouchingRotationSharpness: 5
-  _proningRotationSharpness: 10
+  _hand: {fileID: 0}
+  aimLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _bullerProjectile: {fileID: 0}
+  _spawnBulletPosition: {fileID: 0}
+  _debugTransform: {fileID: 0}
+  _vfxParticlesCollition: {fileID: 0}
 --- !u!54 &636976552
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3526,7 +3559,6 @@ MonoBehaviour:
   hungerdmg: 2.5
   healthBar: {fileID: 464564785}
   hungerBar: {fileID: 1262180759}
-  uicolor: {fileID: 0}
 --- !u!1001 &668854780
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3852,6 +3884,7 @@ MonoBehaviour:
   _active: 1
   _owner: {fileID: 510399089}
   _hurtBoxType: 2
+  _otype: 0
 --- !u!136 &753439208
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -4314,7 +4347,20 @@ MonoBehaviour:
   descSpace: {fileID: 823457597}
   invSlots: []
   allSlots: []
-  cont: {fileID: 636976546}
+  _spawnableList: {fileID: 0}
+  s_axe: {fileID: 0}
+  e_axe: {fileID: 0}
+  r_axe: {fileID: 0}
+  d_axe: {fileID: 0}
+  s_pck: {fileID: 0}
+  e_pck: {fileID: 0}
+  r_pck: {fileID: 0}
+  d_pck: {fileID: 0}
+  hitbox: {fileID: 0}
+  strui: {fileID: 0}
+  strcurrent: {fileID: 0}
+  craftui: {fileID: 0}
+  objui: {fileID: 0}
   strui_op: 0
 --- !u!1 &862901933
 GameObject:
@@ -5801,6 +5847,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 18e9e95ac372e7c44a4e010e45b5e9c6, type: 2}
   - {fileID: 11400000, guid: bfeb3d9670add454ab80954190fa233a, type: 2}
   - {fileID: 11400000, guid: 8f96336fd07d7ff4bbdac92636089265, type: 2}
+  allr: []
   contentH: {fileID: 90846544}
   inCraft: {fileID: 0}
 --- !u!1001 &1226861445
@@ -6445,7 +6492,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attack: 1
-  _damage: 10
+  _lifedamage: 20
+  _wooddamage: 20
+  _rockdamage: 20
   _hitBox: {fileID: 1306053898}
 --- !u!65 &1306053900
 BoxCollider:

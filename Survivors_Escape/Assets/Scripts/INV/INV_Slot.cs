@@ -64,6 +64,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     {
         if (stackSize <= 0) {
             data = null;
+            stackSize = 0;
         }
 
         if (data == null)
