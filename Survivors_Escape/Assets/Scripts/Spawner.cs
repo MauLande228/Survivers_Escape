@@ -64,7 +64,7 @@ public class Spawner : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void ActualSuperSpawnServerRpc()
+    public void DespawnServerRpc()
     {
         
     }

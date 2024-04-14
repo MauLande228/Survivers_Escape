@@ -38,7 +38,7 @@ public class INV_Collide : NetworkBehaviour
                     if (!bDestroyed)
                     {
                         Debug.Log("PICK UP");
-                        bDestroyed = other.GetComponentInChildren<INV_ScreenManager>().AddItem(pickup, cc);
+                        bDestroyed = other.GetComponentInChildren<INV_ScreenManager>().AddItem(pickup);
                     }
                 }
             }

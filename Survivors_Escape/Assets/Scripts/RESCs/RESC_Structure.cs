@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class RESC_Structure : MonoBehaviour, ITargetable, IHurtResponder
+public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
 {
-    //public RESC_DropDataSO alldrops;
+    // public RESC_DropDataSO alldrops; // 5:Cobweb // 6:Liana // 7:Leaves
     public int hp = 0;
     public int structype = 0; // 0:Stone // 1-5:TreeABCDN // 5:Enemy
     public Transform droploc;
     public int luck = 0;
 
     int r, s = 0; float px, py, pz = 0;
+    public NetworkObject no;
 
     List<int> stones = new List<int> { 4,5,6,8,11 };
     List<int> gems = new List<int> { 2,3,4,6,9 };
@@ -34,11 +36,12 @@ public class RESC_Structure : MonoBehaviour, ITargetable, IHurtResponder
         px = droploc.position.x;
         py = droploc.position.y;
         pz = droploc.position.z;
+        no = GetComponent<NetworkObject>();
         _hurtBoxes = new List<SEHurtBox>(GetComponentsInChildren<SEHurtBox>());
 
         foreach (SEHurtBox hb in _hurtBoxes)
         {
-            Debug.Log("HURTBOX FOUND");
+            // Debug.Log("HURTBOX FOUND");
             hb.HurtResponder = this;
         }
     }
@@ -58,12 +61,16 @@ public class RESC_Structure : MonoBehaviour, ITargetable, IHurtResponder
         if (hp <= 0)
         {
             BreakAndDrop();
-            Destroy(gameObject);
+            DestroyItemServerRpc();
         }
         Debug.Log("Current STRUCTURE HP:" + hp.ToString());
     }
 
-    
+    [ServerRpc(RequireOwnership = false)]
+    public void DestroyItemServerRpc()
+    {
+        no.Despawn();
+    }
 
     void Update()
     {
@@ -130,7 +137,7 @@ public class RESC_Structure : MonoBehaviour, ITargetable, IHurtResponder
     // Banana > Litchi > Carrot
     // Starfruit > Blueberry
 
-    public void FruitsA(int s) // 20:Coconut:8,4 // 21:Pineapple:14:7
+    public void FruitsA(int s) // 20:Coconut:8,4 // 21:Pineapple:14,7
     {
         r = rnd.Next(9);
         // suerte?

@@ -226,12 +226,14 @@ public class STR_UI : MonoBehaviour
 
     public void Close(STR_UI st)
     {
-        if(storageO == null)
+        if (storageO == null)
         {
             return;
         }
 
         storageO.Close(allslots.ToArray(), st);
+        //storageO.AllCloseClientRpc(allslots.ToArray(), st);
+
         S_Slot[] slotsToDestroy = GetComponentsInChildren<S_Slot>();
 
         for (int i = 0; i < slotsToDestroy.Length; i++)

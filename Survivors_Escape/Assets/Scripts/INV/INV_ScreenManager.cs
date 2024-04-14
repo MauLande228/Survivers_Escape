@@ -32,6 +32,7 @@ public class INV_ScreenManager : MonoBehaviour
     public TextMeshProUGUI Qtext;
     public TextMeshProUGUI descSpace;
     public TextMeshProUGUI Ktext;
+    public PlayerStats Pstats;
 
     public Slot[] invSlots;
     public Slot[] allSlots;
@@ -80,6 +81,7 @@ public class INV_ScreenManager : MonoBehaviour
         {
             if (cc.IsOwner)
             {
+                Pstats = GetComponentInParent<PlayerStats>();
                 GenSlots();
                 GenDescSpace();
                 GenInvButtons();
@@ -431,19 +433,16 @@ public class INV_ScreenManager : MonoBehaviour
         allButtons.SetActive(true);
         Qtext.text = "Equip";
     }
-
     void SetToButtonsB()
     {
         allButtons.SetActive(true);
         Qtext.text = "Consume";
     }
-
     void SetToButtonsC()
     {
         allButtons.SetActive(true);
         Qtext.text = "Store";
     }
-
     void SetToNoButtons()
     {
         allButtons.SetActive(false);
@@ -514,10 +513,8 @@ public class INV_ScreenManager : MonoBehaviour
         switch (ac)
         {
             case 0: //Any normal food
-                PlayerStats stats = GetComponentInParent<PlayerStats>();
-
-                stats.hunger += allSlots[cs].data.plusHB;
-                stats.health += allSlots[cs].data.plusHP;
+                Pstats.hunger += allSlots[cs].data.plusHB;
+                Pstats.health += allSlots[cs].data.plusHP;
                 break;
 
             case 1: //Attack Booster
@@ -1070,7 +1067,7 @@ public class INV_ScreenManager : MonoBehaviour
         return g;
     }
 
-    public bool AddItem(INV_PickUp pickUp, SurvivorsEscape.CharacterController cc)
+    public bool AddItem(INV_PickUp pickUp)
     {
         Debug.Log("PICKED ITEM UP BRO");
         bool isIn = false;
@@ -1167,7 +1164,7 @@ public class INV_ScreenManager : MonoBehaviour
                 if (emptySlot != null)
                 {
                     emptySlot.Clean();
-                    Debug.Log(pickUp.stackSize.ToString());
+                    //Debug.Log(pickUp.stackSize.ToString());
                     emptySlot.AddItemToSlot(pickUp.data, pickUp.stackSize);
                     emptySlot.UpdateSlot();
                     //EFX_Applied(e);

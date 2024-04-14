@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6999012866095269149}
   - component: {fileID: 4204732573861646981}
+  - component: {fileID: -3463470129908088180}
   m_Layer: 0
   m_Name: BigStone2
   m_TagString: Untagged
@@ -47,12 +48,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 33
-  structype: 2
+  structype: 0
   droploc: {fileID: 5266052352963539886}
   luck: 0
   _isTargetable: 1
   _targetTransform: {fileID: 433872318782306668}
   _RbTarget: {fileID: 7834168078075718746}
+--- !u!114 &-3463470129908088180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485337650232672851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &3551480408949645824
 GameObject:
   m_ObjectHideFlags: 0

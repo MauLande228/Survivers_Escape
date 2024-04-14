@@ -12,6 +12,7 @@ public class PlayersManager : NetworkBehaviour
     public STR_Main MainRepository;
     public GameObject Chest1;
 
+    [Header("Refs")]
     public List<NetworkObject> playerObjects = new List<NetworkObject>();
     public List<INV_ScreenManager> playerInventory = new List<INV_ScreenManager>();
     public List<SurvivorsEscape.CharacterController> playerReference = new List<SurvivorsEscape.CharacterController>();
@@ -22,7 +23,7 @@ public class PlayersManager : NetworkBehaviour
         Instance = this;
         Invoke(nameof(GetPlayersInSession), 5);
         Invoke(nameof(E_P_Invoke), 25);
-        Instantiate(Chest1);
+        //Instantiate(Chest1);
     }
 
     void Update()
@@ -69,6 +70,7 @@ public class PlayersManager : NetworkBehaviour
         Invoke(nameof(CEV_SupportRepository), 20); // Start loop of checking repository
     }
 
+    [Header("Global Action's Checks")]
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // Support the structures breaking // Support the repository (Material / Weapon / Tool / Cons / Special / Unique)
     // Material = 1, Weapon = 2, Tool = 2, Consumable = 2, Special = 3, Unique = 3
@@ -85,31 +87,31 @@ public class PlayersManager : NetworkBehaviour
         y = 0;
         string z = "";
 
-        //Referencia al repositorio central
+        // Referencia al repositorio central
         for (int i = 0; i < MainRepository.sslots.Length; i++)
         {
             if (MainRepository.sslots[i].itemdata != null)
             {
                 z = MainRepository.sslots[i].itemdata.itType.ToString();
                 y = MainRepository.sslots[i].stack;
-                switch (z[0])
+                switch (z[0]) // Detectar tipo de item almacenado y obtener valor
                 {
-                    case 'M':
+                    case 'M': // Material
                         x += 1 * y;
                         break;
-                    case 'W':
+                    case 'W': // Weapon
                         x += 2 * y;
                         break;
-                    case 'T':
+                    case 'T': // Tool
                         x += 2 * y;
                         break;
-                    case 'C':
+                    case 'C': // Consumable
                         x += 4 * y;
                         break;
-                    case 'S':
+                    case 'S': // Special
                         x += 4 * y;
                         break;
-                    case 'U':
+                    case 'U': // Unique
                         x += 32 * y;
                         break;
                 }
@@ -123,11 +125,11 @@ public class PlayersManager : NetworkBehaviour
         {
             cev = 0.9f;
         }
-        else if (x > 48) // Mucho
+        else if (x > 52) // Mucho
         {
             cev = 0.7f;
         }
-        else if (x > 32) // Intermedio
+        else if (x > 28) // Normal
         {
             cev = 0.5f;
         }

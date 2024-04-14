@@ -14,17 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 0
   itName: Plains Essence
-  itDesc: Red essence obtained from plains living creatures. Can repair the Defense
-    Booster
+  itDesc: Yellow essence obtained from plain's bushes.
   itEqup: 1
-  itIcon: {fileID: 21300000, guid: ffab26e466d050140aff6acb679e79ee, type: 3}
-  itPrefab: {fileID: 4098803488786464192, guid: 831981d70a2fe7846b2f9779943e9275,
+  itIcon: {fileID: 21300000, guid: 09930fb4a87dc8144a40c1a90948378c, type: 3}
+  itPrefab: {fileID: 2294801392949547437, guid: 5a6bdfa749fe99a41bda7389cf33dbb3,
     type: 3}
   isStackable: 1
-  maxStack: 10
+  maxStack: 15
   value: 0
   plusHB: 0
   plusHP: 0
+  act: 0
   WepDmg: 0
   StoneDmg: 0
   WoodDmg: 0
+  dropPos: {fileID: 0}
+  efx: 0
