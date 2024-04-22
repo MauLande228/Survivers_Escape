@@ -33,6 +33,8 @@ public class CheckEnemyInAttackRange : BT.Node
             return State;
         }
 
+        _animator.SetBool("Attacking", false);
+        _animator.SetBool("Walking", true);
         State = NodeState.FAILURE;
         return State;
     }

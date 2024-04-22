@@ -33,6 +33,8 @@ public class PlayerStats : MonoBehaviour
     public StatsBar healthBar;
     public StatsBar hungerBar;
 
+    private SurvivorsEscape.CharacterController _CharacterController;
+
     private float possibledmg;
     //public UI_opacity_time uicolor;
 
@@ -47,6 +49,7 @@ public class PlayerStats : MonoBehaviour
         luck = -1;
 
         inv = GetComponentInChildren<INV_ScreenManager>();
+        _CharacterController = GetComponent<SurvivorsEscape.CharacterController>();
         //uicolor = GetComponentInChildren<UI_opacity_time>();
     }
 
@@ -77,7 +80,7 @@ public class PlayerStats : MonoBehaviour
             life_lock = true;
             health = 0;
             inv.IsDeadAsHell();
-
+            _CharacterController.SetDeathState(true);
         }
         if (health > maxhealth) { health = maxhealth; }
 
@@ -115,11 +118,13 @@ public class PlayerStats : MonoBehaviour
         if (possibledmg > 0) { health -= possibledmg; }
     }
 
-    private void ApplyDamage(float dmg)
+    public void ApplyDamage(float dmg)
     {
         possibledmg = dmg * defense;
         health -= possibledmg;
     }
+
+
 
     // All frutal permanent buffs
     private void FDessert() { defense -= 0.1f; }

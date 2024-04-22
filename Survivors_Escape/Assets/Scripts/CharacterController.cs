@@ -17,6 +17,7 @@ namespace SurvivorsEscape
         private EventHandler _eventHandler;
         private CapsuleCollider _capsuleCollider;
         private CharacterStance _stance;
+        private bool _IsDead = false;
 
         [Header("Speed [Normal Sprint]")]
         [SerializeField] private Vector3 _standingSpeed = new Vector3(6, 8, 2);
@@ -50,6 +51,9 @@ namespace SurvivorsEscape
 
         [Header("Shooting particles")]
         [SerializeField] private Transform _vfxParticlesCollition;
+
+        [Header("Color")]
+        [SerializeField] private PlayerVisual _playerVisual;
 
         #region ANIMATOR_STATE_NAMES
         private const string _standToCrouch = "Base Layer.Base Crouching";
@@ -102,6 +106,10 @@ namespace SurvivorsEscape
             _inputs = GetComponent<InputManager>();
             _eventHandler = GetComponent<EventHandler>();
             _capsuleCollider = GetComponent<CapsuleCollider>();
+            _playerVisual = GetComponent<PlayerVisual>();
+
+            PlayerData pData = SurvivorsEscapeMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+            _playerVisual.SetPlayerColor(SurvivorsEscapeMultiplayer.Instance.GetPlayerColor(pData.colorId));
 
             //_handVessel = GameObject.Find("mixamorig1:RightHand");
             //if (_handVessel != null)
@@ -140,6 +148,8 @@ namespace SurvivorsEscape
             _stance = CharacterStance.STANDING;
             SetCapsuleDimensions(_standingCapsule);
 
+            
+
             int mask = 0;
             for (int i = 0; i < 32; i++)
             {
@@ -164,6 +174,7 @@ namespace SurvivorsEscape
         {
             if (_proning) return;
             if (!IsOwner) return;
+            if (_IsDead) return;
 
             Vector3 moveInputVector = new Vector3(_inputs.MoveAxisRight, 0, _inputs.MoveAxisForward);
             Vector3 cameraPlanarDirection = _cameraController._cameraPlanarDirection;
@@ -186,6 +197,9 @@ namespace SurvivorsEscape
                     Debug.Log("Inv open");
                 }
             }
+
+            if (Cursor.lockState != CursorLockMode.Locked)
+                return;
 
             if (_inputs.Aim.Pressed())
             {
@@ -516,6 +530,15 @@ namespace SurvivorsEscape
             _objectsHit.Add(data.HurtBox.Owner);
         }
 
+        public void SetDeathState(bool b)
+        {
+            _IsDead = b;
+        }
+
+        public bool IsPlayerDead()
+        {
+            return _IsDead;
+        }
         public Vector2 GetStandingSpeed() { return _standingSpeed; }
         public float GetMoveSharpness() { return _moveSharpness; }
         public float GetRotationSharpness() { return _rotationSharpness; }
