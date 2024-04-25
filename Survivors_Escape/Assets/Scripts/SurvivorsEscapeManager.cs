@@ -31,7 +31,7 @@ public class SurvivorsEscapeManager : NetworkBehaviour
 
 
     [SerializeField] private Transform playerPrefab;
-
+    [SerializeField] private Transform playerPosition;
 
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private bool isLocalPlayerReady;
@@ -75,8 +75,9 @@ public class SurvivorsEscapeManager : NetworkBehaviour
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            Transform playerTransform = Instantiate(playerPrefab);
+            Transform playerTransform = Instantiate(playerPrefab, playerPosition);
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            playerPosition.position = playerPosition.position + new Vector3(1, 0, 0);
         }
     }
 

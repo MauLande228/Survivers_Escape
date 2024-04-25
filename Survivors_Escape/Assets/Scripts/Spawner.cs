@@ -16,15 +16,6 @@ public class Spawner : NetworkBehaviour
         Instace = this;
     }
 
-    public void DropItem(Slot slot)
-    {
-        if (slot == null)
-        {
-            Debug.Log("Prefab null");
-            Debug.Log(slot.stackSize.ToString());
-        }
-    }
-
     // Cualquier cliente debe llamar al serverRPC para que se encargue del spawneo de objetos en todas las escenas
     // Para ello, serverRPC debe enviar el stacksize global a un clientRPC, luego recuperarlo en el spawn en otro serverRPC
 
@@ -32,10 +23,10 @@ public class Spawner : NetworkBehaviour
     public NetworkVariable<int> stackn = new NetworkVariable<int>();
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnObjectServerRpc(int itemSOIndex, int stackSize, float x, float y, float z)
+    public void SpawnObjectServerRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid)
     {
         Debug.Log("SPAWN OBJECT GOT CALLED BY SOMEONE");
-        SetRightValuesClientRpc(itemSOIndex, stackSize, x, y, z);
+        SetRightValuesClientRpc(itemSOIndex, stackSize, x, y, z, uid);
         
         var pickNO = Instantiate(itDropModel);
 
@@ -45,7 +36,7 @@ public class Spawner : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetRightValuesClientRpc(int itemSOIndex, int stackSize, float x, float y, float z)
+    public void SetRightValuesClientRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid)
     {
         var item = GetItemFromIndex(itemSOIndex);
 
@@ -56,6 +47,7 @@ public class Spawner : NetworkBehaviour
 
         pickup.data = item; // CANT MODIFY NETWORK VARIABLES AS CLIENT
         pickup.stackSize = stackSize;
+        pickup.pow = uid;
 
         transform.position = new Vector3(x, y, z);
         pickup.transform.position = transform.position;

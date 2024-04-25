@@ -6,6 +6,7 @@ public class INV_PickUp : MonoBehaviour
 {
     public Inv_itemSO data;
     public int stackSize;
+    public ulong pow;
 
     // Start is called before the first frame update
     void Start()

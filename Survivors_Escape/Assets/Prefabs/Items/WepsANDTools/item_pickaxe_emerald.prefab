@@ -214,7 +214,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 700fcc50f17bea7428a87fc2d8285f23, type: 2}
-  stackSize: 20
+  stackSize: 60
+  pow: 0
 --- !u!114 &1651648771365627815
 MonoBehaviour:
   m_ObjectHideFlags: 0

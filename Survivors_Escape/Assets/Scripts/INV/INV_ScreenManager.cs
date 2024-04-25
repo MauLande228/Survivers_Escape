@@ -12,13 +12,14 @@ public class INV_ScreenManager : MonoBehaviour
 {
     public bool opened = false;
     public KeyCode invKey = KeyCode.Tab;
-    public KeyCode equipKey = KeyCode.Q;
-    public KeyCode dropKey = KeyCode.R;
+    public KeyCode equipKey = KeyCode.Q; // Equip
+    public KeyCode dropKey = KeyCode.R; // Drop
+    public KeyCode splitKey = KeyCode.F; // Split
     private KeyCode[] keyCodes = new KeyCode[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8 };
 
     [Header("Settings")]
-    public int invSize = 7;
-
+    public int invSize = 7; // Defines the amount of inventory slots
+    public int invVals = 0; // Stores the inventory value
     public int selectedSlot = 0;
     public int currentSlot = 0;
 
@@ -70,6 +71,8 @@ public class INV_ScreenManager : MonoBehaviour
 
     public SurvivorsEscape.CharacterController cc;
     public PlayersManager gchecks;
+    public ulong uid;
+
     public List<float> cevTest = new List<float>();
     public bool hasTool = false;
 
@@ -82,6 +85,7 @@ public class INV_ScreenManager : MonoBehaviour
             if (cc.IsOwner)
             {
                 Pstats = GetComponentInParent<PlayerStats>();
+
                 GenSlots();
                 GenDescSpace();
                 GenInvButtons();
@@ -208,7 +212,14 @@ public class INV_ScreenManager : MonoBehaviour
                         if (currentSlot > 0) { selectedSlot -= 1; ChangeSelected(selectedSlot); }
                     }
 
-                    if (Input.GetKeyDown(dropKey)) { if (allSlots[currentSlot].itisEmpty == false) { allSlots[currentSlot].Drop(); } }
+                    if (Input.GetKeyDown(dropKey))
+                    {
+                        if (allSlots[currentSlot].itisEmpty == false) { allSlots[currentSlot].Drop(); }
+                    }
+                    if (Input.GetKeyDown(splitKey))
+                    {
+                        if (allSlots[currentSlot].itisEmpty == false) { DivideSlot(selectedSlot); }
+                    }
                 }
                 else
                 {
@@ -239,13 +250,9 @@ public class INV_ScreenManager : MonoBehaviour
         }
     }
 
-    public void NumericCraft()
+    public void SetOwnerID(ulong id)
     {
-
-    }
-    public void NumericStore()
-    {
-
+        uid = id;
     }
 
     public void SetChecks(PlayersManager pd)
@@ -253,6 +260,19 @@ public class INV_ScreenManager : MonoBehaviour
         gchecks = pd;
     }
 
+    public int GetValue()
+    {
+        return invVals;
+    }
+
+    public void ApplyDMG()
+    {
+        Pstats.health -= 4.0f;
+    }
+    public int ApplyLUCK()
+    {
+        return Pstats.luck;
+    }
     public void IsHungry()
     {
         gchecks.CEV_HungryRecovery();
@@ -517,16 +537,23 @@ public class INV_ScreenManager : MonoBehaviour
                 Pstats.health += allSlots[cs].data.plusHP;
                 break;
 
-            case 1: //Attack Booster
-                Debug.Log("Attack Booster");
+            case 1: // Frutal Delight : More HP
+                Pstats.hunger += allSlots[cs].data.plusHB;
+                Pstats.health += allSlots[cs].data.plusHP;
+                Pstats.maxhealth += 5.0f;
                 break;
 
-            case 2: //Defense Booster
-                Debug.Log("Defense Booster");
+            case 2: // Frutal Dessert : More HB
+                Pstats.hunger += allSlots[cs].data.plusHB;
+                Pstats.health += allSlots[cs].data.plusHP;
+                Pstats.maxhunger += 5.0f;
                 break;
 
-            case 3: //Speed Booster
-                Debug.Log("Speed Booster");
+            case 3: // Frutal Drink : More luck
+                Pstats.hunger += allSlots[cs].data.plusHB;
+                Pstats.health += allSlots[cs].data.plusHP;
+                Pstats.luck += 1;
+                cc._luckyPoint += 1;
                 break;
 
             case 4: //Luck Booster
@@ -574,6 +601,7 @@ public class INV_ScreenManager : MonoBehaviour
     {
         allSlots[0].stackSize = allSlots[0].stackSize - 1;
         allSlots[0].UpdateSlot();
+        Pstats.health -= 2.0f;
 
         if (allSlots[0].stackSize <= 0)
         {
@@ -628,7 +656,7 @@ public class INV_ScreenManager : MonoBehaviour
                 Ktext.text = "";
                 break;
             case 1:
-                Ktext.text = "Press a number to craft";
+                Ktext.text = "Press a number to craft and F to split the stack of an item";
                 break;
             case 2:
                 Ktext.text = "Press a number to take items";
@@ -659,7 +687,7 @@ public class INV_ScreenManager : MonoBehaviour
         invSlots = invSlots_.ToArray();
         allSlots = allSlots_.ToArray();
     }
-    public void GenUIAlerts()
+    public void GenUIAlerts() // NOT REFERENCED THATS WHY IT DOESNT WORK ???
     {
         Instantiate(uisign, canvas.gameObject.transform);
     }
@@ -715,6 +743,33 @@ public class INV_ScreenManager : MonoBehaviour
         }  
     }
 
+    public void DivideSlot(int cs)
+    {
+        int css = allSlots[cs].stackSize;
+        if(css > 1)
+        {
+            int ns = css / 2;
+            int ls = css - ns;
+
+            Slot emptySlot = null;
+
+            for (int i = 0; i < invSlots.Length; i++)
+            {
+                if (invSlots[i].itisEmpty)
+                {
+                    emptySlot = invSlots[i];
+                    break;
+                }
+            }
+            if (emptySlot != null) // IF WE HAVE AN EMPTY SLOT THAN ADD THE ITEM
+            {
+                emptySlot.AddItemToSlot(allSlots[cs].data, ns);
+                emptySlot.UpdateSlot();
+                allSlots[cs].stackSize = ls;
+                allSlots[cs].UpdateSlot();
+            }
+        }
+    }
     public void SetSlot(int ss, int st)
     {
         invSlots[ss].stackSize = st;
@@ -1067,21 +1122,35 @@ public class INV_ScreenManager : MonoBehaviour
         return g;
     }
 
+    public void AddValue(int v, int st)
+    {
+        invVals += v * st;
+    }
+    public void SubValue(int v, int st)
+    {
+        invVals -= v * st;
+    }
+
     public bool AddItem(INV_PickUp pickUp)
     {
         Debug.Log("PICKED ITEM UP BRO");
+
+        if (pickUp.pow < 999 && pickUp.pow != uid)
+        {
+            Debug.Log("++++++++++++++ ITEM from OTHER USER");
+        }
+        
         bool isIn = false;
         bool f = false;
 
         //int e = pickUp.data.efx;
         //Debug.Log(e.ToString());
 
-        if (pickUp.data.isStackable)
+        if (pickUp.data.isStackable) // IF THE ITEM CAN BE STACKED
         {
             Slot stackableSlot = null;
 
-            // TRY FINDING STACKABLE SLOT
-            for (int i = 0; i < invSlots.Length; i++)
+            for (int i = 0; i < invSlots.Length; i++) // TRY FINDING STACKABLE SLOT
             {
                 if (!invSlots[i].itisEmpty)
                 {
@@ -1093,16 +1162,16 @@ public class INV_ScreenManager : MonoBehaviour
                 }
             }
 
-            if (stackableSlot != null)
+            if (stackableSlot != null) // IF A STACKABLE SLOT WAS FOUND
             {
-
-                // IF IT CANNOT FIT THE PICKED UP AMOUNT
-                if (stackableSlot.stackSize + pickUp.stackSize > pickUp.data.maxStack)
+                if (stackableSlot.stackSize + pickUp.stackSize > pickUp.data.maxStack) // IF IT CANNOT FIT THE PICKED UP AMOUNT
                 {
                     int amountLeft = (stackableSlot.stackSize + pickUp.stackSize) - pickUp.data.maxStack;
+                    int amountToAdd = pickUp.stackSize - amountLeft;
 
                     // ADD IT TO THE STACKABLE SLOT
                     stackableSlot.AddItemToSlot(pickUp.data, pickUp.data.maxStack);
+                    AddValue(pickUp.data.value, amountToAdd);
 
                     // TRY FIND A NEW EMPTY STACK
                     for (int i = 0; i < invSlots.Length; i++)
@@ -1111,6 +1180,7 @@ public class INV_ScreenManager : MonoBehaviour
                         {
                             if (i == currentSlot) { isIn = true; }
                             invSlots[i].AddItemToSlot(pickUp.data, amountLeft);
+                            AddValue(pickUp.data.value, amountLeft);
                             invSlots[i].UpdateSlot();
                             if (isIn)
                             {
@@ -1135,12 +1205,14 @@ public class INV_ScreenManager : MonoBehaviour
                         return false;
                     }
                     // EFX_Applied(e); // stackableSlot.UpdateSlot(); // Destroy(pickUp.gameObject); // return true;
+
                 }
-                // IF IT CAN FIT THE PICKED UP AMOUNT
-                else
+                else // IF IT CAN FIT THE PICKED UP AMOUNT
                 {
                     stackableSlot.AddStackAmount(pickUp.stackSize);
                     stackableSlot.UpdateSlot();
+
+                    AddValue(pickUp.data.value, pickUp.stackSize);
                     //Destroy(pickUp.gameObject);
                     return true;
                 }
@@ -1166,6 +1238,7 @@ public class INV_ScreenManager : MonoBehaviour
                     emptySlot.Clean();
                     //Debug.Log(pickUp.stackSize.ToString());
                     emptySlot.AddItemToSlot(pickUp.data, pickUp.stackSize);
+                    AddValue(pickUp.data.value, pickUp.stackSize);
                     emptySlot.UpdateSlot();
                     //EFX_Applied(e);
                     if (isIn)
@@ -1183,7 +1256,7 @@ public class INV_ScreenManager : MonoBehaviour
             }
 
         }
-        else
+        else // IF THE ITEM CAN NOT BE STACKED
         {
             Slot emptySlot = null;
             int s = 0;
@@ -1249,7 +1322,8 @@ public class INV_ScreenManager : MonoBehaviour
             UnEquip(currentTool);
         }
 
-        Spawner.Instace.SpawnObjectServerRpc(i, slot.stackSize, x, y, z);
+        SubValue(slot.data.value, slot.stackSize);
+        Spawner.Instace.SpawnObjectServerRpc(i, slot.stackSize, x, y, z, uid);
         //Debug.Log("Here");
         UpdateNoDesc();
         slot.Clean();
@@ -1271,8 +1345,10 @@ public class INV_ScreenManager : MonoBehaviour
         float x = positon.x;
         float y = positon.y;
         float z = positon.z;
+
+        SubValue(dt.value, nl);
         //SetToNoButtons();
-        Spawner.Instace.SpawnObjectServerRpc(i, nl, x, y, z);
+        Spawner.Instace.SpawnObjectServerRpc(i, nl, x, y, z, uid);
         //INV_PickUp pickup = Instantiate(itDropModel, dropPos).AddComponent<INV_PickUp>();
         //pickup.transform.position = dropPos.position;
         //pickup.transform.SetParent(null);

@@ -21,7 +21,7 @@ MonoBehaviour:
     type: 3}
   isStackable: 1
   maxStack: 1
-  value: 0
+  value: 20
   plusHB: 0
   plusHP: 0
   act: 7

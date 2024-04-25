@@ -30,6 +30,7 @@ namespace SurvivorsEscape
         [SerializeField] private int _lifeDamage = 5;
         [SerializeField] private int _woodDamage = 12;
         [SerializeField] private int _rockDamage = 7;
+        [SerializeField] public int _luckyPoint = 6;
         [SerializeField] private SEHitBox _hitBox;
 
         [Header("Sharpness")]
@@ -85,13 +86,16 @@ namespace SurvivorsEscape
         private Vector3 _newVelocity;
         private Quaternion _newRotation;
 
-        private bool _proning;
+        public bool _proning = false;
         private bool _isAiming;
         private bool _bInvOpen = false;
         private Vector3 _mouseWorldPosition = new Vector3();
 
         private GameObject _handInt;
         private GameObject _handBone;
+
+        public INV_ScreenManager inv;
+        public ulong uid;
 
         private void Start()
         {
@@ -102,6 +106,10 @@ namespace SurvivorsEscape
             _inputs = GetComponent<InputManager>();
             _eventHandler = GetComponent<EventHandler>();
             _capsuleCollider = GetComponent<CapsuleCollider>();
+
+            uid = OwnerClientId;
+            inv = GetComponentInChildren<INV_ScreenManager>();
+            inv.SetOwnerID(uid);
 
             //_handVessel = GameObject.Find("mixamorig1:RightHand");
             //if (_handVessel != null)
@@ -499,6 +507,10 @@ namespace SurvivorsEscape
         int IHitResponder.RockDamage
         {
             get => _rockDamage;
+        }
+        int IHitResponder.LuckyPoint
+        {
+            get => _luckyPoint;
         }
 
         bool IHitResponder.CheckHit(HitInteraction data)

@@ -21,7 +21,7 @@ public class PlayersManager : NetworkBehaviour
     void Start()
     {
         Instance = this;
-        Invoke(nameof(GetPlayersInSession), 5);
+        Invoke(nameof(GetPlayersInSession), 2);
         Invoke(nameof(E_P_Invoke), 25);
         //Instantiate(Chest1);
     }
@@ -47,6 +47,7 @@ public class PlayersManager : NetworkBehaviour
                 // Add the player object to the list
                 playerObjects.Add(obj);
             }
+            // Check if the object is a chest object
             if (obj.CompareTag("Chest"))
             {
                 if (obj.GetComponent<STR_Main>().bh == 1)
@@ -68,9 +69,21 @@ public class PlayersManager : NetworkBehaviour
         }
 
         Invoke(nameof(CEV_SupportRepository), 20); // Start loop of checking repository
+        Invoke(nameof(CEV_MaterialCollection), 20);
     }
 
     [Header("Global Action's Checks")]
+    // xd
+    public List<int> cev_mcollect = new List<int>();
+    public void CEV_MaterialCollection()
+    {
+        foreach (INV_ScreenManager v in playerInventory)
+        {
+            int aux = v.GetValue();
+            cev_mcollect.Add(aux);
+        }
+        Invoke(nameof(CEV_MaterialCollection), 20);
+    }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // Support the structures breaking // Support the repository (Material / Weapon / Tool / Cons / Special / Unique)
     // Material = 1, Weapon = 2, Tool = 2, Consumable = 2, Special = 3, Unique = 3
@@ -96,7 +109,7 @@ public class PlayersManager : NetworkBehaviour
                 y = MainRepository.sslots[i].stack;
                 switch (z[0]) // Detectar tipo de item almacenado y obtener valor
                 {
-                    case 'M': // Material
+                    case 'M': // Material : 2
                         x += 1 * y;
                         break;
                     case 'W': // Weapon
@@ -105,13 +118,13 @@ public class PlayersManager : NetworkBehaviour
                     case 'T': // Tool
                         x += 2 * y;
                         break;
-                    case 'C': // Consumable
+                    case 'C': // Consumable : 4
                         x += 4 * y;
                         break;
-                    case 'S': // Special
+                    case 'S': // Special : 20
                         x += 4 * y;
                         break;
-                    case 'U': // Unique
+                    case 'U': // Unique : 30
                         x += 32 * y;
                         break;
                 }

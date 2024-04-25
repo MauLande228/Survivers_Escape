@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
+  m_Name: xRuby Sword
+  m_EditorClassIdentifier: 
+  itType: 1
+  itName: Ruby Sword
+  itDesc: Sword of medium resistance. Deals medium damage
+  itIcon: {fileID: 21300000, guid: b4e1ae4dc7624d5438dd65fbc7586406, type: 3}
+  itPrefab: {fileID: 8353914980991603965, guid: de686078b15b83a4ca738786741efe76,
+    type: 3}
+  isStackable: 0
+  maxStack: 50
+  plusHB: 0
+  plusHP: 0
+  WepDmg: 30
+  StoneDmg: 6
+  WoodDmg: 6

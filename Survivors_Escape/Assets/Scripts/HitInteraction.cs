@@ -5,6 +5,7 @@ using UnityEngine;
 public class HitInteraction
 {
     public int Damage;
+    public int Lucky;
     public Vector3 HitPoint;
     public Vector3 HitNormal;
     public IHurtBox HurtBox;
@@ -51,6 +52,7 @@ public interface IHitResponder
     int LifeDamage { get; }
     int WoodDamage { get; }
     int RockDamage { get; }
+    int LuckyPoint { get; }
 
     public bool CheckHit(HitInteraction data);
 

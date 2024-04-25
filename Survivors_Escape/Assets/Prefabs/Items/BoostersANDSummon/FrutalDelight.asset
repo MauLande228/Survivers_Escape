@@ -14,16 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Frutal Delight
-  itDesc: A combination of certain fruits. It boosts your luck
+  itDesc: A combination of certain fruits. It increases your maximum health in 5
+    points
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 356258a565db9244cb6ae30c27b68af2, type: 3}
   itPrefab: {fileID: 4191920457192618501, guid: b9ea6b38faa657843accc09f9e3a34e5,
     type: 3}
   isStackable: 1
-  maxStack: 2
+  maxStack: 5
   value: 0
   plusHB: 10
   plusHP: 10
+  act: 1
   WepDmg: 0
   StoneDmg: 0
   WoodDmg: 0
+  dropPos: {fileID: 0}
+  efx: 0

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,10 +16,18 @@ public class PlayerStats : MonoBehaviour
     public float defense;
     public float damage;
     public float speed;
-    public int luck;
+    public int luck = 6;
 
     [Header("Refs")]
     public INV_ScreenManager inv;
+    public INV_CanvRef canvas;
+    public REF_HUD hud;
+    public SurvivorsEscape.CharacterController cc;
+
+    public Vector3 respawnPos = new(516, 38, 34);
+    public GameObject player_real;
+    public GameObject player_tmbt;
+    public int respawnTime = 10;
 
     [Header("Enough")]
     public float regenhealth = 0.25f;
@@ -39,32 +48,51 @@ public class PlayerStats : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        health = maxhealth;
-        hunger = maxhunger;
-        defense = 1;
-        damage = 1;
-        speed = 1;
-        luck = -1;
+        //cc = GetComponent<SurvivorsEscape.CharacterController>();
+        player_tmbt.SetActive(false);
+        if (cc != null)
+        {
+            if (cc.IsOwner)
+            {
+                health = maxhealth;
+                hunger = maxhunger;
+                defense = 1;
+                damage = 1;
+                speed = 1;
+                luck = 6;
 
-        inv = GetComponentInChildren<INV_ScreenManager>();
-        //uicolor = GetComponentInChildren<UI_opacity_time>();
+                inv = GetComponentInChildren<INV_ScreenManager>();
+                canvas = GetComponentInChildren<INV_CanvRef>();
+
+                Transform h = Instantiate(hud, canvas.gameObject.transform).GetComponent<Transform>();
+                healthBar = h.GetComponentInChildren<REF_Health>().GetComponent<StatsBar>();
+                hungerBar = h.GetComponentInChildren<REF_Hunger>().GetComponent<StatsBar>();
+                //uicolor = GetComponentInChildren<UI_opacity_time>();
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        UpdateStats();
-        UpdateUI();
+        if (cc != null)
+        {
+            if (cc.IsOwner)
+            {
+                UpdateStats();
+                UpdateUI();
+            }
+        }
     }
 
     //Update the UI bars
     private void UpdateUI()
     {
         healthBar.numberText.text = health.ToString("f0");
-        healthBar.bar.fillAmount = health / 100;
+        healthBar.bar.fillAmount = health / maxhealth;
 
         hungerBar.numberText.text = hunger.ToString("f0");
-        hungerBar.bar.fillAmount = hunger / 100;
+        hungerBar.bar.fillAmount = hunger / maxhunger;
 
     }
 
@@ -79,7 +107,7 @@ public class PlayerStats : MonoBehaviour
         if (hunger > 0)
         {
             hunger -= idlehunger * Time.deltaTime;
-            if (health < 100 && !regen_lock) { health += regenhealth * Time.deltaTime; }
+            if (health < maxhealth && !regen_lock) { health += regenhealth * Time.deltaTime; }
         }
         if (health > 0 && hunger_lock)
         {
@@ -118,6 +146,12 @@ public class PlayerStats : MonoBehaviour
         {
             life_lock = true;
             health = 0;
+
+            player_real.SetActive(false);
+            cc._proning = true;
+            player_tmbt.SetActive(true);
+            GoRespawnTime();
+
             inv.IsDeadAsHell();
         }
         if (health > maxhealth)
@@ -133,6 +167,28 @@ public class PlayerStats : MonoBehaviour
         if (hunger > maxhunger)
         {
             hunger = maxhunger;
+        }
+    }
+
+    private void GoRespawnTime()
+    {
+        respawnTime -= 1;
+        if (respawnTime < 1)
+        {
+            player_tmbt.SetActive(false);
+            Transform playernow = GetComponent<Transform>();
+            playernow.position = respawnPos;
+            health = 50;
+            hunger = 50;
+            life_lock = false;
+            hunger_lock = false;
+            cc._proning = false;
+            player_real.SetActive(true);
+            respawnTime = 10;
+        }
+        else
+        {
+            Invoke(nameof(GoRespawnTime), 1);
         }
     }
 

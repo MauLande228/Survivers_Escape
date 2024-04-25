@@ -24,8 +24,7 @@ public class INV_Collide : NetworkBehaviour
             GameObject go = other.gameObject;
             SurvivorsEscape.CharacterController cc = go.GetComponent<SurvivorsEscape.CharacterController>();
 
-            Debug.Log("+ - + - + - + - + - + - +  - + - + - + - + - + - + TOCADO");
-
+            //Debug.Log("+ - + - + - + - + - + - +  - + - + - + - + - + - + TOCADO");
             if (pickup == null)
             {
                 Debug.Log("+ - + - + - + - + - + - + - + - + - +  - + - + - + - + ES NULO, NO EXISTE");

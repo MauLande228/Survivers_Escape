@@ -21,8 +21,12 @@ MonoBehaviour:
     type: 3}
   isStackable: 0
   maxStack: 35
+  value: 0
   plusHB: 0
   plusHP: 0
-  WepDmg: 8
-  StoneDmg: 20
-  WoodDmg: 4
+  act: 0
+  WepDmg: 0
+  StoneDmg: 4
+  WoodDmg: 2
+  dropPos: {fileID: 0}
+  efx: 0
