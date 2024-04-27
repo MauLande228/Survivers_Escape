@@ -381,6 +381,7 @@ MonoBehaviour:
   rec_temp: {fileID: 206762019531718461, guid: 3abe88c669e011240ad964dc86fcf26e, type: 3}
   recs_ref: []
   recs:
+  - {fileID: 11400000, guid: f9ff215434159344a9bfa4e0d6e451bf, type: 2}
   - {fileID: 11400000, guid: 8f96336fd07d7ff4bbdac92636089265, type: 2}
   - {fileID: 11400000, guid: b2669cc8b6b6cf740a54a3c0e4af2a61, type: 2}
   - {fileID: 0}
@@ -390,6 +391,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   allr:
+  - {fileID: 11400000, guid: f9ff215434159344a9bfa4e0d6e451bf, type: 2}
   - {fileID: 11400000, guid: 8f96336fd07d7ff4bbdac92636089265, type: 2}
   - {fileID: 11400000, guid: b2669cc8b6b6cf740a54a3c0e4af2a61, type: 2}
   - {fileID: 11400000, guid: bfeb3d9670add454ab80954190fa233a, type: 2}
@@ -695,7 +697,7 @@ MonoBehaviour:
   equipKey: 113
   dropKey: 114
   splitKey: 102
-  invSize: 7
+  invSize: 10
   invVals: 0
   selectedSlot: 0
   currentSlot: 0
@@ -703,7 +705,8 @@ MonoBehaviour:
   slotTemp: {fileID: 7617428050136512621, guid: 4cab14e942346414983a697986a7bf0a,
     type: 3}
   contentHolder: {fileID: 2539882735653778097}
-  allButtons: {fileID: 0}
+  allButtons: {fileID: 7311220520276145072, guid: 1881909035bdadf40a0000291fdc555c,
+    type: 3}
   Qtext: {fileID: 0}
   descSpace: {fileID: 0}
   Ktext: {fileID: 0}
@@ -724,13 +727,13 @@ MonoBehaviour:
   strcurrent: {fileID: 0}
   craftui: {fileID: 9065036633031740313}
   crafton: 1
-  objui: {fileID: 0}
+  objui: {fileID: 1815361659483963797, guid: d7ab0b9aced21b148ba85fec796409c3, type: 3}
   pre_objui: {fileID: 4046504087882256406, guid: d7ab0b9aced21b148ba85fec796409c3,
     type: 3}
   uisign: {fileID: 4797798287594347357, guid: 3b2b28641be9bd9459b24c533da99863, type: 3}
   canvas: {fileID: 1649467260405057250}
   uiDQRS: {fileID: 315613818070882853}
-  uiDesc: {fileID: 2117905280692142905, guid: 44a50adbaf805b04ba60856fab60cbd9, type: 3}
+  uiDesc: {fileID: 1814474961979876253, guid: 44a50adbaf805b04ba60856fab60cbd9, type: 3}
   uiBTNS: {fileID: 7311220520276145072, guid: 1881909035bdadf40a0000291fdc555c, type: 3}
   uiKeyu: {fileID: 1485926421700655746, guid: 388944c1203cfc7498630037bbc8d9c1, type: 3}
   cc: {fileID: 7167662983067830938}
@@ -827,10 +830,10 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 90, y: 90}
-  m_Spacing: {x: 10, y: 10}
+  m_CellSize: {x: 64, y: 64}
+  m_Spacing: {x: 6, y: 6}
   m_Constraint: 1
-  m_ConstraintCount: 7
+  m_ConstraintCount: 10
 --- !u!1 &6297840498957081846
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,7 +945,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -10}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7547859278198815909
@@ -1857,7 +1860,7 @@ PrefabInstance:
     - target: {fileID: 6318700460903435028, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
       propertyPath: far clip plane
-      value: 800
+      value: 175
       objectReference: {fileID: 0}
     - target: {fileID: 7410738029844459690, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
@@ -1997,6 +2000,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1201274425125816921}
+    - targetCorrespondingSourceObject: {fileID: 4031696834700952788, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8679019617266783787}
     - targetCorrespondingSourceObject: {fileID: 2145777551731333124, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
       insertIndex: -1
@@ -2125,6 +2132,18 @@ MonoBehaviour:
   hungerdmg: 4
   healthBar: {fileID: 0}
   hungerBar: {fileID: 0}
+--- !u!114 &8679019617266783787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2211191862671032799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3790791672940666127 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2145777551731333124, guid: 45c3f3910e2c3af4d8432f6f88b178f8,

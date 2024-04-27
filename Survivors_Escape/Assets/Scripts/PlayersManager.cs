@@ -5,6 +5,8 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine.InputSystem;
 using System.Runtime.ConstrainedExecution;
+using FLS;
+using FLS.Rules;
 
 public class PlayersManager : NetworkBehaviour
 {
@@ -22,6 +24,7 @@ public class PlayersManager : NetworkBehaviour
     {
         Instance = this;
         Invoke(nameof(GetPlayersInSession), 2);
+        TestCVE();
         Invoke(nameof(E_P_Invoke), 25);
         //Instantiate(Chest1);
     }
@@ -84,6 +87,30 @@ public class PlayersManager : NetworkBehaviour
         }
         Invoke(nameof(CEV_MaterialCollection), 20);
     }
+
+    public void TestCVE()
+    {
+        var water = new LinguisticVariable("Water");
+        var cold = water.MembershipFunctions.AddTrapezoid("Cold", 0, 0, 20, 40);
+        var warm = water.MembershipFunctions.AddTriangle("Warm", 30, 50, 70);
+        var hot = water.MembershipFunctions.AddTrapezoid("Hot", 50, 80, 100, 100);
+
+        var power = new LinguisticVariable("Power");
+        var low = power.MembershipFunctions.AddTriangle("Low", 0, 25, 50);
+        var high = power.MembershipFunctions.AddTriangle("High", 25, 50, 75);
+
+        IFuzzyEngine fuzzyEngine = new FuzzyEngineFactory().Default();
+
+        var rule1 = Rule.If(water.Is(cold).Or(water.Is(warm))).Then(power.Is(high));
+        var rule2 = Rule.If(water.Is(hot)).Then(power.Is(low));
+        fuzzyEngine.Rules.Add(rule1, rule2);
+
+        double result = fuzzyEngine.Defuzzify(new { water = 50 });
+
+        Debug.Log("EL RESULTADO ES: ");
+        Debug.Log(result.ToString());
+    }
+
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // Support the structures breaking // Support the repository (Material / Weapon / Tool / Cons / Special / Unique)
     // Material = 1, Weapon = 2, Tool = 2, Consumable = 2, Special = 3, Unique = 3
@@ -564,6 +591,7 @@ public class PlayersManager : NetworkBehaviour
         float d = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)); // Mathf.Pow((x2 - x1), 2.0f)
         return d;
     }
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion de promedios
     float E_Promedio(List<float> acev)
     {
@@ -585,4 +613,21 @@ public class PlayersManager : NetworkBehaviour
         Invoke(nameof(E_P_Invoke), 25);
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // EXTRA : Funcion de muerte
+
+    SurvivorsEscape.CharacterController p_died;
+    public void SyncDeadState(SurvivorsEscape.CharacterController itsme)
+    {
+        p_died = itsme;
+        SyncDeadStateClientRPC();
+    }
+
+    [ClientRpc]
+    public void SyncDeadStateClientRPC()
+    {
+        foreach (SurvivorsEscape.CharacterController p in playerReference)
+        {
+            p_died.inv.Pstats.respawnTime = 2;
+        }
+    }
 }

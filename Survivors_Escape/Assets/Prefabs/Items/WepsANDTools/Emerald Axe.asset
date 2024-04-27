@@ -20,7 +20,7 @@ MonoBehaviour:
   itPrefab: {fileID: 6018988607588332743, guid: 58f16df66d2bfba499f7774c05cdfaba,
     type: 3}
   isStackable: 0
-  maxStack: 35
+  maxStack: 96
   value: 0
   plusHB: 0
   plusHP: 0

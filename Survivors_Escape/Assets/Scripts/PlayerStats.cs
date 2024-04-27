@@ -49,7 +49,7 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         //cc = GetComponent<SurvivorsEscape.CharacterController>();
-        player_tmbt.SetActive(false);
+        //player_tmbt.SetActive(false);
         if (cc != null)
         {
             if (cc.IsOwner)
@@ -152,7 +152,7 @@ public class PlayerStats : MonoBehaviour
             player_tmbt.SetActive(true);
             GoRespawnTime();
 
-            inv.IsDeadAsHell();
+            //inv.IsDeadAsHell();
         }
         if (health > maxhealth)
         {

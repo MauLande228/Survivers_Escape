@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -154,7 +155,7 @@ public class STR_Main : NetworkBehaviour
                     CheckStored(st);
                     break;
                 case 2:
-                    Check2();
+                    Check3();
                     break;
             }
 
@@ -214,7 +215,87 @@ public class STR_Main : NetworkBehaviour
         }
     }
 
-    public void Check2()
+    // 15 Plains -> 1 Gas Barrel ----- Found in Forest
+    // 15 Fantasy -> 1 Gear ----- Found in Density
+    // 15 Forest -> 1 PressG ----- Found in Plains
+    // 15 Density -> 1 ElecEng ----- Found in Fantasy
+    public void CheckEssenceTrade()
+    {
+        if (sslots[0].itemdata != null)
+        {
+            if (sslots[0].itemdata.itName.ToString() == inp_name)
+            {
+                if (sslots[0].stack >= inp_numb)
+                {
+                    sslots[0].itemdata = out_item;
+                    sslots[0].stack = out_numb;
+                }
+            }
+        }
+    }
+
+    public void CheckCycleTrade()
+    {
+        if (sslots[0].itemdata != null)
+        {
+            int ns = 0;
+            switch (sslots[0].itemdata.itName.ToString())
+            {
+                case "Leaves": // itemsList[7]
+                    if(sslots[0].stack > 5){ ns = (int)Math.Round(sslots[0].stack * 0.8); }
+                    sslots[0].itemdata = all_sos._itemsList[6];
+                    sslots[0].stack = ns;
+                    break;
+                case "Lianas": // itemsList[6]
+                    if (sslots[0].stack > 5) { ns = (int)Math.Round(sslots[0].stack * 0.8); }
+                    sslots[0].itemdata = all_sos._itemsList[5];
+                    sslots[0].stack = ns;
+                    break;
+                case "Cobweb": // itemsList[5]
+                    if (sslots[0].stack > 5) { ns = (int)Math.Round(sslots[0].stack * 0.8); }
+                    sslots[0].itemdata = all_sos._itemsList[7];
+                    sslots[0].stack = ns;
+                    break;
+                default:
+                    break;
+            }
+            
+            
+        }
+    }
+
+    public void CheckGemsTrade()
+    {
+        if (sslots[0].itemdata != null)
+        {
+            switch (sslots[0].itemdata.itName.ToString())
+            {
+                case "Emerald": // itemsList[]
+                    if (sslots[0].stack >= 20)
+                    {
+                        sslots[0].itemdata = all_sos._itemsList[44];
+                        sslots[0].stack = 1;
+                    }
+                    break;
+                case "Ruby": // itemsList[]
+                    if (sslots[0].stack >= 20)
+                    {
+                        sslots[0].itemdata = all_sos._itemsList[45];
+                        sslots[0].stack = 1;
+                    }
+                    break;
+                case "Diamond": // itemsList[]
+                    if (sslots[0].stack >= 20)
+                    {
+                        sslots[0].itemdata = all_sos._itemsList[46];
+                        sslots[0].stack = 1;
+                    }
+                    break;
+            }
+        }
+    }
+
+    public void Check3()
     {
         if (sslots[0].itemdata != null)
         {

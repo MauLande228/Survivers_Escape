@@ -22,4 +22,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 466643ea6e834fb4c86a192c7fa280fa, type: 2}
   out_tm: 8
   out_it: {fileID: 11400000, guid: 0403f46a99481184390b4ebe738f0a51, type: 2}
-  out_nn: 50
+  out_nn: 96

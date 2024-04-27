@@ -31,10 +31,10 @@ public class STR_Objectives : MonoBehaviour
 
     public void ResetAll()
     {
-        o_gbarrel.text = "0/6 - Gas Barrel";
+        o_gbarrel.text = "0/2 - Gas Barrel";
         o_eleceng.text = "0/1 - Elec Engine";
         o_wood.text = "0/200 - Wood";
-        o_gear.text = "0/4 - Gear";
+        o_gear.text = "0/2 - Gear";
         o_pressg.text = "0/1 Pressure Gauge";
         o_stone.text = "0/200 - Stone";
     }

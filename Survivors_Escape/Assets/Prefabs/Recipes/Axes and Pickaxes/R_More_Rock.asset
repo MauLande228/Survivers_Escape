@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: R_More_Rock
   m_EditorClassIdentifier: 
   rdata: {fileID: 11400000, guid: 78e37e64be14e8840b735b6eb21a9198, type: 2}
-  rneed: 50
+  rneed: 40

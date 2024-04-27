@@ -7,7 +7,7 @@ using UnityEngine;
 public class RESC_BushCollide : NetworkBehaviour
 {
     // public SpawnableList all_sos; 
-    public int bushtype = 0; // 0:Forest // 1:Density // 2:Plains // 3:Fantasy
+    // public int bushtype = 0; // 0:Forest // 1:Density // 2:Plains // 3:Fantasy
 
     public Inv_itemSO it1; // 3:Wood // 4:Rock // 5:Cobweb // 6:Liana // 7:Leaves
     public Inv_itemSO it2; // 20 : Pine < Coco // 21 : Mango > Orange > Apple // 25 : Banana > Litchi > Carrot // 28 : Star > Blue > Plus

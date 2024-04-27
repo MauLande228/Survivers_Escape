@@ -1,27 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PLY_CollideTombstone : MonoBehaviour
+public class PLY_CollideTombstone : NetworkBehaviour
 {
     public PlayerStats stats;
     public bool touchlock = true;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            Debug.Log("+ + + + + + + + ITS PLAYER");
             GameObject go = other.gameObject;
             SurvivorsEscape.CharacterController cc = go.GetComponent<SurvivorsEscape.CharacterController>();
 
-            if ( cc != null)
+            if (cc != null)
             {
-                if (cc.IsOwner)
+                if (touchlock)
                 {
-                    if (touchlock)
-                    {
-                        touchlock = false;
-                        stats.respawnTime = 1;
-                    }
+                    Debug.Log("+ + + + + + + + TOUCH LOCK");
+                    touchlock = false;
+
+                    stats.inv.gchecks.SyncDeadState(stats.cc);
                 }
             }
         }

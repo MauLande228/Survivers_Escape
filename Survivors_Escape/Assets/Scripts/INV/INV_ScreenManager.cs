@@ -18,7 +18,7 @@ public class INV_ScreenManager : MonoBehaviour
     private KeyCode[] keyCodes = new KeyCode[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8 };
 
     [Header("Settings")]
-    public int invSize = 7; // Defines the amount of inventory slots
+    public int invSize = 10; // Defines the amount of inventory slots
     public int invVals = 0; // Stores the inventory value
     public int selectedSlot = 0;
     public int currentSlot = 0;
@@ -205,7 +205,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                     if (Input.GetKeyDown(KeyCode.RightArrow))
                     {
-                        if (currentSlot < 6) { selectedSlot += 1; ChangeSelected(selectedSlot); }
+                        if (currentSlot < 9) { selectedSlot += 1; ChangeSelected(selectedSlot); }
                     }
                     if (Input.GetKeyDown(KeyCode.LeftArrow))
                     {
@@ -408,7 +408,7 @@ public class INV_ScreenManager : MonoBehaviour
         {
             if (cc.IsOwner)
             {
-                if (newSlotPos >= 0 && newSlotPos <= 6)
+                if (newSlotPos >= 0 && newSlotPos <= 9)
                 {
                     allSlots[currentSlot].UnselectS();
                     allSlots[newSlotPos].SelectS();
@@ -564,26 +564,26 @@ public class INV_ScreenManager : MonoBehaviour
                 break;
 
             case 6: //Emerald Recipes
-                craftui.recs[2] = craftui.allr[2];
                 craftui.recs[3] = craftui.allr[3];
-                craftui.AddRecs(2);
+                craftui.recs[4] = craftui.allr[4];
                 craftui.AddRecs(3);
+                craftui.AddRecs(4);
                 gchecks.CEV_NCT_UpdateHighestGem(1);
                 break;
 
             case 7: //Ruby Recipes
-                craftui.recs[4] = craftui.allr[4];
                 craftui.recs[5] = craftui.allr[5];
-                craftui.AddRecs(4);
+                craftui.recs[6] = craftui.allr[6];
                 craftui.AddRecs(5);
+                craftui.AddRecs(6);
                 gchecks.CEV_NCT_UpdateHighestGem(2);
                 break;
 
             case 8: //Diamond Recipes
-                craftui.recs[6] = craftui.allr[6];
                 craftui.recs[7] = craftui.allr[7];
-                craftui.AddRecs(6);
+                craftui.recs[8] = craftui.allr[8];
                 craftui.AddRecs(7);
+                craftui.AddRecs(8);
                 gchecks.CEV_NCT_UpdateHighestGem(3);
                 break;
         }

@@ -77,7 +77,7 @@ public class SurvivorsEscapeManager : NetworkBehaviour
         {
             Transform playerTransform = Instantiate(playerPrefab, playerPosition);
             playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
-            playerPosition.position = playerPosition.position + new Vector3(1, 0, 0);
+            playerPosition.position = playerPosition.position + new Vector3(4, 0, 0);
         }
     }
 

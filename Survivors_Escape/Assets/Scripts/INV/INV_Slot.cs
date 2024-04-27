@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using Unity.Netcode;
 
 public class Slot : MonoBehaviour, IPointerClickHandler
