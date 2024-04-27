@@ -12,6 +12,7 @@ public class PlayersManager : NetworkBehaviour
 {
     public static PlayersManager Instance { get; private set; }
     public STR_Main MainRepository;
+    public SpawnableList spw;
     public GameObject Chest1;
 
     [Header("Refs")]
@@ -64,7 +65,6 @@ public class PlayersManager : NetworkBehaviour
         {
             playerInventory.Add(p.GetComponentInChildren<INV_ScreenManager>());
         }
-
         foreach (INV_ScreenManager v in playerInventory)
         {
             v.SetChecks(this);
@@ -314,9 +314,10 @@ public class PlayersManager : NetworkBehaviour
             checknearest.Add(nearestd);
             cevR4 += 1;
 
-            if(nearestd < 2)
+            if(nearestd < 3)
             {
                 cont4 = false;
+                player_one.ReviveMe();
             }
 
             Invoke(nameof(CEV_ADP_Invoke), 5);

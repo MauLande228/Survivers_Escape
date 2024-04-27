@@ -25,9 +25,7 @@ public class PlayerStats : MonoBehaviour
     public SurvivorsEscape.CharacterController cc;
 
     public Vector3 respawnPos = new(516, 38, 34);
-    public GameObject player_real;
-    public GameObject player_tmbt;
-    public int respawnTime = 10;
+    public int respawnTime = 20;
 
     [Header("Enough")]
     public float regenhealth = 0.25f;
@@ -147,12 +145,10 @@ public class PlayerStats : MonoBehaviour
             life_lock = true;
             health = 0;
 
-            player_real.SetActive(false);
             cc._proning = true;
-            player_tmbt.SetActive(true);
             GoRespawnTime();
 
-            //inv.IsDeadAsHell();
+            inv.IsDeadAsHell();
         }
         if (health > maxhealth)
         {
@@ -175,7 +171,6 @@ public class PlayerStats : MonoBehaviour
         respawnTime -= 1;
         if (respawnTime < 1)
         {
-            player_tmbt.SetActive(false);
             Transform playernow = GetComponent<Transform>();
             playernow.position = respawnPos;
             health = 50;
@@ -183,8 +178,7 @@ public class PlayerStats : MonoBehaviour
             life_lock = false;
             hunger_lock = false;
             cc._proning = false;
-            player_real.SetActive(true);
-            respawnTime = 10;
+            respawnTime = 20;
         }
         else
         {

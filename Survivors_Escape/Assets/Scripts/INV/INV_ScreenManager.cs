@@ -24,6 +24,7 @@ public class INV_ScreenManager : MonoBehaviour
     public int currentSlot = 0;
 
     [Header("Refs")]
+    public SpawnableList spw;
     public Transform dropPos;
 
     public GameObject slotTemp;
@@ -95,7 +96,6 @@ public class INV_ScreenManager : MonoBehaviour
                 GenUIAlerts();
                 GenObjList();
 
-                ChangeSelected(0);
                 //strui = GetComponentInChildren<STR_UI>();
                 //craftui = GetComponentInChildren<CraftManager>();
                 //objui = GetComponentInChildren<STR_Objectives>();
@@ -103,6 +103,8 @@ public class INV_ScreenManager : MonoBehaviour
                 currentTool = 0;
                 opened = false;
                 hasTool = false;
+
+                Invoke(nameof(SetStartEquipment), 5);
             }
         }
     }
@@ -254,7 +256,13 @@ public class INV_ScreenManager : MonoBehaviour
     {
         uid = id;
     }
-
+    public void SetStartEquipment()
+    {
+        currentSlot = 0;
+        ChangeSelected(currentSlot);
+        bool naxe = CreateItem(spw._itemsList[12], 96); // Give player a stone axe
+        bool npck = CreateItem(spw._itemsList[11], 60); // Give player a stone pickaxe
+    }
     public void SetChecks(PlayersManager pd)
     {
         gchecks = pd;
@@ -402,8 +410,6 @@ public class INV_ScreenManager : MonoBehaviour
 
     public void ChangeSelected(int newSlotPos)
     {
-        SurvivorsEscape.CharacterController cc = dropPos.GetComponentInParent<SurvivorsEscape.CharacterController>();
-
         if (cc != null)
         {
             if (cc.IsOwner)

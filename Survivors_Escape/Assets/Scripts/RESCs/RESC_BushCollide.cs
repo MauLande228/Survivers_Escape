@@ -51,10 +51,13 @@ public class RESC_BushCollide : NetworkBehaviour
 
                 Debug.Log("+ - + - + - + - + ARBUSTO");
 
+                r = rnd.Next(14);
                 inv = other.GetComponentInChildren<INV_ScreenManager>();
-
-                int l = inv.ApplyLUCK();
-                r = l + rnd.Next(14);
+                if(inv != null)
+                {
+                    int l = inv.ApplyLUCK();
+                    r += l;
+                }
                 s = rnd.Next(3);
 
                 inv.ApplyDMG();

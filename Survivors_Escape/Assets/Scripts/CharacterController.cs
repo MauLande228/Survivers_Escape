@@ -539,5 +539,13 @@ namespace SurvivorsEscape
         public Transform GetPlayerTransform() { return transform; }
 
         public bool IsPlayerOwner() { return IsOwner; }
+
+        public void ReviveMe()
+        {
+            if (IsOwner)
+            {
+                inv.Pstats.respawnTime = 2;
+            }
+        }
     }
 }
