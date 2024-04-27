@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class BulletTarget : MonoBehaviour
 {
-    void Start()
+    private int count = 10;
+    
+    public void LoseCount()
     {
-        
-    }
-
-    void Update()
-    {
-        
+        count -= 1;
+        if (count < 1)
+        {
+            Destroy(gameObject);
+        }
     }
 }

@@ -25,14 +25,15 @@ public class BulletProjectile : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         string collidedObjectName = other.gameObject.name;
-
+        BulletTarget bt = other.GetComponent<BulletTarget>();
         // Do something with the name
         Debug.Log("Bullet hit: " + collidedObjectName);
 
-        if (other.GetComponent<BulletTarget>() != null)
+        if (bt != null)
         {
             // Hit target
             Instantiate(vfxHitGreen, transform.position, Quaternion.identity);
+            bt.LoseCount();
         }
         else
         {

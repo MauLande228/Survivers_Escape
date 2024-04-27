@@ -40,6 +40,8 @@ public class PlayerStats : MonoBehaviour
     public StatsBar healthBar;
     public StatsBar hungerBar;
 
+    private SurvivorsEscape.CharacterController _CharacterController;
+
     private float possibledmg;
     //public UI_opacity_time uicolor;
 
@@ -193,11 +195,13 @@ public class PlayerStats : MonoBehaviour
         if (possibledmg > 0) { health -= possibledmg; }
     }
 
-    private void ApplyDamage(float dmg)
+    public void ApplyDamage(float dmg)
     {
         possibledmg = dmg * defense;
         health -= possibledmg;
     }
+
+
 
     // All frutal permanent buffs
     private void FDessert() { defense -= 0.1f; }
