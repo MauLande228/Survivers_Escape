@@ -99,7 +99,7 @@ namespace SurvivorsEscape
 
         private void Start()
         {
-            _hasGun = false;
+            _hasGun = true;
 
             _animator = GetComponent<Animator>();
             _cameraController = IsOwner ? GetComponent<CameraController>() : null;
@@ -318,14 +318,14 @@ namespace SurvivorsEscape
 
                         Vector3 aimDir = (_mouseWorldPosition - _spawnBulletPosition.position).normalized;
 
-                        Spawner.Instace.SpawnBulletServerRpc(_spawnBulletPosition.position.x,
+                        /*Spawner.Instace.SpawnBulletServerRpc(_spawnBulletPosition.position.x,
                             _spawnBulletPosition.position.y,
                             _spawnBulletPosition.position.z,
                             aimDir.x,
                             aimDir.y,
-                            aimDir.z);
+                            aimDir.z);*/
 
-                        //Instantiate(_bullerProjectile, _spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+                        Instantiate(_bullerProjectile, _spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
 
                         /*if (hitTransform != null)
                         {
