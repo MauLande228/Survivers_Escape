@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
   m_Name: FrutalDessert
   m_EditorClassIdentifier: 
-  itType: 3
+  itType: 4
   itName: Frutal Dessert
   itDesc: A combination of certain fruits. It increases your maximum hunger in 5
     points
@@ -21,7 +21,7 @@ MonoBehaviour:
   itPrefab: {fileID: 4018485583720525432, guid: 45d987a7633748042976022bc511fa73,
     type: 3}
   isStackable: 1
-  maxStack: 5
+  maxStack: 10
   value: 0
   plusHB: 10
   plusHP: 10

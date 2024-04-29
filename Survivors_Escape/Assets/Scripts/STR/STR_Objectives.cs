@@ -31,12 +31,12 @@ public class STR_Objectives : MonoBehaviour
 
     public void ResetAll()
     {
-        o_gbarrel.text = "0/2 - Gas Barrel";
+        o_gbarrel.text = "0/1 - Gas Barrel";
         o_eleceng.text = "0/1 - Elec Engine";
-        o_wood.text = "0/200 - Wood";
-        o_gear.text = "0/2 - Gear";
+        o_wood.text = "0/100 - Wood";
+        o_gear.text = "0/1 - Gear";
         o_pressg.text = "0/1 Pressure Gauge";
-        o_stone.text = "0/200 - Stone";
+        o_stone.text = "0/150 - Stone";
     }
 
     public void UpTitle() // Objectives
@@ -45,18 +45,18 @@ public class STR_Objectives : MonoBehaviour
     }
     public void UpGBarrel(int n) // 0/6 - Gas Barrel
     {
-        if(n > 3)
+        if(n > 0)
         {
-            o_gbarrel.text = "<color=#1A8DC6>" + n.ToString() + "/6 - Gas Barrel</color>";
+            o_gbarrel.text = "<color=#1A8DC6>" + n.ToString() + "/1 - Gas Barrel</color>";
         }
         else
         {
-            o_gbarrel.text = n.ToString() + "/6 - Gas Barrel";
+            o_gbarrel.text = n.ToString() + "/1 - Gas Barrel";
         }
     }
     public void UpElecEng(int n) // 0/1 - Elec Engine
     {
-        if (n == 1)
+        if (n > 0)
         {
             o_eleceng.text = "<color=#1A8DC6>" + n.ToString() + "/1 - Electric Engine</color>";
         }
@@ -69,29 +69,29 @@ public class STR_Objectives : MonoBehaviour
     public void UpWood(int n) // 0/200 - Wood
     {
         nwood += n;
-        if (nwood > 200)
+        if (nwood > 99)
         {
-            o_wood.text = "<color=#1A8DC6>" + nwood.ToString() + "/200 - Wood</color>";
+            o_wood.text = "<color=#1A8DC6>" + nwood.ToString() + "/100 - Wood</color>";
         }
         else
         {
-            o_wood.text = nwood.ToString() + "/200 - Wood";
+            o_wood.text = nwood.ToString() + "/100 - Wood";
         }
     }
     public void UpGear(int n) // 0/4 - Gear
     {
-        if (n == 4)
+        if (n > 0)
         {
-            o_gear.text = "<color=#1A8DC6>" + n.ToString() + "/4 - Gear</color>";
+            o_gear.text = "<color=#1A8DC6>" + n.ToString() + "/1 - Gear</color>";
         }
         else
         {
-            o_gear.text = n.ToString() + "/4 - Gear";
+            o_gear.text = n.ToString() + "/1 - Gear";
         }
     }
     public void UpPressG(int n) // 0/1 Pressure Gauge
     {
-        if (n == 1)
+        if (n > 0)
         {
             o_pressg.text = "<color=#1A8DC6>" + n.ToString() + "/1 Pressure Gauge</color>";
         }
@@ -104,13 +104,13 @@ public class STR_Objectives : MonoBehaviour
     public void UpStone(int n) // 0/200 - Stone
     {
         nstone += n;
-        if (nstone > 200)
+        if (nstone > 149)
         {
-            o_stone.text = "<color=#1A8DC6>" + nstone.ToString() + "/200 - Stone</color>";
+            o_stone.text = "<color=#1A8DC6>" + nstone.ToString() + "/150 - Stone</color>";
         }
         else
         {
-            o_stone.text = nstone.ToString() + "/200 - Stone";
+            o_stone.text = nstone.ToString() + "/150 - Stone";
         }
     }
     public void UpResetWS()

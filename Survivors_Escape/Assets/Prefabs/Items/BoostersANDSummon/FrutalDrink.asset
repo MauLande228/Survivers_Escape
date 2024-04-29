@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
   m_Name: FrutalDrink
   m_EditorClassIdentifier: 
-  itType: 3
+  itType: 4
   itName: Frutal Drink
   itDesc: A combination of certain fruits. It increases your luck slightly
   itEqup: 0
@@ -20,7 +20,7 @@ MonoBehaviour:
   itPrefab: {fileID: 5657137418118054131, guid: 91dca74862af2f3408c39254cf4607e8,
     type: 3}
   isStackable: 1
-  maxStack: 5
+  maxStack: 10
   value: 0
   plusHB: 10
   plusHP: 10

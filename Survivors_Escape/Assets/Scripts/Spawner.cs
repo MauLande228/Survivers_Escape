@@ -25,14 +25,14 @@ public class Spawner : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SpawnObjectServerRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid)
     {
-        Debug.Log("SPAWN OBJECT GOT CALLED BY SOMEONE");
+        //Debug.Log("SPAWN OBJECT GOT CALLED BY SOMEONE");
         SetRightValuesClientRpc(itemSOIndex, stackSize, x, y, z, uid);
         
         var pickNO = Instantiate(itDropModel);
 
         var refNO = pickNO.GetComponent<NetworkObject>();
         refNO.Spawn();
-        Debug.Log("THE SPAWNING FINISHED");
+        //Debug.Log("THE SPAWNING FINISHED");
     }
 
     [ClientRpc]
@@ -52,7 +52,7 @@ public class Spawner : NetworkBehaviour
         transform.position = new Vector3(x, y, z);
         pickup.transform.position = transform.position;
 
-        Debug.Log("THE VALUES WERE SET RIGHT FOR EVERYONE");
+        //Debug.Log("THE VALUES WERE SET RIGHT FOR EVERYONE");
     }
 
     [ServerRpc]

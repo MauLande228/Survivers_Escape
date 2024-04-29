@@ -96,6 +96,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     {
         data = data1;
         stackSize = stackSize1;
+        this.UpdateSlot();
     }
 
     public void AddStackAmount(int stackSize1)

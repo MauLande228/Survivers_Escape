@@ -17,10 +17,10 @@ namespace SurvivorsEscape
         private EventHandler _eventHandler;
         private CapsuleCollider _capsuleCollider;
         private CharacterStance _stance;
-        private bool _IsDead = false;
+        public bool _IsDead = false;
 
         [Header("Speed [Normal Sprint]")]
-        [SerializeField] private Vector3 _standingSpeed = new Vector3(6, 8, 2);
+        [SerializeField] private Vector3 _standingSpeed = new Vector3(6, 9, 2);
         [SerializeField] private Vector2 _crouchingSpeed = new Vector2(0, 0);
 
         [Header("Capsule [Radius Height YOffset]")]
@@ -31,7 +31,7 @@ namespace SurvivorsEscape
         [SerializeField] private int _lifeDamage = 5;
         [SerializeField] private int _woodDamage = 12;
         [SerializeField] private int _rockDamage = 7;
-        [SerializeField] public int _luckyPoint = 6;
+        [SerializeField] public int _luckyPoint = 0;
         [SerializeField] private SEHitBox _hitBox;
 
         [Header("Sharpness")]
@@ -71,7 +71,7 @@ namespace SurvivorsEscape
 
         private bool _strafing;
         private bool _sprinting;
-        private bool _hasGun;
+        public bool _hasGun;
         private float _strafeParameter;
         private Vector3 _strafeParameterXZ;
 
@@ -100,10 +100,11 @@ namespace SurvivorsEscape
 
         public INV_ScreenManager inv;
         public ulong uid;
+        public GameObject theEnemy;
 
         private void Start()
         {
-            _hasGun = true;
+            _hasGun = false;
 
             _animator = GetComponent<Animator>();
             _cameraController = IsOwner ? GetComponent<CameraController>() : null;
@@ -190,24 +191,24 @@ namespace SurvivorsEscape
             Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection);
             Vector3 moveInputVectorOrientation = cameraPlanarRotation * moveInputVector.normalized;
 
-            if (_inputs.CursosrEnable.PressedDown())
-            {
-                if (_bInvOpen)
-                {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    _bInvOpen = false;
-                    Debug.Log("Inv close");
-                }
-                else
-                {
-                    Cursor.lockState = CursorLockMode.None;
-                    _bInvOpen = true;
-                    Debug.Log("Inv open");
-                }
-            }
+            //if (_inputs.CursosrEnable.PressedDown())
+            //{
+            //    if (_bInvOpen)
+            //    {
+            //        Cursor.lockState = CursorLockMode.Locked;
+            //        _bInvOpen = false;
+            //        //Debug.Log("Inv close");
+            //    }
+            //    else
+            //    {
+            //        Cursor.lockState = CursorLockMode.None;
+            //        _bInvOpen = true;
+            //        //Debug.Log("Inv open");
+            //    }
+            //}
 
-            if (Cursor.lockState != CursorLockMode.Locked)
-                return;
+            //if (Cursor.lockState != CursorLockMode.Locked)
+            //    return;
 
             if (_inputs.Aim.Pressed())
             {
@@ -321,36 +322,37 @@ namespace SurvivorsEscape
                 {
                     if (_inputs.Attack.PressedDown())
                     {
-                        _inAnimation = true;
-                        _animator.CrossFadeInFixedTime(_shootRifle, 0.1f, 0, 0);
-
-                        Vector3 aimDir = (_mouseWorldPosition - _spawnBulletPosition.position).normalized;
-
-                        /*Spawner.Instace.SpawnBulletServerRpc(_spawnBulletPosition.position.x,
-                            _spawnBulletPosition.position.y,
-                            _spawnBulletPosition.position.z,
-                            aimDir.x,
-                            aimDir.y,
-                            aimDir.z);*/
-
-                        Instantiate(_bullerProjectile, _spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
-
-                        /*if (hitTransform != null)
+                        if (_strafing)
                         {
-                            if (hitTransform.GetComponent<BulletTarget>() != null)
-                            {
-                                Instantiate(_vfxParticlesCollition, transform.position, Quaternion.identity);
-                            }
-                        }*/
+                            _inAnimation = true;
+                            _animator.CrossFadeInFixedTime(_shootRifle, 0.1f, 0, 0);
 
-                        
+                            Vector3 aimDir = (_mouseWorldPosition - _spawnBulletPosition.position).normalized;
+
+                            /*Spawner.Instace.SpawnBulletServerRpc(_spawnBulletPosition.position.x,
+                                _spawnBulletPosition.position.y,
+                                _spawnBulletPosition.position.z,
+                                aimDir.x,
+                                aimDir.y,
+                                aimDir.z);*/
+
+                            Instantiate(_bullerProjectile, _spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+
+                            /*if (hitTransform != null)
+                            {
+                                if (hitTransform.GetComponent<BulletTarget>() != null)
+                                {
+                                    Instantiate(_vfxParticlesCollition, transform.position, Quaternion.identity);
+                                }
+                            }*/
+                        }
                     }
                 }
             }
 
             if(_hitting)
             {
-                Debug.Log("+ - + - + - + - + - + - + - + Se dio el golpe");
+                //Debug.Log("+ - + - + - + - + - + - + - + Se dio el golpe");
                 _hitBox.CheckHit();
             }
         }
@@ -567,7 +569,16 @@ namespace SurvivorsEscape
         {
             if (IsOwner)
             {
-                inv.Pstats.respawnTime = 2;
+                inv.Pstats.respawnTime = 0;
+            }
+        }
+
+        public void SpawnEnemy(ulong nid)
+        {
+            if (uid == nid)
+            {
+                Vector3 enemypos = this.gameObject.transform.position + new Vector3(0, 5, 0);
+                Instantiate(theEnemy, enemypos, Quaternion.identity);
             }
         }
     }

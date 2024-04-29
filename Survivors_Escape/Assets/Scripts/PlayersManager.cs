@@ -7,26 +7,33 @@ using UnityEngine.InputSystem;
 using System.Runtime.ConstrainedExecution;
 using FLS;
 using FLS.Rules;
+using UnityEngine.UIElements;
+using System;
 
 public class PlayersManager : NetworkBehaviour
 {
     public static PlayersManager Instance { get; private set; }
-    public STR_Main MainRepository;
     public SpawnableList spw;
     public GameObject Chest1;
+    private static readonly System.Random rnd = new();
 
     [Header("Refs")]
     public List<NetworkObject> playerObjects = new List<NetworkObject>();
-    public List<INV_ScreenManager> playerInventory = new List<INV_ScreenManager>();
-    public List<SurvivorsEscape.CharacterController> playerReference = new List<SurvivorsEscape.CharacterController>();
+
+    public List<SurvivorsEscape.CharacterController> playerReference = new();
+    public List<INV_ScreenManager> playerInventory = new();
+    public List<PlayerStats> playerStatistics = new();
+
     public List<float> cev_allvgs = new List<float>();
+
+    public int testvar = 0;
 
     void Start()
     {
         Instance = this;
-        Invoke(nameof(GetPlayersInSession), 2);
-        TestCVE();
-        Invoke(nameof(E_P_Invoke), 25);
+        Invoke(nameof(GetPlayersInSession), 10);
+        //TestCVE();
+        Invoke(nameof(CEV_RBID_InvokeCheck), 60);
         //Instantiate(Chest1);
     }
 
@@ -52,18 +59,19 @@ public class PlayersManager : NetworkBehaviour
                 playerObjects.Add(obj);
             }
             // Check if the object is a chest object
-            if (obj.CompareTag("Chest"))
-            {
-                if (obj.GetComponent<STR_Main>().bh == 1)
-                {
-                    MainRepository = obj.GetComponent<STR_Main>();
-                }
-            }
+            //if (obj.CompareTag("Chest"))
+            //{
+            //    if (obj.GetComponent<STR_Main>().bh == 1)
+            //    {
+            //        STR_Main MainRepository = obj.GetComponent<STR_Main>();
+            //    }
+            //}
         }
 
         foreach (NetworkObject p in playerObjects)
         {
             playerInventory.Add(p.GetComponentInChildren<INV_ScreenManager>());
+            playerStatistics.Add(p.GetComponent<PlayerStats>());
         }
         foreach (INV_ScreenManager v in playerInventory)
         {
@@ -71,7 +79,6 @@ public class PlayersManager : NetworkBehaviour
             playerReference.Add(v.GetComponentInParent<SurvivorsEscape.CharacterController>());
         }
 
-        Invoke(nameof(CEV_SupportRepository), 20); // Start loop of checking repository
         Invoke(nameof(CEV_MaterialCollection), 20);
     }
 
@@ -111,185 +118,155 @@ public class PlayersManager : NetworkBehaviour
         Debug.Log(result.ToString());
     }
 
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-    // Support the structures breaking // Support the repository (Material / Weapon / Tool / Cons / Special / Unique)
-    // Material = 1, Weapon = 2, Tool = 2, Consumable = 2, Special = 3, Unique = 3
-    // + Considerar de manera general cuanto está aportando el equipo al repositorio cada x tiempo
-    // + Cada cierto tiempo revisar cuantos puntos se han adquirido
-    public List<float> cev_supprep = new List<float>();
-    public int prevx = 0;
-    public int x = 0;
-    public int y = 0;
-    public void CEV_SupportRepository()
-    {
-        float cev = 0.0f;
-        x = 0;
-        y = 0;
-        string z = "";
+    // A L L - A V E R A G E - A N D - P R O C E S S I N G
 
-        // Referencia al repositorio central
-        for (int i = 0; i < MainRepository.sslots.Length; i++)
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    // Manera de recolectar todos los datos
+    // Listas que reciben el ID del player para posicionar EL VALOR en su posicion respectiva de una lista ya de tamaño players_amount
+    // Crear las listas desde el inicio y cada vez que termina el jugador, con serverRPC y clientRPC sincronizar todas las listas
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+
+    // H I S T O R Y - O F - P E R M A N E N T - B U F F S
+
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    public List<ulong> cev_historybuffs = new();
+    public double variance = 0;
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CEV_RegisterBuffByIDServerRpc(ulong uid)
+    {
+        CEV_RBID_SyncClientRpc(uid);
+    }
+    [ClientRpc]
+    public void CEV_RBID_SyncClientRpc(ulong uid)
+    {
+        cev_historybuffs.Add(uid);
+    }
+
+    public void CEV_RBID_InvokeCheck()
+    {
+        if (cev_historybuffs.Count > 1) { CEV_RBID_Distribution(); }
+        else { Debug.Log("Not enough players!!!"); }
+        Invoke(nameof(CEV_RBID_InvokeCheck), 60);
+    }
+    public void CEV_RBID_Distribution()
+    {
+        List<ulong> cev_hbdistribution = new();
+        Dictionary<ulong, int> cev_dists = new();
+
+        // Inicializar el diccionario con todos los jugadores en 0
+        for (int i = 0; i < playerObjects.Count; i++) { cev_dists[(ulong)i] = 0; }
+
+        // Obtener todo el historial en una nueva lista
+        foreach (ulong uid in cev_historybuffs) { cev_hbdistribution.Add(uid); }
+
+        // Hacer conteo en diccionario
+        foreach (ulong nid in cev_hbdistribution)
         {
-            if (MainRepository.sslots[i].itemdata != null)
+            if (cev_dists.ContainsKey(nid)) { cev_dists[nid]++; }
+            else { cev_dists[nid] = 0; }
+        }
+
+        // Obtener el conteo en una lista de enteros
+        List<int> cev_allvalues = new();
+        for (int i = 0; i < playerObjects.Count; i++)
+        {
+            cev_allvalues.Add(cev_dists[(ulong)i]);
+        }
+
+        int sum = 0;
+        foreach (int n in cev_allvalues) { sum += n; }
+        double avg = (double)sum / cev_allvalues.Count;
+
+        double sumSquaredDiff = 0;
+        foreach (int n in cev_allvalues)
+        {
+            double diff = n - avg;
+            sumSquaredDiff += diff * diff;
+        }
+
+        variance = sumSquaredDiff / cev_allvalues.Count;
+    }
+
+    public void CEV_RBID_FinalVariance()
+    {
+        float cev;
+        if (variance > 1.2) { cev = 0.1f; }
+        else if (variance > 0.9) { cev = 0.3f; }
+        else if (variance > 0.6) { cev = 0.5f; }
+        else if (variance > 0.3) { cev = 0.7f; }
+        else { cev = 0.9f; }
+    }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+
+    // M O N S T E R - R E A C T I O N
+
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    List<ulong> all_ids = new();
+    [ServerRpc(RequireOwnership = false)]
+    public void CEV_SpawnMonsterServerRpc()
+    {
+        bool spawned = false;
+        foreach (INV_ScreenManager v in playerInventory)
+        {
+            all_ids.Add(v.uid);
+        }
+
+        while (!spawned)
+        {
+            int x = rnd.Next(all_ids.Count);
+            ulong y = all_ids[x];
+
+            foreach (INV_ScreenManager v in playerInventory)
             {
-                z = MainRepository.sslots[i].itemdata.itType.ToString();
-                y = MainRepository.sslots[i].stack;
-                switch (z[0]) // Detectar tipo de item almacenado y obtener valor
+                if (y == v.uid && !v.hasWep)
                 {
-                    case 'M': // Material : 2
-                        x += 1 * y;
-                        break;
-                    case 'W': // Weapon
-                        x += 2 * y;
-                        break;
-                    case 'T': // Tool
-                        x += 2 * y;
-                        break;
-                    case 'C': // Consumable : 4
-                        x += 4 * y;
-                        break;
-                    case 'S': // Special : 20
-                        x += 4 * y;
-                        break;
-                    case 'U': // Unique : 30
-                        x += 32 * y;
-                        break;
+                    v.cc.SpawnEnemy(y);
+                    spawned = true;
                 }
             }
         }
 
-        y = x;
-        x -= prevx;
-        
-        if (x > 64) // Demasiado
-        {
-            cev = 0.9f;
-        }
-        else if (x > 52) // Mucho
-        {
-            cev = 0.7f;
-        }
-        else if (x > 28) // Normal
-        {
-            cev = 0.5f;
-        }
-        else if (x > 16) // Poco
-        {
-            cev = 0.3f;
-        }
-        else // x > 0 // Pobre
-        {
-            cev = 0.1f;
-        }
-
-        prevx = y;
-        
-        cev_supprep.Add(cev); // Enviar valor
-
-        Invoke(nameof(CEV_SupportRepository), 20);
+        Invoke(nameof(CEV_SpawnMonsterServerRpc), 600);
     }
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-
-
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Someone approaching to help in battle situations
-    // Multipeople battle check if same purpose
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
 
+    // H E L P - T H E - D E A D
+
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-    // 0HP player support in time
-    // + Cuanto tiempo se tardan en ayudar a alguien herido
-    int cevS3 = 0; // Estado
-    int cevR3 = 0; // Vueltas
-    public bool cont3 = true;
-    public List<float> cev_suppdead = new List<float>();
-    public void CEV_SupportDeadPlayers()
-    {
-        if (cevS3 == 0)
-        {
-            cont3 = true;
-            cevS3 = 1;
-            CEV_SDP_Invoke();
-        }
-        else
-        {
-            float cev = 0.0f;
-            // Finish count
-            if (cevR3 > 4)
-            {
-                cev = 0.1f;
-            }
-            else if (cevR3 > 3)
-            {
-                cev = 0.3f;
-            }
-            else if (cevR3 > 2)
-            {
-                cev = 0.5f;
-            }
-            else if (cevR3 > 1)
-            {
-                cev = 0.7f;
-            }
-            else // > 0
-            {
-                cev = 0.9f;
-            }
-            // Enviar valor
-            cev_suppdead.Add(cev);
-
-            cevS3 = 0;
-            cevR3 = 0;
-        }
-    }
-    void CEV_SDP_Invoke()
-    {
-        if (cont3)
-        {
-            cevR3 += 1;
-            Invoke(nameof(CEV_SDP_Invoke), 8);
-        }
-        else
-        {
-            CEV_SupportDeadPlayers();
-        }
-    }
-    public void CEV_SDP_Saved()
-    {
-        cont3 = false;
-    }
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-
-
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-    // 0hp support in proximity
-    // Medir progreso de cercania
-    int cevS4 = 0; // Estado
-    int cevR4 = 0; // Vueltas
+    int Lap4 = 1; // Vueltas
     public bool cont4 = true;
-    public List<float> checknearest = new List<float>();
-    public List<float> cev_apprdead = new List<float>();
+    public List<float> checknearest = new();
+    public List<float> cev_apprdead = new();
 
     List<SurvivorsEscape.CharacterController> player_sdp;
     SurvivorsEscape.CharacterController player_one;
     // + No matter the player, check if the nearest distance is closer than the prev one
-    public void CEV_ApproachDeadPlayers(SurvivorsEscape.CharacterController itsme)
+    public void CEV_ApproachDeadPlayers_1(SurvivorsEscape.CharacterController itsme)
     {
         player_sdp = new List<SurvivorsEscape.CharacterController>();
         foreach (SurvivorsEscape.CharacterController p in playerReference)
         {
             player_sdp.Add(p);
         }
-        player_sdp.Remove(itsme);
-        player_one = itsme;
 
-        cont4 = true;
-        cevR4 = 0;
-        checknearest.Clear();
+        player_sdp.Remove(itsme); player_one = itsme;
+        cont4 = true; Lap4 = 1; checknearest.Clear();
+
         CEV_ADP_Invoke();
     }
     void CEV_ADP_Invoke()
@@ -305,75 +282,66 @@ public class PlayersManager : NetworkBehaviour
                 float x2 = p.gameObject.transform.position.x;
                 float y2 = p.gameObject.transform.position.y;
                 float dist = E_Distancia(x1, y1, x2, y2);
-                if (dist < nearestd)
-                {
-                    nearestd = dist;
-                }
+                if (dist < nearestd) { nearestd = dist; }
             }
 
             checknearest.Add(nearestd);
-            cevR4 += 1;
+            Lap4 += 1;
+            if(nearestd < 2.0f) { cont4 = false; player_one.ReviveMe(); }
 
-            if(nearestd < 3)
-            {
-                cont4 = false;
-                player_one.ReviveMe();
-            }
-
-            Invoke(nameof(CEV_ADP_Invoke), 5);
+            Invoke(nameof(CEV_ADP_Invoke), 1);
         }
         else
         {
             CEV_ADP_Reached();
         }
     }
+    public void CEV_ADP_AmAlive(){ cont4 = false; }
     void CEV_ADP_Reached()
     {
-        List<int> proxs = new List<int>();
-        int x = 0;
-
+        List<int> proxs = new();
         float prevd = checknearest[0];
         checknearest.RemoveAt(0);
+
         if (checknearest.Count > 0)
         {
             foreach (float d in checknearest)
             {
-                if (d < prevd)
+                if (prevd < 75.0f)
                 {
-                    proxs.Add(1);
-                    x += 1;
+                    if (d < prevd) { proxs.Add(1); }
+                    else { proxs.Add(0); }
                 }
                 else
                 {
-                    proxs.Add(-1);
-                    x -= 1;
+                    proxs.Add(0);
                 }
+                prevd = d;
             }
         }
 
-        float cev = 0.0f;
-        if (x > 1)
+        int lenp = proxs.Count;
+        int plus = 0;
+        foreach (int x in proxs)
         {
-            cev = 0.8f;
+            plus += x;
         }
-        else if (x > -2 && x < 2)
-        {
-            cev = 0.3f;
-        }
-        else if (x < -1)
-        {
-            cev = 0.1f;
-        }
-        else
-        {
-            cev = 0.0f;
-        }
-        // Enviar valor
-        cev_apprdead.Add(cev);
+        int pavg = plus * 100 / lenp;
+
+        float cev;
+        if (pavg > 80) { cev = 0.9f; }
+        else if (pavg > 60) { cev = 0.7f; }
+        else if (pavg > 40) { cev = 0.5f; }
+        else if (pavg > 20) { cev = 0.3f; }
+        else { cev = 0.1f; }
+        
+        cev_apprdead.Add(cev); // Enviar valor
     }
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
 
-
+    // INV_SM : 1198
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Tool repartition // Craft person available
@@ -559,32 +527,6 @@ public class PlayersManager : NetworkBehaviour
 
 
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Remains Well Fed
-    // + Cada X minutos revisar cuantas veces se mantuvo en el estado de <Bien Alimentado>
-    public void CEV_RemainsWellFed()
-    {
-
-    }
-    void CEV_RWF_Invoke()
-    {
-
-    }
-    public void CEV_RWF_Didnt()
-    {
-
-    }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Frutal Recipes Sharing - CANCELLED FOR NOW
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion de distancia
     float E_Distancia(float x1, float y1, float x2, float y2)
@@ -605,30 +547,5 @@ public class PlayersManager : NetworkBehaviour
         float cavg = cmix / clen;
         return cavg;
     }
-    void E_P_Invoke()
-    {
-        float res_supprep = E_Promedio(cev_supprep);
-        cev_allvgs.Add(res_supprep);
-        Debug.Log("Support Repository: " + res_supprep.ToString());
-
-        Invoke(nameof(E_P_Invoke), 25);
-    }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-    // EXTRA : Funcion de muerte
-
-    SurvivorsEscape.CharacterController p_died;
-    public void SyncDeadState(SurvivorsEscape.CharacterController itsme)
-    {
-        p_died = itsme;
-        SyncDeadStateClientRPC();
-    }
-
-    [ClientRpc]
-    public void SyncDeadStateClientRPC()
-    {
-        foreach (SurvivorsEscape.CharacterController p in playerReference)
-        {
-            p_died.inv.Pstats.respawnTime = 2;
-        }
-    }
 }

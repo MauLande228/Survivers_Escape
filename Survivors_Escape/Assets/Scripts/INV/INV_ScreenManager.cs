@@ -11,6 +11,7 @@ using UnityEngine.UI;
 public class INV_ScreenManager : MonoBehaviour
 {
     public bool opened = false;
+    public bool hasWep = false;
     public KeyCode invKey = KeyCode.Tab;
     public KeyCode equipKey = KeyCode.Q; // Equip
     public KeyCode dropKey = KeyCode.R; // Drop
@@ -18,13 +19,12 @@ public class INV_ScreenManager : MonoBehaviour
     private KeyCode[] keyCodes = new KeyCode[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8 };
 
     [Header("Settings")]
-    public int invSize = 10; // Defines the amount of inventory slots
+    public int invSize = 14; // Defines the amount of inventory slots
     public int invVals = 0; // Stores the inventory value
     public int selectedSlot = 0;
     public int currentSlot = 0;
 
     [Header("Refs")]
-    public SpawnableList spw;
     public Transform dropPos;
 
     public GameObject slotTemp;
@@ -39,6 +39,11 @@ public class INV_ScreenManager : MonoBehaviour
     public Slot[] invSlots;
     public Slot[] allSlots;
     [SerializeField] private SpawnableList _spawnableList;
+    private static readonly System.Random rnd = new();
+
+    private bool lock_emrl = false;
+    private bool lock_ruby = false;
+    private bool lock_dmnd = false;
 
     private int currentTool = 0;
     public GameObject s_axe; // 1
@@ -104,7 +109,7 @@ public class INV_ScreenManager : MonoBehaviour
                 opened = false;
                 hasTool = false;
 
-                Invoke(nameof(SetStartEquipment), 5);
+                Invoke(nameof(SetStartEquipment), 8);
             }
         }
     }
@@ -114,11 +119,12 @@ public class INV_ScreenManager : MonoBehaviour
     {
         if (cc != null)
         {
-            if (cc.IsOwner)
+            if (cc.IsOwner && !cc._IsDead)
             {
                 if (Input.GetKeyDown(invKey))
                 {
                     opened = !opened;
+                    Cursor.lockState = CursorLockMode.None;
                     //if (strui.op)
                     //{
                     //    strui.op = false;
@@ -148,6 +154,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                 if (opened)
                 {
+                    
                     transform.localPosition = new Vector3(0, 0, 0);
 
                     if (objui.inrange)
@@ -167,6 +174,7 @@ public class INV_ScreenManager : MonoBehaviour
                         else if (Input.GetKeyDown(KeyCode.Alpha6)) { craftui.Check_Recs(6); ChangeSelected(currentSlot); }
                         else if (Input.GetKeyDown(KeyCode.Alpha7)) { craftui.Check_Recs(7); ChangeSelected(currentSlot); }
                         else if (Input.GetKeyDown(KeyCode.Alpha8)) { craftui.Check_Recs(8); ChangeSelected(currentSlot); }
+                        else if (Input.GetKeyDown(KeyCode.Alpha8)) { craftui.Check_Recs(9); ChangeSelected(currentSlot); }
                     }
                     if (strui_op)
                     {
@@ -207,7 +215,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                     if (Input.GetKeyDown(KeyCode.RightArrow))
                     {
-                        if (currentSlot < 9) { selectedSlot += 1; ChangeSelected(selectedSlot); }
+                        if (currentSlot < 13) { selectedSlot += 1; ChangeSelected(selectedSlot); }
                     }
                     if (Input.GetKeyDown(KeyCode.LeftArrow))
                     {
@@ -226,6 +234,7 @@ public class INV_ScreenManager : MonoBehaviour
                 else
                 {
                     transform.localPosition = new Vector3(-10000, 0, 0);
+                    Cursor.lockState = CursorLockMode.Locked;
 
                     if (objui.inrange)
                     {
@@ -252,16 +261,35 @@ public class INV_ScreenManager : MonoBehaviour
         }
     }
 
-    public void SetOwnerID(ulong id)
+    public void CloseInventory()
     {
-        uid = id;
+        if (opened) {
+            opened = false;
+            cc._IsDead = true;
+            transform.localPosition = new Vector3(-10000, 0, 0);
+            Cursor.lockState = CursorLockMode.Locked;
+
+            if (objui.inrange)
+            {
+                objui.inrange = false;
+                craftui.gameObject.SetActive(true); // Re enables CRAFTING
+                UpdateKeyUse(1); crafton = true;
+                objui.transform.localPosition = new Vector3(-10000, 0, 0);
+            }
+            if (strui.inrange)
+            {
+                strui.inrange = false;
+            }
+        }
     }
+
+    public void SetOwnerID(ulong id) { uid = id; }
     public void SetStartEquipment()
     {
         currentSlot = 0;
         ChangeSelected(currentSlot);
-        bool naxe = CreateItem(spw._itemsList[12], 96); // Give player a stone axe
-        bool npck = CreateItem(spw._itemsList[11], 60); // Give player a stone pickaxe
+        bool naxe = CreateItem(_spawnableList._itemsList[12], 96); // Give player a stone axe
+        bool npck = CreateItem(_spawnableList._itemsList[11], 60); // Give player a stone pickaxe
     }
     public void SetChecks(PlayersManager pd)
     {
@@ -275,7 +303,7 @@ public class INV_ScreenManager : MonoBehaviour
 
     public void ApplyDMG()
     {
-        Pstats.health -= 4.0f;
+        Pstats.health -= 2.5f;
     }
     public int ApplyLUCK()
     {
@@ -295,8 +323,7 @@ public class INV_ScreenManager : MonoBehaviour
         {
             if (cc.IsOwner)
             {
-                gchecks.CEV_SupportDeadPlayers();
-                gchecks.CEV_ApproachDeadPlayers(GetComponentInParent<SurvivorsEscape.CharacterController>());
+                gchecks.CEV_ApproachDeadPlayers_1(cc);
             }
         }
     }
@@ -348,6 +375,9 @@ public class INV_ScreenManager : MonoBehaviour
             case 8:
                 d_pck.SetActive(false);
                 break;
+            case 9:
+                cc._hasGun = false;
+                break;
             default:
                 break;
         }
@@ -391,6 +421,10 @@ public class INV_ScreenManager : MonoBehaviour
                 d_pck.SetActive(true);
                 currentTool = 8;
                 break;
+            case "Gun":
+                cc._hasGun = true;
+                currentTool = 9;
+                break;
             default:
                 currentTool = 0;
                 break;
@@ -414,7 +448,7 @@ public class INV_ScreenManager : MonoBehaviour
         {
             if (cc.IsOwner)
             {
-                if (newSlotPos >= 0 && newSlotPos <= 9)
+                if (newSlotPos >= 0 && newSlotPos <= 13)
                 {
                     allSlots[currentSlot].UnselectS();
                     allSlots[newSlotPos].SelectS();
@@ -546,51 +580,68 @@ public class INV_ScreenManager : MonoBehaviour
             case 1: // Frutal Delight : More HP
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
+                gchecks.CEV_RegisterBuffByIDServerRpc(uid);
                 Pstats.maxhealth += 5.0f;
                 break;
 
             case 2: // Frutal Dessert : More HB
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
+                gchecks.CEV_RegisterBuffByIDServerRpc(uid);
                 Pstats.maxhunger += 5.0f;
                 break;
 
             case 3: // Frutal Drink : More luck
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
+                gchecks.CEV_RegisterBuffByIDServerRpc(uid);
                 Pstats.luck += 1;
                 cc._luckyPoint += 1;
                 break;
 
-            case 4: //Luck Booster
+            case 4: // Luck Booster
                 Debug.Log("Luck Booster");
                 break;
 
-            case 5: //Idol
+            case 5: // Idol // 36:Drink // 37:Dessert // 38:Delight
+                int s = rnd.Next(3);
+                CreateItem(_spawnableList._itemsList[36 + s], 1);
                 break;
 
-            case 6: //Emerald Recipes
-                craftui.recs[3] = craftui.allr[3];
-                craftui.recs[4] = craftui.allr[4];
-                craftui.AddRecs(3);
-                craftui.AddRecs(4);
-                gchecks.CEV_NCT_UpdateHighestGem(1);
+            case 6: // Emerald Recipes
+                if (!lock_emrl)
+                {
+                    lock_emrl = true;
+                    craftui.recs[3] = craftui.allr[3];
+                    craftui.recs[4] = craftui.allr[4];
+                    craftui.AddRecs(3);
+                    craftui.AddRecs(4);
+                    gchecks.CEV_NCT_UpdateHighestGem(1);
+                }
                 break;
 
-            case 7: //Ruby Recipes
-                craftui.recs[5] = craftui.allr[5];
-                craftui.recs[6] = craftui.allr[6];
-                craftui.AddRecs(5);
-                craftui.AddRecs(6);
-                gchecks.CEV_NCT_UpdateHighestGem(2);
+            case 7: // Ruby Recipes
+                if (!lock_ruby)
+                {
+                    lock_ruby = true;
+                    craftui.recs[5] = craftui.allr[5];
+                    craftui.recs[6] = craftui.allr[6];
+                    craftui.AddRecs(5);
+                    craftui.AddRecs(6);
+                    gchecks.CEV_NCT_UpdateHighestGem(2);
+                }
                 break;
 
-            case 8: //Diamond Recipes
-                craftui.recs[7] = craftui.allr[7];
-                craftui.recs[8] = craftui.allr[8];
-                craftui.AddRecs(7);
-                craftui.AddRecs(8);
-                gchecks.CEV_NCT_UpdateHighestGem(3);
+            case 8: // Diamond Recipes
+                if (!lock_dmnd)
+                {
+                    lock_dmnd = true;
+                    craftui.recs[7] = craftui.allr[7];
+                    craftui.recs[8] = craftui.allr[8];
+                    craftui.AddRecs(7);
+                    craftui.AddRecs(8);
+                    gchecks.CEV_NCT_UpdateHighestGem(3);
+                }
                 break;
         }
 
@@ -607,7 +658,7 @@ public class INV_ScreenManager : MonoBehaviour
     {
         allSlots[0].stackSize = allSlots[0].stackSize - 1;
         allSlots[0].UpdateSlot();
-        Pstats.health -= 2.0f;
+        Pstats.health -= 1.5f;
 
         if (allSlots[0].stackSize <= 0)
         {
@@ -998,7 +1049,6 @@ public class INV_ScreenManager : MonoBehaviour
                 if (emptySlot != null)
                 {
                     emptySlot.AddItemToSlot(dt, st);
-                    emptySlot.UpdateSlot();
                     if (isIn)
                     {
                         UpdateCurrentSlot(emptySlot);
@@ -1041,7 +1091,7 @@ public class INV_ScreenManager : MonoBehaviour
                 }
                 if (s == 0) { DoEquip(dt.itName); }
                 int g = GetGem(dt.itName);
-                if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
+                //if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
                 return true;
             }
             else
@@ -1136,21 +1186,18 @@ public class INV_ScreenManager : MonoBehaviour
     {
         invVals -= v * st;
     }
-
+    public void GunAcquired()
+    {
+        hasWep = true;
+    }
+    
     public bool AddItem(INV_PickUp pickUp)
     {
-        Debug.Log("PICKED ITEM UP BRO");
-
-        if (pickUp.pow < 999 && pickUp.pow != uid)
-        {
-            Debug.Log("++++++++++++++ ITEM from OTHER USER");
-        }
-        
         bool isIn = false;
+        bool isSaved = false;
         bool f = false;
 
-        //int e = pickUp.data.efx;
-        //Debug.Log(e.ToString());
+        if (pickUp.pow < 999 && pickUp.pow != uid) { isSaved = true; }
 
         if (pickUp.data.isStackable) // IF THE ITEM CAN BE STACKED
         {
@@ -1188,10 +1235,10 @@ public class INV_ScreenManager : MonoBehaviour
                             invSlots[i].AddItemToSlot(pickUp.data, amountLeft);
                             AddValue(pickUp.data.value, amountLeft);
                             invSlots[i].UpdateSlot();
-                            if (isIn)
-                            {
-                                UpdateCurrentSlot(invSlots[i]);
-                            }
+
+                            if (isIn) { UpdateCurrentSlot(invSlots[i]); }
+                            if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
+
                             f = true;
                             stackableSlot.UpdateSlot();
                             return true;
@@ -1219,6 +1266,7 @@ public class INV_ScreenManager : MonoBehaviour
                     stackableSlot.UpdateSlot();
 
                     AddValue(pickUp.data.value, pickUp.stackSize);
+                    if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
                     //Destroy(pickUp.gameObject);
                     return true;
                 }
@@ -1247,10 +1295,8 @@ public class INV_ScreenManager : MonoBehaviour
                     AddValue(pickUp.data.value, pickUp.stackSize);
                     emptySlot.UpdateSlot();
                     //EFX_Applied(e);
-                    if (isIn)
-                    {
-                        UpdateCurrentSlot(emptySlot);
-                    }
+                    if (isIn) { UpdateCurrentSlot(emptySlot); }
+                    if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
                     return true;
                     //Destroy(pickUp.gameObject);
                 }
@@ -1285,16 +1331,15 @@ public class INV_ScreenManager : MonoBehaviour
                 emptySlot.AddItemToSlot(pickUp.data, pickUp.stackSize);
                 emptySlot.UpdateSlot();
                 //EFX_Applied(e);
-                if (isIn)
-                {
-                    UpdateCurrentSlot(emptySlot);
-                }
+                if (isIn) { UpdateCurrentSlot(emptySlot); }
+                if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
+
                 if (s == 0) { DoEquip(invSlots[0].data.itName); }
                 int g = GetGem(pickUp.data.itName);
-                Debug.Log("Took the wep");
-                if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
-                Debug.Log("After gcheck");
+
                 return true;
+
+                //if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
                 //cc.TakeWeapon(pickUp);
                 //Vector3 newPosition = new Vector3(0.087f, 0.082f, 0.07f);
                 //Vector3 newRotation = new Vector3(-162.30f, 71.77f, -29.83f);
@@ -1328,6 +1373,11 @@ public class INV_ScreenManager : MonoBehaviour
             UnEquip(currentTool);
         }
 
+        if(i == 10)
+        {
+            hasWep = false;
+        }
+
         SubValue(slot.data.value, slot.stackSize);
         Spawner.Instace.SpawnObjectServerRpc(i, slot.stackSize, x, y, z, uid);
         //Debug.Log("Here");
@@ -1337,7 +1387,7 @@ public class INV_ScreenManager : MonoBehaviour
         if (!CheckIfTool())
         {
             hasTool = false;
-            gchecks.CEV_SupportWithTools(true);
+            //gchecks.CEV_SupportWithTools(true);
         }
     }
 
@@ -1363,19 +1413,24 @@ public class INV_ScreenManager : MonoBehaviour
         //pickup.stackSize = nl;
     }
 
-    public void EFX_Applied(int e)
-    {
-        switch (e)
-        {
-            case 0: //Nada
-                break;
-        }
-    }
-
     public bool CanBeDestroyed() { return _bCanBeDestroyed; }
 
     public Transform GetCurrentDropPos()
     {
         return dropPos;
+    }
+
+    // 0:Materials // 1:Food // 2:Objectives // 3:Boosters // 4:Tools
+    public List<int> count_objects_shared = new() { 0, 0, 0, 0, 0 };
+    public void AddCountShare(char x)
+    {
+        switch(x)
+        {
+            case 'M': count_objects_shared[0]++; break;
+            case 'F': count_objects_shared[1]++; break;
+            case 'O': count_objects_shared[2]++; break;
+            case 'B': count_objects_shared[3]++; break;
+            case 'T': count_objects_shared[4]++; break;
+        }
     }
 }

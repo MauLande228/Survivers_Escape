@@ -216,7 +216,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -232}
-  m_SizeDelta: {x: 1000, y: 110}
+  m_SizeDelta: {x: 1300, y: 110}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6089248407689554946
 CanvasRenderer:
@@ -693,15 +693,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   opened: 0
+  hasWep: 0
   invKey: 9
   equipKey: 113
   dropKey: 114
   splitKey: 102
-  invSize: 10
+  invSize: 14
   invVals: 0
   selectedSlot: 0
   currentSlot: 0
-  spw: {fileID: 11400000, guid: 0a97b5ec6e831af4da9721fea6b9fbd5, type: 2}
   dropPos: {fileID: 8035371953330897404}
   slotTemp: {fileID: 7617428050136512621, guid: 4cab14e942346414983a697986a7bf0a,
     type: 3}
@@ -831,10 +831,10 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 64, y: 64}
+  m_CellSize: {x: 82, y: 82}
   m_Spacing: {x: 6, y: 6}
   m_Constraint: 1
-  m_ConstraintCount: 10
+  m_ConstraintCount: 14
 --- !u!1 &6297840498957081846
 GameObject:
   m_ObjectHideFlags: 0
@@ -1805,6 +1805,17 @@ PrefabInstance:
       objectReference: {fileID: 5660020987316439058}
     - target: {fileID: 5342511745748340625, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
+      propertyPath: theEnemy
+      value: 
+      objectReference: {fileID: 4462363268145753104, guid: ddd28bc0d2b69ff46b3acb4fa9d48220,
+        type: 3}
+    - target: {fileID: 5342511745748340625, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
+        type: 3}
+      propertyPath: _luckyPoint
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5342511745748340625, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
+        type: 3}
       propertyPath: _debugTransform
       value: 
       objectReference: {fileID: 7598740891475216614}
@@ -1816,7 +1827,7 @@ PrefabInstance:
     - target: {fileID: 5342511745748340625, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
       propertyPath: _standingSpeed.y
-      value: 6
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 5342511745748340625, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
@@ -2073,6 +2084,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8679019617266783787}
+    - targetCorrespondingSourceObject: {fileID: 4031696834700952788, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4292349008228692892}
+    - targetCorrespondingSourceObject: {fileID: 4031696834700952788, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4730264316825624764}
     - targetCorrespondingSourceObject: {fileID: 2145777551731333124, guid: 45c3f3910e2c3af4d8432f6f88b178f8,
         type: 3}
       insertIndex: -1
@@ -2187,18 +2206,20 @@ MonoBehaviour:
   defense: 0
   damage: 0
   speed: 0
-  luck: 6
+  luck: 0
   inv: {fileID: 0}
   canvas: {fileID: 0}
   hud: {fileID: 1767146266505922156, guid: f9a96f09596c66a4d94a53d1260d786f, type: 3}
   cc: {fileID: 7167662983067830938}
   respawnPos: {x: 516, y: 38, z: 34}
-  respawnTime: 20
-  regenhealth: 0.25
-  idlehunger: 0.85
-  hungerdmg: 4
+  respawnTime: 18
+  regenhealth: 0.5
+  idlehunger: 0.5
+  hungerdmg: 5
   healthBar: {fileID: 0}
   hungerBar: {fileID: 0}
+  cont3: 0
+  cev_suppdead: []
 --- !u!114 &8679019617266783787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2211,6 +2232,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4292349008228692892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2211191862671032799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 134870a0e204f764cb667ccae0c151d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4730264316825624764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2211191862671032799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79e44749a2c942143ae8c72ff76188e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bodyMeshRenderer: {fileID: 5971973273668736416}
 --- !u!1 &3790791672940666127 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2145777551731333124, guid: 45c3f3910e2c3af4d8432f6f88b178f8,

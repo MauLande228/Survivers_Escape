@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +17,7 @@ public class PlayerStats : MonoBehaviour
     public float defense;
     public float damage;
     public float speed;
-    public int luck = 6;
+    public int luck = 0;
 
     [Header("Refs")]
     public INV_ScreenManager inv;
@@ -28,13 +29,13 @@ public class PlayerStats : MonoBehaviour
     public int respawnTime = 20;
 
     [Header("Enough")]
-    public float regenhealth = 0.25f;
+    public float regenhealth = 0.5f;
 
     [Header("Idle")]
     public float idlehunger = 0.5f;
 
     [Header("Hungry")]
-    public float hungerdmg = 2.5f;
+    public float hungerdmg = 5.0f;
 
     [Header("UI")]
     public StatsBar healthBar;
@@ -107,6 +108,7 @@ public class PlayerStats : MonoBehaviour
         if (hunger > 0)
         {
             hunger -= idlehunger * Time.deltaTime;
+            hunger_lock = false;
             if (health < maxhealth && !regen_lock) { health += regenhealth * Time.deltaTime; }
         }
         if (health > 0 && hunger_lock)
@@ -147,25 +149,20 @@ public class PlayerStats : MonoBehaviour
             life_lock = true;
             health = 0;
 
-            cc._proning = true;
-            GoRespawnTime();
+            inv.CloseInventory();
 
+            CEV_SuppPlayerTime_1();
             inv.IsDeadAsHell();
+            Invoke(nameof(GoRespawnTime), 1);
         }
         if (health > maxhealth)
         {
             health = maxhealth;
         }
+
         // Prevent HUNGER out of limits
-        if (hunger <= 0 && !hunger_lock)
-        {
-            hunger_lock = true;
-            hunger = 0;
-        }
-        if (hunger > maxhunger)
-        {
-            hunger = maxhunger;
-        }
+        if (hunger <= 0 && !hunger_lock) { hunger_lock = true; hunger = 0; }
+        if (hunger > maxhunger) { hunger = maxhunger; }
     }
 
     private void GoRespawnTime()
@@ -173,20 +170,55 @@ public class PlayerStats : MonoBehaviour
         respawnTime -= 1;
         if (respawnTime < 1)
         {
+            CEV_SPT_Saved();
             Transform playernow = GetComponent<Transform>();
             playernow.position = respawnPos;
             health = 50;
             hunger = 50;
             life_lock = false;
             hunger_lock = false;
-            cc._proning = false;
-            respawnTime = 20;
+            cc._IsDead = false;
+            inv.gchecks.CEV_ADP_AmAlive();
+            respawnTime = 18;
         }
         else
         {
             Invoke(nameof(GoRespawnTime), 1);
         }
     }
+
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // 0HP player support in time
+    // + Cuanto tiempo se tardan en ayudar a alguien herido
+    int Lap3 = 1; // Vueltas
+    public bool cont3 = false;
+    public List<float> cev_suppdead = new List<float>();
+    public void CEV_SuppPlayerTime_1()
+    {
+        cont3 = true;
+        Lap3 = 1;
+        Invoke(nameof(CEV_SPT_Invoke), 3.6f);
+    }
+    void CEV_SPT_Invoke()
+    {
+        if (cont3) { Lap3 += 1; Invoke(nameof(CEV_SPT_Invoke), 3.6f); }
+        else { CEV_SupportPlayerTime_2(); }
+    }
+    public void CEV_SPT_Saved() { cont3 = false; }
+    public void CEV_SupportPlayerTime_2()
+    {
+        float cev = 0.0f;
+        switch (Lap3) // Finish count
+        {
+            case 1: cev = 90.0f; break;
+            case 2: cev = 70.0f; break;
+            case 3: cev = 50.0f; break;
+            case 4: cev = 30.0f; break;
+            default: cev = 10.0f; break;
+        }
+        cev_suppdead.Add(cev); // Enviar valor
+    }
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
 
     private void FallDamage(float spd)
     {

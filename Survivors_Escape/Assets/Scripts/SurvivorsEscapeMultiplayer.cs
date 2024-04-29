@@ -18,9 +18,11 @@ public class SurvivorsEscapeMultiplayer : NetworkBehaviour
     public static SurvivorsEscapeMultiplayer Instance { get; private set; }
 
     public static bool playMultiplayer = true;
+    private static readonly System.Random rnd = new();
 
     [SerializeField] private SpawnableList objectListSO;
     [SerializeField] private List<Color> playerColorList;
+    //[SerializeField] private List<Color> randomColorList;
 
     private NetworkList<PlayerData> playerDataNetworkList;
     private string playerName;
@@ -40,11 +42,23 @@ public class SurvivorsEscapeMultiplayer : NetworkBehaviour
 
     private void Start()
     {
+        Shuffle(playerColorList);
         if (!playMultiplayer)
         {
             // SinglePlayer (for god knows what reason)
             StartHost();
             SceneLoader.LoadNetwork(SceneLoader.Scene.MultiplayerDevScene);
+        }
+    }
+
+    public void Shuffle(List<Color> list)
+    {
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rnd.Next(n + 1);
+            (list[n], list[k]) = (list[k], list[n]);
         }
     }
 

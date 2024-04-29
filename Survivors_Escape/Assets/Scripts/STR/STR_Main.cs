@@ -10,6 +10,9 @@ public class STR_Main : NetworkBehaviour
     public STR_Slot sslotPrefab;
     public SpawnableList all_sos;
 
+    public int bh = 0; // 0 for Normal // 1 for Repository // 2 for Essence Trading // 3 for rotating materials
+    // 2:PinkS <-> Gear <-> DENSITY // 3:YellS <-> FuelBarrel <-> FOREST // 4: GrenS <-> PressG <-> PLAINS // 5: BlueS <-> ElecEng <-> FANTASY
+
     public string inp_name; // Name of the item to check if stored
     public int inp_numb; // Amount required of the previous item
     public Inv_itemSO out_item; // ItemSO of the trade item
@@ -19,9 +22,6 @@ public class STR_Main : NetworkBehaviour
 
     public bool inCheck = false; // Lock of chest
     public bool opened = false; // State of chest
-
-    public int bh = 0; // 0 for Normal // 1 for Repository // 2++ for Trading
-    // 2:BlueS <-> Gear <-> FOREST // 3:YellS <-> FuelBarrel <-> DENSE // 4: GrenS <-> ElecEng <-> FANT // 5: PinkS <-> PressG <-> PLAINS
 
     // Start is called before the first frame update
     void Start()
@@ -36,17 +36,17 @@ public class STR_Main : NetworkBehaviour
         sslots = slotList.ToArray();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    //// Update is called once per frame
+    //void Update()
+    //{
         
-    }
+    //}
 
     public void Open(STR_UI ui)
     {
         if (!inCheck)
         {
-            LockChestServerRpc();
+            //LockChestServerRpc();
             if (!opened)
             {
                 ui.Open(this);
@@ -56,76 +56,34 @@ public class STR_Main : NetworkBehaviour
         }
     }
 
-    // LOCKING THE CHEST WHEN OPEN
-    [ServerRpc(RequireOwnership = false)]
-    public void LockChestServerRpc()
-    {
-        CheckChestClientRpc();
-    }
-    [ClientRpc]
-    public void CheckChestClientRpc()
-    {
-        if (!inCheck)
-        {
-            inCheck = true;
-        }
-    }
-
-    // UNLOCKING THE CHEST WHEN CLOSED
-    [ServerRpc(RequireOwnership = false)]
-    public void UnlockChestServerRpc()
-    {
-        CheckntChestClientRpc();
-    }
-
-    [ClientRpc]
-    public void CheckntChestClientRpc()
-    {
-        if (inCheck)
-        {
-            inCheck = false;
-        }
-    }
-
-    //[ClientRpc]
-    //public void SyncCloseClientRpc(int xslot, int xitem, int xcant)
+    //// LOCKING THE CHEST WHEN OPEN
+    //[ServerRpc(RequireOwnership = false)]
+    //public void LockChestServerRpc()
     //{
-    //    sslots[xslot].itemdata = all_sos._itemsList[xitem];
-    //    sslots[xslot].stack = xcant;
+    //    CheckChestClientRpc();
+    //}
+    //[ClientRpc]
+    //public void CheckChestClientRpc()
+    //{
+    //    if (!inCheck)
+    //    {
+    //        inCheck = true;
+    //    }
+    //}
+
+    //// UNLOCKING THE CHEST WHEN CLOSED
+    //[ServerRpc(RequireOwnership = false)]
+    //public void UnlockChestServerRpc()
+    //{
+    //    CheckntChestClientRpc();
     //}
 
     //[ClientRpc]
-    //public void AllCloseClientRpc(S_Slot[] uiSlots, STR_UI st)
+    //public void CheckntChestClientRpc()
     //{
-    //    if (opened)
+    //    if (inCheck)
     //    {
-    //        for (int i = 0; i < sslots.Length; i++)
-    //        {
-    //            if (uiSlots[i] == null)
-    //            {
-    //                sslots[i].itemdata = null;
-    //            }
-    //            else
-    //            {
-    //                sslots[i].itemdata = uiSlots[i].data;
-    //            }
-
-    //            sslots[i].stack = uiSlots[i].stackSize;
-    //        }
-
-    //        switch (bh)
-    //        {
-    //            case 0:
-    //                break;
-    //            case 1:
-    //                CheckStored(st);
-    //                break;
-    //            case 2:
-    //                Check2();
-    //                break;
-    //        }
-
-    //        opened = false;
+    //        inCheck = false;
     //    }
     //}
 
@@ -149,18 +107,15 @@ public class STR_Main : NetworkBehaviour
 
             switch (bh)
             {
-                case 0:
-                    break;
-                case 1:
-                    CheckStored(st);
-                    break;
-                case 2:
-                    Check3();
-                    break;
+                case 0: break;
+                case 1: CheckStored(st); break;
+                case 2: CheckOneTrade(); break;
+                case 3: CheckCycleTrade(); break;
+                case 4: CheckCycleGem(); break;
             }
 
             opened = false;
-            UnlockChestServerRpc();
+            //UnlockChestServerRpc();
         }
     }
 
@@ -215,20 +170,28 @@ public class STR_Main : NetworkBehaviour
         }
     }
 
-    // 15 Plains -> 1 Gas Barrel ----- Found in Forest
-    // 15 Fantasy -> 1 Gear ----- Found in Density
-    // 15 Forest -> 1 PressG ----- Found in Plains
-    // 15 Density -> 1 ElecEng ----- Found in Fantasy
-    public void CheckEssenceTrade()
+    // 20 Plains -> 1 Gas Barrel ----- Found in Forest
+    // 20 Fantasy -> 1 Gear ----- Found in Density
+    // 20 Forest -> 1 PressG ----- Found in Plains
+    // 20 Density -> 1 ElecEng ----- Found in Fantasy
+    public void CheckOneTrade()
     {
         if (sslots[0].itemdata != null)
         {
             if (sslots[0].itemdata.itName.ToString() == inp_name)
             {
-                if (sslots[0].stack >= inp_numb)
+                if (sslots[0].stack > inp_numb)
                 {
-                    sslots[0].itemdata = out_item;
-                    sslots[0].stack = out_numb;
+                    sslots[0].stack -= inp_numb;
+                    sslots[1].itemdata = out_item;
+                    sslots[1].stack = out_numb;
+
+                }
+                if (sslots[0].stack == inp_numb)
+                {
+                    sslots[0].itemdata = null;
+                    sslots[1].itemdata = out_item;
+                    sslots[1].stack = out_numb;
                 }
             }
         }
@@ -242,58 +205,120 @@ public class STR_Main : NetworkBehaviour
             switch (sslots[0].itemdata.itName.ToString())
             {
                 case "Leaves": // itemsList[7]
-                    if(sslots[0].stack > 5){ ns = (int)Math.Round(sslots[0].stack * 0.8); }
-                    sslots[0].itemdata = all_sos._itemsList[6];
-                    sslots[0].stack = ns;
+                    if(sslots[0].stack > 4) {
+                        ns = (int)Math.Round(sslots[0].stack * 0.8); 
+                        sslots[0].itemdata = all_sos._itemsList[5];
+                        sslots[0].stack = ns;
+                    }
                     break;
-                case "Lianas": // itemsList[6]
-                    if (sslots[0].stack > 5) { ns = (int)Math.Round(sslots[0].stack * 0.8); }
-                    sslots[0].itemdata = all_sos._itemsList[5];
-                    sslots[0].stack = ns;
+                case "Liana": // itemsList[6]
+                    if (sslots[0].stack > 4)
+                    {
+                        ns = (int)Math.Round(sslots[0].stack * 0.8);
+                        sslots[0].itemdata = all_sos._itemsList[7];
+                        sslots[0].stack = ns;
+                    }
                     break;
                 case "Cobweb": // itemsList[5]
-                    if (sslots[0].stack > 5) { ns = (int)Math.Round(sslots[0].stack * 0.8); }
-                    sslots[0].itemdata = all_sos._itemsList[7];
-                    sslots[0].stack = ns;
+                    if (sslots[0].stack > 4)
+                    {
+                        ns = (int)Math.Round(sslots[0].stack * 0.8);
+                        sslots[0].itemdata = all_sos._itemsList[6];
+                        sslots[0].stack = ns;
+                    }
                     break;
                 default:
                     break;
             }
-            
-            
         }
     }
 
-    public void CheckGemsTrade()
+    public void CheckCycleGem()
     {
         if (sslots[0].itemdata != null)
         {
+            int ns = 0;
             switch (sslots[0].itemdata.itName.ToString())
             {
-                case "Emerald": // itemsList[]
-                    if (sslots[0].stack >= 20)
+                case "Emerald": // itemsList[0]
+                    if (sslots[0].stack > 1)
                     {
-                        sslots[0].itemdata = all_sos._itemsList[44];
-                        sslots[0].stack = 1;
+                        ns = (int)Math.Round(sslots[0].stack * 0.5);
+                        sslots[0].itemdata = all_sos._itemsList[1];
+                        sslots[0].stack = ns;
                     }
                     break;
-                case "Ruby": // itemsList[]
-                    if (sslots[0].stack >= 20)
+                case "Ruby": // itemsList[1]
+                    if (sslots[0].stack > 1)
                     {
-                        sslots[0].itemdata = all_sos._itemsList[45];
-                        sslots[0].stack = 1;
+                        ns = (int)Math.Round(sslots[0].stack * 0.5);
+                        sslots[0].itemdata = all_sos._itemsList[2];
+                        sslots[0].stack = ns;
                     }
                     break;
-                case "Diamond": // itemsList[]
-                    if (sslots[0].stack >= 20)
-                    {
-                        sslots[0].itemdata = all_sos._itemsList[46];
-                        sslots[0].stack = 1;
-                    }
+                default:
                     break;
             }
         }
     }
+
+    public void TradeForest() // in PLAINS for PRESSURE GAUGE
+    {
+        if (sslots[0].itemdata != null)
+        {
+            if (sslots[0].itemdata.itName.ToString() == "Forest Essence")
+            {
+                if (sslots[0].stack >= 20)
+                {
+                    sslots[0].itemdata = all_sos._itemsList[0];
+                    sslots[0].stack = 1;
+                }
+            }
+        }
+    }
+    public void TradeDense() // in FANTASY for ELECTRIC ENGINE
+    {
+        if (sslots[0].itemdata != null)
+        {
+            if (sslots[0].itemdata.itName.ToString() == "Density Essence")
+            {
+                if (sslots[0].stack >= 20)
+                {
+                    sslots[0].itemdata = all_sos._itemsList[0];
+                    sslots[0].stack = 1;
+                }
+            }
+        }
+    }
+    public void TradePlains() // in FOREST for GAS BARREL
+    {
+        if (sslots[0].itemdata != null)
+        {
+            if (sslots[0].itemdata.itName.ToString() == "Plains Essence")
+            {
+                if (sslots[0].stack >= 20)
+                {
+                    sslots[0].itemdata = all_sos._itemsList[0];
+                    sslots[0].stack = 1;
+                }
+            }
+        }
+    }
+    public void TradeFantasy() // in DENSITY for GEAR
+    {
+        if (sslots[0].itemdata != null)
+        {
+            if (sslots[0].itemdata.itName.ToString() == "Fantasy Essence")
+            {
+                if (sslots[0].stack >= 20)
+                {
+                    sslots[0].itemdata = all_sos._itemsList[0];
+                    sslots[0].stack = 1;
+                }
+            }
+        }
+    }
+
 
     public void Check3()
     {

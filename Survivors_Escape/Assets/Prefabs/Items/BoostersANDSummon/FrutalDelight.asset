@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
   m_Name: FrutalDelight
   m_EditorClassIdentifier: 
-  itType: 3
+  itType: 4
   itName: Frutal Delight
   itDesc: A combination of certain fruits. It increases your maximum health in 5
     points
@@ -21,7 +21,7 @@ MonoBehaviour:
   itPrefab: {fileID: 4191920457192618501, guid: b9ea6b38faa657843accc09f9e3a34e5,
     type: 3}
   isStackable: 1
-  maxStack: 5
+  maxStack: 10
   value: 0
   plusHB: 10
   plusHP: 10

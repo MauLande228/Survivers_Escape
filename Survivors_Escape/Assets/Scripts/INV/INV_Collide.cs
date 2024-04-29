@@ -36,7 +36,7 @@ public class INV_Collide : NetworkBehaviour
                 {
                     if (!bDestroyed)
                     {
-                        Debug.Log("PICK UP");
+                        //Debug.Log("PICK UP");
                         bDestroyed = other.GetComponentInChildren<INV_ScreenManager>().AddItem(pickup);
                     }
                 }
@@ -57,6 +57,10 @@ public class INV_Collide : NetworkBehaviour
             if (bDestroyed)
             {
                 //Destroy(pickup.gameObject);
+                if (pickup.data.itName == "Gun")
+                {
+                    other.GetComponentInChildren<INV_ScreenManager>().GunAcquired();
+                }
                 DestroyItemServerRpc();
             }
         }

@@ -37,7 +37,7 @@ public class SEHitBox : MonoBehaviour, IHitDetector
 
         foreach (RaycastHit hit in hits)
         {
-            Debug.Log("+ - + - + - + - + - + - + - + - + - + For each");
+            //Debug.Log("+ - + - + - + - + - + - + - + - + - + For each");
             hurtBox = hit.collider.GetComponent<IHurtBox>();
             if(hurtBox != null)
             {

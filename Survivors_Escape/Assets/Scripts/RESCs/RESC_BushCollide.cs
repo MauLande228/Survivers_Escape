@@ -15,7 +15,7 @@ public class RESC_BushCollide : NetworkBehaviour
 
     private static readonly System.Random rnd = new();
     
-    List<int> ncant = new() { 1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3 };
+    List<int> ncant = new() { 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
     // Suerte determinada : { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z };
     // Se obtiene la cantidad gracias a "luck + rnd.Next(10)" con minimo 0 y máximo 15
 
@@ -47,16 +47,15 @@ public class RESC_BushCollide : NetworkBehaviour
             {
                 bush = false;
                 LockBushServerRpc();
-                Invoke(nameof(RegenLoot), 10);
+                Invoke(nameof(RegenLoot), 15);
 
-                Debug.Log("+ - + - + - + - + ARBUSTO");
-
-                r = rnd.Next(14);
+                r = rnd.Next(7);
                 inv = other.GetComponentInChildren<INV_ScreenManager>();
-                if(inv != null)
+                if (inv != null)
                 {
                     int l = inv.ApplyLUCK();
                     r += l;
+                    if (r > 11) { r = 11; }
                 }
                 s = rnd.Next(3);
 
@@ -68,26 +67,14 @@ public class RESC_BushCollide : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void LockBushServerRpc()
-    {
-        LockBushClientRpc();
-    }
+    public void LockBushServerRpc() { LockBushClientRpc(); }
     [ClientRpc]
-    public void LockBushClientRpc()
-    {
-        bush = false;
-    }
+    public void LockBushClientRpc() { bush = false; }
 
     [ServerRpc(RequireOwnership = false)]
-    public void OpenBushServerRpc()
-    {
-        OpenBushClientRpc();
-    }
+    public void OpenBushServerRpc() { OpenBushClientRpc(); }
     [ClientRpc]
-    public void OpenBushClientRpc()
-    {
-        bush = true;
-    }
+    public void OpenBushClientRpc() { bush = true; }
 
     // Start is called before the first frame update
     //void Start()
