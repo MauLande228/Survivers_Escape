@@ -171,15 +171,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectListSO: {fileID: 0}
   playerColorList:
-  - {r: 1, g: 0.3882353, b: 0.3882353, a: 1}
-  - {r: 1, g: 0.5921569, b: 0.3372549, a: 1}
   - {r: 1, g: 0.87058824, b: 0.4, a: 1}
-  - {r: 0.6627451, g: 1, b: 0.5176471, a: 1}
   - {r: 0.49803922, g: 1, b: 0.8392157, a: 1}
-  - {r: 0.46666667, g: 0.8509804, b: 1, a: 1}
+  - {r: 1, g: 0.3882353, b: 0.3882353, a: 1}
+  - {r: 0.6627451, g: 1, b: 0.5176471, a: 1}
   - {r: 0.43137255, g: 0.44705883, b: 1, a: 1}
-  - {r: 0.69411767, g: 0.43137255, b: 1, a: 1}
   - {r: 1, g: 0.5176471, b: 0.972549, a: 1}
+  - {r: 0.46666667, g: 0.8509804, b: 1, a: 1}
+  - {r: 0.69411767, g: 0.43137255, b: 1, a: 1}
+  - {r: 1, g: 0.5921569, b: 0.3372549, a: 1}
   - {r: 0.7607843, g: 0.53333336, b: 0.49019608, a: 1}
 --- !u!4 &58242434
 Transform:
@@ -2289,6 +2289,12 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 4412166786139507372, guid: b14702d22a436fd43937f05b259fbaf4,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 4462363268145753104, guid: ddd28bc0d2b69ff46b3acb4fa9d48220,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0

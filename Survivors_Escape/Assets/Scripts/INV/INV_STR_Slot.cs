@@ -10,9 +10,11 @@ public class S_Slot : MonoBehaviour, IPointerClickHandler
 {
     public Inv_itemSO data;
     public int stackSize;
+    public int slotnum = 0;
     [Space]
     public Image icon;
     public TextMeshProUGUI stackText;
+    public TextMeshProUGUI slotNumber;
 
     public Color32 selectC = new(255, 255, 0, 255);
     public Color32 unselectC = new(255, 255, 255, 255);

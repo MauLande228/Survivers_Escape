@@ -572,14 +572,5 @@ namespace SurvivorsEscape
                 inv.Pstats.respawnTime = 0;
             }
         }
-
-        public void SpawnEnemy(ulong nid)
-        {
-            if (uid == nid)
-            {
-                Vector3 enemypos = this.gameObject.transform.position + new Vector3(0, 5, 0);
-                Instantiate(theEnemy, enemypos, Quaternion.identity);
-            }
-        }
     }
 }

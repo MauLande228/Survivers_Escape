@@ -326,6 +326,7 @@ MonoBehaviour:
   content: {fileID: 1663226332365299833}
   inv: {fileID: 0}
   op: 0
+  slotNum: 0
   inrange: 0
   oppos: {x: 0, y: 0, z: 0}
 --- !u!1 &2870056432681531381
@@ -698,10 +699,13 @@ MonoBehaviour:
   equipKey: 113
   dropKey: 114
   splitKey: 102
+  testKey: 112
+  mapKey: 109
   invSize: 14
   invVals: 0
   selectedSlot: 0
   currentSlot: 0
+  count_objects_shared: 0000000000000000000000000000000000000000
   dropPos: {fileID: 8035371953330897404}
   slotTemp: {fileID: 7617428050136512621, guid: 4cab14e942346414983a697986a7bf0a,
     type: 3}
@@ -737,6 +741,9 @@ MonoBehaviour:
   uiDesc: {fileID: 1814474961979876253, guid: 44a50adbaf805b04ba60856fab60cbd9, type: 3}
   uiBTNS: {fileID: 7311220520276145072, guid: 1881909035bdadf40a0000291fdc555c, type: 3}
   uiKeyu: {fileID: 1485926421700655746, guid: 388944c1203cfc7498630037bbc8d9c1, type: 3}
+  uiFMap: {fileID: 6935961824259572895, guid: d51258beea2716c49b3ad99a9f346a8b, type: 3}
+  mapREF: {fileID: 0}
+  mapOpen: 0
   cc: {fileID: 7167662983067830938}
   gchecks: {fileID: 0}
   uid: 0
@@ -1105,7 +1112,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8973599979391685538}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -2212,10 +2219,10 @@ MonoBehaviour:
   hud: {fileID: 1767146266505922156, guid: f9a96f09596c66a4d94a53d1260d786f, type: 3}
   cc: {fileID: 7167662983067830938}
   respawnPos: {x: 516, y: 38, z: 34}
-  respawnTime: 18
-  regenhealth: 0.5
-  idlehunger: 0.5
-  hungerdmg: 5
+  respawnTime: 25
+  regenhealth: 0.55
+  idlehunger: 0.45
+  hungerdmg: 8
   healthBar: {fileID: 0}
   hungerBar: {fileID: 0}
   cont3: 0

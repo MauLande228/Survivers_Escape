@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BulletTarget : MonoBehaviour
+public class BulletTarget : NetworkBehaviour
 {
     private int count = 10;
     
@@ -11,7 +12,13 @@ public class BulletTarget : MonoBehaviour
         count -= 1;
         if (count < 1)
         {
-            Destroy(gameObject);
+            DestroyEnemyServerRpc();
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void DestroyEnemyServerRpc()
+    {
+        this.GetComponent<NetworkObject>().Despawn();
     }
 }

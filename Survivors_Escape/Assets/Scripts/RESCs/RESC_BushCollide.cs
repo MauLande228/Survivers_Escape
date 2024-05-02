@@ -15,7 +15,7 @@ public class RESC_BushCollide : NetworkBehaviour
 
     private static readonly System.Random rnd = new();
     
-    List<int> ncant = new() { 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
+    List<int> ncant = new() { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
     // Suerte determinada : { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z };
     // Se obtiene la cantidad gracias a "luck + rnd.Next(10)" con minimo 0 y máximo 15
 
@@ -27,7 +27,7 @@ public class RESC_BushCollide : NetworkBehaviour
 
     private void Start()
     {
-        nitem = new List<Inv_itemSO> { it1, it2, it3 };
+        nitem = new List<Inv_itemSO> { it1, it2, it3, it1 }; // it1:material // it2:food // it3:essence
     }
 
     private void RegenLoot()
@@ -47,9 +47,10 @@ public class RESC_BushCollide : NetworkBehaviour
             {
                 bush = false;
                 LockBushServerRpc();
-                Invoke(nameof(RegenLoot), 15);
+                Invoke(nameof(RegenLoot), 30);
 
                 r = rnd.Next(7);
+                Debug.Log(r.ToString());
                 inv = other.GetComponentInChildren<INV_ScreenManager>();
                 if (inv != null)
                 {
@@ -57,7 +58,8 @@ public class RESC_BushCollide : NetworkBehaviour
                     r += l;
                     if (r > 11) { r = 11; }
                 }
-                s = rnd.Next(3);
+                Debug.Log(r.ToString());
+                s = rnd.Next(4);
 
                 inv.ApplyDMG();
                 inv.CreateItem(nitem[s], ncant[r]);

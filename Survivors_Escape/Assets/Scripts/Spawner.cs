@@ -23,10 +23,10 @@ public class Spawner : NetworkBehaviour
     public NetworkVariable<int> stackn = new NetworkVariable<int>();
 
     [ServerRpc(RequireOwnership = false)]
-    public void SpawnObjectServerRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid)
+    public void SpawnObjectServerRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid, bool shared_once)
     {
         //Debug.Log("SPAWN OBJECT GOT CALLED BY SOMEONE");
-        SetRightValuesClientRpc(itemSOIndex, stackSize, x, y, z, uid);
+        SetRightValuesClientRpc(itemSOIndex, stackSize, x, y, z, uid, shared_once);
         
         var pickNO = Instantiate(itDropModel);
 
@@ -36,7 +36,7 @@ public class Spawner : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetRightValuesClientRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid)
+    public void SetRightValuesClientRpc(int itemSOIndex, int stackSize, float x, float y, float z, ulong uid, bool sharedonce)
     {
         var item = GetItemFromIndex(itemSOIndex);
 
@@ -48,6 +48,7 @@ public class Spawner : NetworkBehaviour
         pickup.data = item; // CANT MODIFY NETWORK VARIABLES AS CLIENT
         pickup.stackSize = stackSize;
         pickup.pow = uid;
+        pickup.shared_once = sharedonce;
 
         transform.position = new Vector3(x, y, z);
         pickup.transform.position = transform.position;

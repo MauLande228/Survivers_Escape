@@ -14,6 +14,7 @@ public class STR_UI : MonoBehaviour
     public INV_ScreenManager inv;
 
     public bool op = false;
+    public int slotNum = 0;
     public bool inrange = false;
     public Vector3 oppos;
 
@@ -82,7 +83,11 @@ public class STR_UI : MonoBehaviour
         for (int i = 0; i < str.sslots.Length; i++)
         {
             S_Slot slot = Instantiate(slotPrefab, content).GetComponent<S_Slot>();
-            
+
+            slotNum++;
+            if (slotNum == 10) { slotNum = 0; }
+            slot.slotNumber.text = "[" + slotNum.ToString() + "]";
+
             if (str.sslots[i].itemdata == null)
             {
                 slot.data = null;
@@ -232,6 +237,7 @@ public class STR_UI : MonoBehaviour
         }
 
         storageO.Close(allslots.ToArray(), st);
+        slotNum = 0;
         //storageO.AllCloseClientRpc(allslots.ToArray(), st);
 
         S_Slot[] slotsToDestroy = GetComponentsInChildren<S_Slot>();

@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Pineapple
-  itDesc: Obtained from trees on the beach. Very tasty!
+  itDesc: Obtained from trees on the beach. Heals 10 hunger points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 5eb9b18e47cf23240aaec628211b07a3, type: 3}
   itPrefab: {fileID: 8133790937890213033, guid: f88e54603780b8745a335877fecc6a9a,
     type: 3}
   isStackable: 1
-  maxStack: 25
+  maxStack: 50
   value: 4
-  plusHB: 12
+  shared_once: 0
+  plusHB: 10
   plusHP: 6
   act: 0
   WepDmg: 0

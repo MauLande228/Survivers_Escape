@@ -60,7 +60,7 @@ public class PlayerStats : MonoBehaviour
                 defense = 1;
                 damage = 1;
                 speed = 1;
-                luck = 6;
+                luck = 0;
 
                 inv = GetComponentInChildren<INV_ScreenManager>();
                 canvas = GetComponentInChildren<INV_CanvRef>();
@@ -149,6 +149,7 @@ public class PlayerStats : MonoBehaviour
             life_lock = true;
             health = 0;
 
+            cc._IsDead = true;
             inv.CloseInventory();
 
             CEV_SuppPlayerTime_1();

@@ -42,7 +42,7 @@ public class SurvivorsEscapeMultiplayer : NetworkBehaviour
 
     private void Start()
     {
-        Shuffle(playerColorList);
+        //Shuffle(playerColorList);
         if (!playMultiplayer)
         {
             // SinglePlayer (for god knows what reason)

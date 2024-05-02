@@ -14,13 +14,13 @@ public class EnemyManager : MonoBehaviour
 
         if (_ps != null)
         {
-            Debug.Log("WAKE UP N*GGA WAKE UP");
+            //Debug.Log("WAKE UP WAKE UP");
         }
     }
 
     public bool TakeHit()
     {
-        _ps.ApplyDamage(10f);
+        _ps.ApplyDamage(60.0f);
 
         return _ps.health <= 0;
     }

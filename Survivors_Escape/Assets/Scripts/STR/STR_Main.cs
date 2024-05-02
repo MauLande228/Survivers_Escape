@@ -112,6 +112,8 @@ public class STR_Main : NetworkBehaviour
                 case 2: CheckOneTrade(); break;
                 case 3: CheckCycleTrade(); break;
                 case 4: CheckCycleGem(); break;
+                case 5: CheckMeatTrade(); break;
+                default: break;
             }
 
             opened = false;
@@ -180,18 +182,12 @@ public class STR_Main : NetworkBehaviour
         {
             if (sslots[0].itemdata.itName.ToString() == inp_name)
             {
-                if (sslots[0].stack > inp_numb)
+                int n = sslots[0].stack / inp_numb;
+                if (sslots[0].stack >= inp_numb)
                 {
-                    sslots[0].stack -= inp_numb;
+                    sslots[0].stack -= inp_numb*n;
                     sslots[1].itemdata = out_item;
-                    sslots[1].stack = out_numb;
-
-                }
-                if (sslots[0].stack == inp_numb)
-                {
-                    sslots[0].itemdata = null;
-                    sslots[1].itemdata = out_item;
-                    sslots[1].stack = out_numb;
+                    sslots[1].stack += out_numb*n;
                 }
             }
         }
@@ -237,7 +233,7 @@ public class STR_Main : NetworkBehaviour
     {
         if (sslots[0].itemdata != null)
         {
-            int ns = 0;
+            int ns;
             switch (sslots[0].itemdata.itName.ToString())
             {
                 case "Emerald": // itemsList[0]
@@ -262,63 +258,23 @@ public class STR_Main : NetworkBehaviour
         }
     }
 
-    public void TradeForest() // in PLAINS for PRESSURE GAUGE
+    public void CheckMeatTrade()
     {
         if (sslots[0].itemdata != null)
         {
-            if (sslots[0].itemdata.itName.ToString() == "Forest Essence")
+            string ifm = sslots[0].itemdata.itType.ToString();
+            if (ifm == inp_name)
             {
-                if (sslots[0].stack >= 20)
+                int n = sslots[0].stack / inp_numb;
+                if (sslots[0].stack >= inp_numb)
                 {
-                    sslots[0].itemdata = all_sos._itemsList[0];
-                    sslots[0].stack = 1;
+                    sslots[0].stack -= inp_numb * n;
+                    sslots[1].itemdata = out_item;
+                    sslots[1].stack += out_numb * n;
                 }
             }
         }
     }
-    public void TradeDense() // in FANTASY for ELECTRIC ENGINE
-    {
-        if (sslots[0].itemdata != null)
-        {
-            if (sslots[0].itemdata.itName.ToString() == "Density Essence")
-            {
-                if (sslots[0].stack >= 20)
-                {
-                    sslots[0].itemdata = all_sos._itemsList[0];
-                    sslots[0].stack = 1;
-                }
-            }
-        }
-    }
-    public void TradePlains() // in FOREST for GAS BARREL
-    {
-        if (sslots[0].itemdata != null)
-        {
-            if (sslots[0].itemdata.itName.ToString() == "Plains Essence")
-            {
-                if (sslots[0].stack >= 20)
-                {
-                    sslots[0].itemdata = all_sos._itemsList[0];
-                    sslots[0].stack = 1;
-                }
-            }
-        }
-    }
-    public void TradeFantasy() // in DENSITY for GEAR
-    {
-        if (sslots[0].itemdata != null)
-        {
-            if (sslots[0].itemdata.itName.ToString() == "Fantasy Essence")
-            {
-                if (sslots[0].stack >= 20)
-                {
-                    sslots[0].itemdata = all_sos._itemsList[0];
-                    sslots[0].stack = 1;
-                }
-            }
-        }
-    }
-
 
     public void Check3()
     {

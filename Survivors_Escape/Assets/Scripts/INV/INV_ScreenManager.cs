@@ -16,6 +16,8 @@ public class INV_ScreenManager : MonoBehaviour
     public KeyCode equipKey = KeyCode.Q; // Equip
     public KeyCode dropKey = KeyCode.R; // Drop
     public KeyCode splitKey = KeyCode.F; // Split
+    public KeyCode testKey = KeyCode.P; // Finish game
+    public KeyCode mapKey = KeyCode.M; // Show map
     private KeyCode[] keyCodes = new KeyCode[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8 };
 
     [Header("Settings")]
@@ -23,6 +25,9 @@ public class INV_ScreenManager : MonoBehaviour
     public int invVals = 0; // Stores the inventory value
     public int selectedSlot = 0;
     public int currentSlot = 0;
+
+    // 0:Material // < 1:Consumable // 2:Unique // 3:Special > // 4:Tools
+    public List<int> count_objects_shared = new() { 0, 0, 0, 0, 0 };
 
     [Header("Refs")]
     public Transform dropPos;
@@ -75,6 +80,10 @@ public class INV_ScreenManager : MonoBehaviour
     public GameObject uiBTNS;
     public GameObject uiKeyu;
 
+    public GameObject uiFMap;
+    public Transform mapREF;
+    public bool mapOpen = false;
+
     public SurvivorsEscape.CharacterController cc;
     public PlayersManager gchecks;
     public ulong uid;
@@ -98,6 +107,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                 GenKeyUses(); UpdateKeyUse(1);
 
+                GenFullMap();
                 GenUIAlerts();
                 GenObjList();
 
@@ -123,6 +133,10 @@ public class INV_ScreenManager : MonoBehaviour
             {
                 if (Input.GetKeyDown(invKey))
                 {
+                    if (mapOpen)
+                    {
+                        CloseMap();
+                    }
                     opened = !opened;
                     Cursor.lockState = CursorLockMode.None;
                     //if (strui.op)
@@ -154,7 +168,6 @@ public class INV_ScreenManager : MonoBehaviour
 
                 if (opened)
                 {
-                    
                     transform.localPosition = new Vector3(0, 0, 0);
 
                     if (objui.inrange)
@@ -188,6 +201,12 @@ public class INV_ScreenManager : MonoBehaviour
                         else if (Input.GetKeyDown(KeyCode.Alpha8)) { strui.TakeSlot(7); ChangeSelected(currentSlot); }
                         else if (Input.GetKeyDown(KeyCode.Alpha9)) { strui.TakeSlot(8); ChangeSelected(currentSlot); }
                         else if (Input.GetKeyDown(KeyCode.Alpha0)) { strui.TakeSlot(9); ChangeSelected(currentSlot); }
+                    }
+
+                    if (Input.GetKeyDown(testKey))
+                    {
+                        gchecks.CEV_MixAllCoordinationServerRpc(count_objects_shared[1], count_objects_shared[2], count_objects_shared[3], count_objects_shared[1], count_objects_shared[4], uid);
+                        gchecks.E_CallMyAverages(uid);
                     }
 
                     if (Input.GetKeyDown(equipKey))
@@ -230,9 +249,21 @@ public class INV_ScreenManager : MonoBehaviour
                     {
                         if (allSlots[currentSlot].itisEmpty == false) { DivideSlot(selectedSlot); }
                     }
+                    if (Input.GetKeyDown(mapKey))
+                    {
+                        opened = false;
+                        if (!mapOpen) { OpenMap(); }
+                        else { CloseMap(); }
+                    }
                 }
                 else
                 {
+                    if (Input.GetKeyDown(mapKey))
+                    {
+                        if (!mapOpen){ OpenMap(); }
+                        else { CloseMap(); }
+                    }
+
                     transform.localPosition = new Vector3(-10000, 0, 0);
                     Cursor.lockState = CursorLockMode.Locked;
 
@@ -265,7 +296,6 @@ public class INV_ScreenManager : MonoBehaviour
     {
         if (opened) {
             opened = false;
-            cc._IsDead = true;
             transform.localPosition = new Vector3(-10000, 0, 0);
             Cursor.lockState = CursorLockMode.Locked;
 
@@ -284,16 +314,20 @@ public class INV_ScreenManager : MonoBehaviour
     }
 
     public void SetOwnerID(ulong id) { uid = id; }
+    public ulong GetOwnerID() { return uid; }
     public void SetStartEquipment()
     {
         currentSlot = 0;
         ChangeSelected(currentSlot);
         bool naxe = CreateItem(_spawnableList._itemsList[12], 96); // Give player a stone axe
         bool npck = CreateItem(_spawnableList._itemsList[11], 60); // Give player a stone pickaxe
+        bool ido1 = CreateItem(_spawnableList._itemsList[35], 1); // Give player an idol
     }
     public void SetChecks(PlayersManager pd)
     {
         gchecks = pd;
+        gchecks.E_SetID(uid);
+        gchecks.E_SetINV(this);
     }
 
     public int GetValue()
@@ -303,7 +337,7 @@ public class INV_ScreenManager : MonoBehaviour
 
     public void ApplyDMG()
     {
-        Pstats.health -= 2.5f;
+        Pstats.health -= 3.5f;
     }
     public int ApplyLUCK()
     {
@@ -347,6 +381,16 @@ public class INV_ScreenManager : MonoBehaviour
         }
     }
 
+    public void OpenMap()
+    {
+        mapREF.gameObject.SetActive(true);
+        mapOpen = true;
+    }
+    public void CloseMap()
+    {
+        mapREF.gameObject.SetActive(false);
+        mapOpen = false;
+    }
     public void UnEquip(int ct)
     {
         switch (ct)
@@ -462,14 +506,8 @@ public class INV_ScreenManager : MonoBehaviour
                         }
                         else
                         {
-                            if (allSlots[currentSlot].data.itEqup)
-                            {
-                                SetToButtonsA();
-                            }
-                            else
-                            {
-                                SetToButtonsB();
-                            }
+                            if (allSlots[currentSlot].data.itEqup) { SetToButtonsA(); }
+                            else { SetToButtonsB(); }
                         }
                         UpdateDesc(allSlots[currentSlot].data.itName, allSlots[currentSlot].data.itType.ToString(), allSlots[currentSlot].data.itDesc);
                         //Debug.Log(allSlots[currentSlot].data.itType.ToString());
@@ -581,14 +619,14 @@ public class INV_ScreenManager : MonoBehaviour
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
                 gchecks.CEV_RegisterBuffByIDServerRpc(uid);
-                Pstats.maxhealth += 5.0f;
+                Pstats.maxhealth += 15.0f;
                 break;
 
             case 2: // Frutal Dessert : More HB
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
                 gchecks.CEV_RegisterBuffByIDServerRpc(uid);
-                Pstats.maxhunger += 5.0f;
+                Pstats.maxhunger += 15.0f;
                 break;
 
             case 3: // Frutal Drink : More luck
@@ -658,7 +696,7 @@ public class INV_ScreenManager : MonoBehaviour
     {
         allSlots[0].stackSize = allSlots[0].stackSize - 1;
         allSlots[0].UpdateSlot();
-        Pstats.health -= 1.5f;
+        Pstats.health -= 1.0f;
 
         if (allSlots[0].stackSize <= 0)
         {
@@ -667,7 +705,6 @@ public class INV_ScreenManager : MonoBehaviour
             if (!CheckIfTool())
             {
                 hasTool = false;
-                gchecks.CEV_SupportWithTools(true);
             }
         }
     }
@@ -770,6 +807,12 @@ public class INV_ScreenManager : MonoBehaviour
     {
         TextMeshProUGUI k = Instantiate(uiKeyu, this.gameObject.transform).GetComponent<TextMeshProUGUI>();
         Ktext = k;
+    }
+    public void GenFullMap()
+    {
+        mapREF = Instantiate(uiFMap, canvas.gameObject.transform).GetComponent<Transform>();
+        mapREF.gameObject.SetActive(false);
+        mapOpen = false;
     }
 
     public void UpdateCurrentSlot(Slot s)
@@ -1197,7 +1240,16 @@ public class INV_ScreenManager : MonoBehaviour
         bool isSaved = false;
         bool f = false;
 
-        if (pickUp.pow < 999 && pickUp.pow != uid) { isSaved = true; }
+        if (!pickUp.shared_once)
+        {
+            if (pickUp.pow < 999 && pickUp.pow != uid)
+            {
+                isSaved = true;
+                Debug.Log("+ + + + + + + + + + + + + + + + + + + + + + + + + + AGARRE UN OBJETO QUE LE PERTENECIO A ALGUIEN MAS");
+            }
+            //pickUp.data.shared_once = true;
+        }
+        
 
         if (pickUp.data.isStackable) // IF THE ITEM CAN BE STACKED
         {
@@ -1237,7 +1289,7 @@ public class INV_ScreenManager : MonoBehaviour
                             invSlots[i].UpdateSlot();
 
                             if (isIn) { UpdateCurrentSlot(invSlots[i]); }
-                            if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
+                            if (isSaved) { AddCountShare(pickUp.data.itType.ToString()[0]); pickUp.shared_once = true; }
 
                             f = true;
                             stackableSlot.UpdateSlot();
@@ -1266,7 +1318,7 @@ public class INV_ScreenManager : MonoBehaviour
                     stackableSlot.UpdateSlot();
 
                     AddValue(pickUp.data.value, pickUp.stackSize);
-                    if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
+                    if (isSaved) { AddCountShare(pickUp.data.itType.ToString()[0]); pickUp.shared_once = true; }
                     //Destroy(pickUp.gameObject);
                     return true;
                 }
@@ -1296,7 +1348,7 @@ public class INV_ScreenManager : MonoBehaviour
                     emptySlot.UpdateSlot();
                     //EFX_Applied(e);
                     if (isIn) { UpdateCurrentSlot(emptySlot); }
-                    if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
+                    if (isSaved) { AddCountShare(pickUp.data.itType.ToString()[0]); pickUp.shared_once = true; }
                     return true;
                     //Destroy(pickUp.gameObject);
                 }
@@ -1332,7 +1384,7 @@ public class INV_ScreenManager : MonoBehaviour
                 emptySlot.UpdateSlot();
                 //EFX_Applied(e);
                 if (isIn) { UpdateCurrentSlot(emptySlot); }
-                if (isSaved) { AddCountShare(pickUp.data.itName[0]); }
+                if (isSaved) { AddCountShare(pickUp.data.itType.ToString()[0]); pickUp.shared_once = true; }
 
                 if (s == 0) { DoEquip(invSlots[0].data.itName); }
                 int g = GetGem(pickUp.data.itName);
@@ -1377,9 +1429,10 @@ public class INV_ScreenManager : MonoBehaviour
         {
             hasWep = false;
         }
+        bool hasPassedOnce = slot.data.itPrefab.GetComponent<INV_PickUp>().shared_once;
 
         SubValue(slot.data.value, slot.stackSize);
-        Spawner.Instace.SpawnObjectServerRpc(i, slot.stackSize, x, y, z, uid);
+        Spawner.Instace.SpawnObjectServerRpc(i, slot.stackSize, x, y, z, uid, hasPassedOnce);
         //Debug.Log("Here");
         UpdateNoDesc();
         slot.Clean();
@@ -1404,7 +1457,7 @@ public class INV_ScreenManager : MonoBehaviour
 
         SubValue(dt.value, nl);
         //SetToNoButtons();
-        Spawner.Instace.SpawnObjectServerRpc(i, nl, x, y, z, uid);
+        Spawner.Instace.SpawnObjectServerRpc(i, nl, x, y, z, uid, false);
         //INV_PickUp pickup = Instantiate(itDropModel, dropPos).AddComponent<INV_PickUp>();
         //pickup.transform.position = dropPos.position;
         //pickup.transform.SetParent(null);
@@ -1414,23 +1467,46 @@ public class INV_ScreenManager : MonoBehaviour
     }
 
     public bool CanBeDestroyed() { return _bCanBeDestroyed; }
+    public Transform GetCurrentDropPos() { return dropPos; }
 
-    public Transform GetCurrentDropPos()
-    {
-        return dropPos;
-    }
-
-    // 0:Materials // 1:Food // 2:Objectives // 3:Boosters // 4:Tools
-    public List<int> count_objects_shared = new() { 0, 0, 0, 0, 0 };
     public void AddCountShare(char x)
     {
         switch(x)
         {
-            case 'M': count_objects_shared[0]++; break;
-            case 'F': count_objects_shared[1]++; break;
-            case 'O': count_objects_shared[2]++; break;
-            case 'B': count_objects_shared[3]++; break;
-            case 'T': count_objects_shared[4]++; break;
+            case 'M': count_objects_shared[0]++; break; // Material - cooperacion
+            case 'C': count_objects_shared[1]++; break; // Consumbale - coordinacion-org
+            case 'U': count_objects_shared[2]++; break; // Unique - coordinacion-org
+            case 'S': count_objects_shared[3]++; break; // Special - coordinacion-org
+            case 'T': count_objects_shared[4]++; break; // Tools - cooperacion
+            default: break;
         }
+    }
+
+    public void Send_SUPPDEAD_Vals()
+    {
+        if(cc != null)
+        {
+            if (cc.IsOwner)
+            {
+                float supp_dead_avg = 0.5f;
+                if (Pstats.cev_suppdead.Count > 0)
+                {
+                    supp_dead_avg = E_Promedio(Pstats.cev_suppdead); // 1/6
+                }
+                gchecks.E_SetPersonalCoop(supp_dead_avg, 0);
+            }
+        }
+    }
+
+    float E_Promedio(List<float> acev)
+    {
+        int clen = acev.Count;
+        float cmix = 0.0f;
+        for (int i = 0; i < clen; i++)
+        {
+            cmix += acev[i];
+        }
+        float cavg = cmix / clen;
+        return cavg;
     }
 }

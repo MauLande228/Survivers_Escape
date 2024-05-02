@@ -16,6 +16,7 @@ public class CraftManager : MonoBehaviour
     public CraftRecipeTemp inCraft;
 
     private bool isCraft;
+    private int theNumber = 1;
     private float ctime;
 
     // Start is called before the first frame update
@@ -62,8 +63,9 @@ public class CraftManager : MonoBehaviour
 
                 rec.rec_so = recs[i];
                 rec.rec_ico.sprite = recs[i].ss_ico;
-                rec.rec_name.text = recs[i].srec_name;
+                rec.rec_name.text = "[" + theNumber.ToString() + "] " + recs[i].srec_name;
                 rec.rec_time.text = "";
+                theNumber += 1;
 
                 for (int j = 0; j < recs[i].reqs.Length; j++)
                 {
@@ -87,8 +89,9 @@ public class CraftManager : MonoBehaviour
 
         rec.rec_so = allr[i];
         rec.rec_ico.sprite = allr[i].ss_ico;
-        rec.rec_name.text = allr[i].srec_name;
+        rec.rec_name.text = "[" + theNumber.ToString() + "] " + allr[i].srec_name;
         rec.rec_time.text = "";
+        theNumber += 1;
 
         for (int j = 0; j < allr[i].reqs.Length; j++)
         {

@@ -14,16 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Starfruit
-  itDesc: Obtained from trees in the snowy woods. Very tasty!
+  itDesc: Obtained from trees in the snowy woods. Heals 18 hunger points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 6079e98b0a541fd40839fa70da2d9b54, type: 3}
   itPrefab: {fileID: 6284274710234526678, guid: f23e298fbc2adea4484e1c16ef02aa25,
     type: 3}
   isStackable: 1
-  maxStack: 25
+  maxStack: 50
   value: 4
-  plusHB: 16
-  plusHP: 8
+  shared_once: 0
+  plusHB: 18
+  plusHP: 10
   act: 0
   WepDmg: 0
   StoneDmg: 0

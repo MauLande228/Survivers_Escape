@@ -213,8 +213,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: f41159a30c35ae44b88a353a4f9c07d8, type: 2}
-  stackSize: 3
+  stackSize: 2
   pow: 999
+  shared_once: 0
 --- !u!114 &6429581213548796213
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 4
   itName: Frutal Drink
-  itDesc: A combination of certain fruits. It increases your luck slightly
+  itDesc: A combination of certain fruits. It increases your luck in one level
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 6541aa27e91f0d142a4d6e17baa02b63, type: 3}
   itPrefab: {fileID: 5657137418118054131, guid: 91dca74862af2f3408c39254cf4607e8,
