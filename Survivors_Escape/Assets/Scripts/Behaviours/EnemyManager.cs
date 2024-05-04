@@ -20,7 +20,7 @@ public class EnemyManager : MonoBehaviour
 
     public bool TakeHit()
     {
-        _ps.ApplyDamage(60.0f);
+        _ps.ApplyDamage(100.0f);
 
         return _ps.health <= 0;
     }

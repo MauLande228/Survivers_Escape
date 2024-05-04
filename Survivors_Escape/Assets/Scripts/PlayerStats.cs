@@ -1,3 +1,4 @@
+using SurvivorsEscape;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
@@ -148,9 +149,12 @@ public class PlayerStats : MonoBehaviour
         {
             life_lock = true;
             health = 0;
+            hunger = 0;
 
             cc._IsDead = true;
+            cc.RequestStanceChange(CharacterStance.CROUCHING);
             inv.CloseInventory();
+            inv.StartDeadUI(respawnTime);
 
             CEV_SuppPlayerTime_1();
             inv.IsDeadAsHell();
@@ -174,16 +178,21 @@ public class PlayerStats : MonoBehaviour
             CEV_SPT_Saved();
             Transform playernow = GetComponent<Transform>();
             playernow.position = respawnPos;
+            inv.FinishDeadUI();
             health = 50;
             hunger = 50;
+
             life_lock = false;
             hunger_lock = false;
+
             cc._IsDead = false;
+            cc.RequestStanceChange(CharacterStance.STANDING);
             inv.gchecks.CEV_ADP_AmAlive();
             respawnTime = 18;
         }
         else
         {
+            inv.NewDeadUI(respawnTime);
             Invoke(nameof(GoRespawnTime), 1);
         }
     }
@@ -198,11 +207,11 @@ public class PlayerStats : MonoBehaviour
     {
         cont3 = true;
         Lap3 = 1;
-        Invoke(nameof(CEV_SPT_Invoke), 3.6f);
+        Invoke(nameof(CEV_SPT_Invoke), 4.5f);
     }
     void CEV_SPT_Invoke()
     {
-        if (cont3) { Lap3 += 1; Invoke(nameof(CEV_SPT_Invoke), 3.6f); }
+        if (cont3) { Lap3 += 1; Invoke(nameof(CEV_SPT_Invoke), 4.5f); }
         else { CEV_SupportPlayerTime_2(); }
     }
     public void CEV_SPT_Saved() { cont3 = false; }
@@ -218,6 +227,7 @@ public class PlayerStats : MonoBehaviour
             default: cev = 10.0f; break;
         }
         cev_suppdead.Add(cev); // Enviar valor
+        inv.gchecks.CEV_RegisterDeadSuppServerRpc(cev);
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
 
@@ -232,6 +242,12 @@ public class PlayerStats : MonoBehaviour
     {
         possibledmg = dmg * defense;
         health -= possibledmg;
+
+        if (health < 0.0f)
+        {
+            hunger = 0;
+            inv.gchecks.E_KillPrevMonsterServerRpc();
+        }
     }
 
 

@@ -27,7 +27,7 @@ public class RESC_BushCollide : NetworkBehaviour
 
     private void Start()
     {
-        nitem = new List<Inv_itemSO> { it1, it2, it3, it1 }; // it1:material // it2:food // it3:essence
+        nitem = new List<Inv_itemSO> { it1, it3, it2, it3, it1 }; // it1:material // it2:food // it3:essence
     }
 
     private void RegenLoot()
@@ -50,7 +50,7 @@ public class RESC_BushCollide : NetworkBehaviour
                 Invoke(nameof(RegenLoot), 30);
 
                 r = rnd.Next(7);
-                Debug.Log(r.ToString());
+                //Debug.Log(r.ToString());
                 inv = other.GetComponentInChildren<INV_ScreenManager>();
                 if (inv != null)
                 {
@@ -58,7 +58,7 @@ public class RESC_BushCollide : NetworkBehaviour
                     r += l;
                     if (r > 11) { r = 11; }
                 }
-                Debug.Log(r.ToString());
+                //Debug.Log(r.ToString());
                 s = rnd.Next(4);
 
                 inv.ApplyDMG();

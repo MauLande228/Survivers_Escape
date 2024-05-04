@@ -28,32 +28,39 @@ public class PlayersManager : NetworkBehaviour
 
     public INV_ScreenManager user_inv;
     public ulong user_id = 999;
-    // 0:cev_suppdead // 1:cev_apprdead // 2:cev_variance // 3:cev_materials // 4:cev_ultimatool // 5:cev_stayfriend
+
+    // LISTAS PERSONALES
+    // 0:cev_suppdead : se puede sacar promedio personal y guardar en cev_personal_coops[0] asi cada jugador tiene su valor
+    // 1:cev_apprdead : se puede sacar promedio personal y guardar en cev_personal_coops[1] asi cada jugador tiene su valor
+    // 2:cev_variance : se debe esperar a que todos terminen y usen el VALOR UNICO para calcular varianza y guardarlo en cev_personal_coops[2] el cual sera igual en todas las sesiones
+    // 3:cev_materials : se debe esperar a que todos terminen y usen LISTA DE NUMS AÑADIDOS para calcular valor y guardarlo en cev_personal_coops[3] el cual sera igual en todas las sesiones
+    // 4:cev_ultimatool : se debe esperar a que todos terminen y usen LISTA DE NUMS AÑADIDOS para calcular valor y guardarlo en cev_personal_coops[4] el cual sera igual en todas las sesiones
+    // 5:cev_stayfriend : se debe esperar a que todos terminen y usen LISTA DE NUMS AÑADIDOS para calcular varianza y guardarlo en cev_personal_coops[5] el cual sera igual en todas las sesiones
     public List<float> cev_personal_coops = new() { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-    // 0:cev_foodbringer // 1:cev_keyitems // 2:cev_idolproducer
+    public List<float> cev_historysuppdead = new();
+    public List<float> cev_historyapprdead = new();
+    public List<ulong> cev_historybuffs = new(); // supp caso 2 guardando tu id cada vez que consumes una mejora
+    public List<int> cev_historymats = new(); // supp caso 3 guardando tu comparticion de materiales en tu posicion
+    public List<int> cev_historytools = new(); // supp caso 4 guardando tu comparticion de herramientas en tu posicion
+    public List<int> cev_historynostay = new(); // supp caso 5 guardando tu minuto de finalizacion de juego en tu posicion
+
+    // 0:cev_foodbringer : se debe esperar a que todos terminen y usen LISTA DE NUMS AÑADIDOS para calcular valor y guardarlo en cev_personal_coord[0] el cual sera igual en todas las sesiones
+    // 1:cev_keyitems : se debe esperar a que todos terminen y usen LISTA DE NUMS AÑADIDOS para calcular valor y guardarlo en cev_personal_coord[1] el cual sera igual en todas las sesiones
+    // 2:cev_idolproducer : se debe esperar a que todos terminen y usen LISTA DE NUMS AÑADIDOS para calcular valor y guardarlo en cev_personal_coord[2] el cual sera igual en todas las sesiones
     public List<float> cev_personal_coord = new() { 0.0f, 0.0f, 0.0f };
-    // 0:coordination // 1:cooperation
+    public List<int> cev_historyfood = new(); // supp caso 0 guardando tu comparticion de comida en tu posicion
+    public List<int> cev_historyuniq = new(); // supp caso 1 guardando tu comparticion de objetos unicos en tu posicion
+    public List<int> cev_historyboos = new(); // supp caso 2 guardando tu comparticion de objetos especiales de mejoras en tu posicion
+
+    // 0:cooperation // 1:coordination // cuando se lleguen a todas las calculaciones, calcular los promedios de las listas personal_coops y personal_coord
     public List<float> cev_personal_avgs = new() { 0.0f, 0.0f };
-
-    public float avgs_coop = 0.0f;
-    public float avgs_coor = 0.0f;
-    public int final_cooperation = 0;
-    public int final_coordination = 0;
-
-    public List<float> cev_supp_time = new();
-    public List<float> cev_supp_dist = new();
-    public List<int> cev_coop_mats = new();
-    public List<int> cev_coop_tool = new();
-    public List<int> cev_coop_stay = new();
-
     public List<float> cev_eachcooperation = new(); // Variable que guarda todos los promedios de cooperacion de cada jugador
-
-    public List<int> cev_coor_food = new();
-    public List<int> cev_coor_uniq = new();
-    public List<int> cev_coor_boos = new();
-
-    public List<bool> cev_coor_finish = new();
     public List<float> cev_eachcoordination = new(); // Variable que guarda todos los promedios de coordinacion de cada jugador
+
+    public float global_avg_coop = 0.0f; // Valor global de cooperacion en float
+    public float global_avg_coor = 0.0f; // Valor global de coordinacion en float
+    public int final_cooperation = 0; // Valor global en entero
+    public int final_coordination = 0; // Valor global en entero
 
     public List<bool> cev_eachfinish = new(); // Variable que guarda si ya terminaron los jugadores
 
@@ -65,7 +72,7 @@ public class PlayersManager : NetworkBehaviour
         // UNCOMMENT TO CHECK VARIANCE ACTIVELY
         //Invoke(nameof(CEV_RBID_InvokeCheck), 60);
 
-        double x = FinalValue(40,60);
+        double x = FinalValue(85, 80);
         //Instantiate(Chest1);
     }
 
@@ -87,15 +94,16 @@ public class PlayersManager : NetworkBehaviour
                 playerObjects.Add(obj); // Add the player object to the list
                 cev_eachcooperation.Add(0f);
                 cev_eachcoordination.Add(0f);
+
+                cev_historymats.Add(0);
+                cev_historytools.Add(0);
+                cev_historynostay.Add(0);
+
+                cev_historyfood.Add(0);
+                cev_historyuniq.Add(0);
+                cev_historyboos.Add(0);
+
                 cev_eachfinish.Add(false);
-
-                cev_coop_mats.Add(0);
-                cev_coop_tool.Add(0);
-
-                cev_coor_food.Add(0);
-                cev_coor_uniq.Add(0);
-                cev_coor_boos.Add(0);
-                cev_coor_finish.Add(false);
             }
         }
 
@@ -130,38 +138,20 @@ public class PlayersManager : NetworkBehaviour
     // Crear las listas desde el inicio y cada vez que termina el jugador, con serverRPC y clientRPC sincronizar todas las listas
 
     // Cuando cada usuario termina su partida, envia sus datos a las listas de promedios despues de calcularlos de su lado
-    [ServerRpc(RequireOwnership = false)]
-    public void SyncAllCevValuesServerRpc(ulong uid, float coop_avg, float coor_avg)
-    {
-        int iid = (int)uid;
-        SyncAllCevValuesClientRpc(iid, coop_avg, coor_avg);
-    }
-    [ClientRpc]
-    public void SyncAllCevValuesClientRpc(int iid, float coop_avg, float coor_avg)
-    {
-        cev_eachcooperation[iid] = coop_avg;
-        cev_eachcoordination[iid] = coor_avg;
-        cev_eachfinish[iid] = true;
+    //[ServerRpc(RequireOwnership = false)]
+    //public void SyncAllCevValuesServerRpc(ulong uid, float coop_avg, float coor_avg)
+    //{
+    //    int iid = (int)uid;
+    //    SyncAllCevValuesClientRpc(iid, coop_avg, coor_avg);
+    //}
+    //[ClientRpc]
+    //public void SyncAllCevValuesClientRpc(int iid, float coop_avg, float coor_avg)
+    //{
+    //    cev_eachcooperation[iid] = coop_avg;
+    //    cev_eachcoordination[iid] = coor_avg;
+    //}
 
-        bool allfinished = true;
-        foreach (bool val in cev_eachfinish)
-        {
-            if (!val) { allfinished = false; }
-        }
-
-        if (allfinished) // Cuando todos los jugadores hayan terminado la partida
-        {
-            avgs_coop = E_Promedio(cev_eachcooperation);
-            avgs_coor = E_Promedio(cev_eachcoordination);
-
-            final_cooperation = (int)avgs_coop * 100;
-            final_coordination = (int)avgs_coor * 100;
-
-            FinalValue(final_cooperation, final_coordination);
-        }
-    }
-
-    public double FinalValue(int val_coordination, int val_cooperation)
+    public double FinalValue(int val_cooperation, int val_coordination)
     {
         var coordinacion = new LinguisticVariable("Coordinacion");
         var lacking = coordinacion.MembershipFunctions.AddTrapezoid("Lacking", 0, 0, 25, 40);
@@ -209,26 +199,49 @@ public class PlayersManager : NetworkBehaviour
 
         //object alls = new { coordinacion = 50 };
         //object allv = new { cooperacion = 50 };
-        double result = fuzzyEngine.Defuzzify(new { coordinacion = 10, cooperacion = 65 });
-        double good_result = fuzzyEngine.Defuzzify(new { coordinacion = val_coordination, cooperacion = val_cooperation });
 
-        Debug.Log("EL RESULTADO ES DE TESTEO ES : "); Debug.Log(result.ToString());
-        Debug.Log("EL RESULTADO VERDADERO VERDADERO ES : "); Debug.Log(good_result.ToString());
+        //double result = fuzzyEngine.Defuzzify(new { cooperacion = 42, coordinacion = 31 });
+        double good_result = fuzzyEngine.Defuzzify(new { cooperacion = val_cooperation, coordinacion = val_coordination });
+        //Debug.Log("+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + EL RESULTADO ES DE TESTEO ES : "); Debug.Log(result.ToString());
+        Debug.Log("+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + EL RESULTADO VERDADERO VERDADERO ES : "); Debug.Log(good_result.ToString());
+
         return good_result;
     }
 
     [Header("Global Action's Checks")]
-
+    public float xyz = 0.0f;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
 
-    // H I S T O R Y - O F - P E R M A N E N T - B U F F S - - - - - Used for cooperation, influence of 16%
+    // H I S T O R Y S
 
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    public List<ulong> cev_historybuffs = new();
-    public double variance = 0;
+    [ServerRpc(RequireOwnership = false)]
+    public void CEV_RegisterDeadSuppServerRpc(float valx)
+    {
+        CEV_RegisterDeadSuppClientRpc(valx);
+    }
+    [ClientRpc]
+    public void CEV_RegisterDeadSuppClientRpc(float valx)
+    {
+        cev_historysuppdead.Add(valx);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void CEV_RegisterDeadApprServerRpc(float valx)
+    {
+        CEV_RegisterDeadApprClientRpc(valx);
+    }
+    [ClientRpc]
+    public void CEV_RegisterDeadApprClientRpc(float valx)
+    {
+        cev_historyapprdead.Add(valx);
+    }
+
+    public double variance_buffs = 0;
+    public double variance_finish = 0;
     public float cev_variance = 0;
 
     [ServerRpc(RequireOwnership = false)]
@@ -248,7 +261,7 @@ public class PlayersManager : NetworkBehaviour
     //    else { Debug.Log("Not enough players!!!"); }
     //    Invoke(nameof(CEV_RBID_InvokeCheck), 60);
     //}
-    public void CEV_RBID_Distribution()
+    public void Set_ALLBUFFS_Variance()
     {
         List<ulong> cev_hbdistribution = new();
         Dictionary<ulong, int> cev_dists = new();
@@ -285,23 +298,42 @@ public class PlayersManager : NetworkBehaviour
             sumSquaredDiff += diff * diff;
         }
 
-        variance = sumSquaredDiff / cev_allvalues.Count;
-        cev_variance = CEV_RBID_FinalVariance(); // 3/6
-        E_SetPersonalCoop(cev_variance, 2);
-    }
-
-    public float CEV_RBID_FinalVariance()
-    {
+        variance_buffs = sumSquaredDiff / cev_allvalues.Count;
         float cev;
-        if (variance > 1.2) { cev = 0.1f; }
-        else if (variance > 0.9) { cev = 0.3f; }
-        else if (variance > 0.6) { cev = 0.5f; }
-        else if (variance > 0.3) { cev = 0.7f; }
+        if (variance_buffs > 1.2) { cev = 0.1f; }
+        else if (variance_buffs > 0.9) { cev = 0.3f; }
+        else if (variance_buffs > 0.6) { cev = 0.5f; }
+        else if (variance_buffs > 0.3) { cev = 0.7f; }
         else { cev = 0.9f; }
 
-        return cev;
+        E_SetPersonalCoop(cev, 2); // 3/6
     }
 
+    public void Set_ISTAYBRO_Variance()
+    {   
+        // Obtener el promedio de varianza
+        int sum = 0;
+        foreach (int min in cev_historynostay) { sum += min; }
+        double avg = (double)sum / cev_historynostay.Count;
+
+        double sumSquaredDiff = 0;
+        foreach (int n in cev_historynostay)
+        {
+            double diff = n - avg;
+            sumSquaredDiff += diff * diff;
+        }
+
+        variance_finish = sumSquaredDiff / cev_historynostay.Count;
+        float cev;
+        if (variance_finish > 1.04) { cev = 0.1f; }
+        else if (variance_finish > 0.78) { cev = 0.3f; }
+        else if (variance_finish > 0.52) { cev = 0.5f; }
+        else if (variance_finish > 0.26) { cev = 0.7f; }
+        else { cev = 0.9f; }
+
+        E_SetPersonalCoop(cev, 5); // 6/6
+    }
+    
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
 
@@ -310,17 +342,6 @@ public class PlayersManager : NetworkBehaviour
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    List<ulong> all_ids = new();
-    [ServerRpc]
-    public void CEV_SpawnMonsterServerRpc()
-    {
-        var enemyOBJ = Instantiate(mEnemy);
-        enemyOBJ.transform.position = new Vector3(516, 76, 121);
-        var refNO = enemyOBJ.GetComponent<NetworkObject>();
-        refNO.Spawn();
-
-        Invoke(nameof(CEV_SpawnMonsterServerRpc), 10);
-    }
     //public void SpawnEnemy(ulong nid)
     //{
     //    if (uid == nid)
@@ -426,66 +447,17 @@ public class PlayersManager : NetworkBehaviour
         else { cev = 0.1f; }
         
         cev_apprdead.Add(cev); // Enviar valor
+        CEV_RegisterDeadApprServerRpc(cev);
     }
-
-    public void CEV_ADP_FinalAverage()
-    {
-        float appr_dead_avg = 0.0f;
-        if (cev_apprdead.Count > 0)
-        {
-            appr_dead_avg = E_Promedio(cev_apprdead); // 2/6
-        }
-        E_SetPersonalCoop(appr_dead_avg, 1);
-    }
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-
-    // M I X - A L L - C O O R D I N A T I O N S - - - - - Mixes all coordinations and obtains average
-
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    [ServerRpc(RequireOwnership = false)]
-    public void CEV_MixAllCoordinationServerRpc(int myAmountFood, int myAmountUniq, int myAmountBoos, int myAmountMats, int myAmountTols, ulong iid)
-    {
-        int pos = (int)iid;
-        CEV_MixAllCoordinationClientRpc(myAmountFood, myAmountUniq, myAmountBoos, myAmountMats, myAmountTols, pos);
-    }
-    [ClientRpc]
-    public void CEV_MixAllCoordinationClientRpc(int myAmountFood, int myAmountUniq, int myAmountBoos, int myAmountMats, int myAmountTols, int pos)
-    {
-        cev_coop_mats[pos] = myAmountMats; // 3:cev_materials // 4:cev_ultimatool // 5:cev_istaywithu
-        cev_coop_tool[pos] = myAmountTols;
-        cev_coop_stay[pos] = 5;
-
-        cev_coor_food[pos] = myAmountFood;
-        cev_coor_uniq[pos] = myAmountUniq;
-        cev_coor_boos[pos] = myAmountBoos;
-        cev_coor_finish[pos] = true;
-
-        bool allfinished = true;
-        foreach (bool val in cev_coor_finish) // 0:cev_foodbringer // 1:cev_keyitems // 2:cev_idolproducer
-        {
-            if (!val) { allfinished = false; }
-        }
-
-        if (allfinished) // Cuando todos los jugadores hayan terminado la partida
-        {
-            MarkTimeServerRpc();
-            // Material case
-            cev_personal_coops[3] = E_ExpectedMats(cev_coop_mats);
-            // Tool case
-            cev_personal_coops[4] = E_ExpectedTool(cev_coop_tool);
-
-            // Food case
-            cev_personal_coord[0] = E_ExpectedFood(cev_coor_food);
-            // Unique case
-            cev_personal_coord[1] = E_ExpectedUniq(cev_coor_uniq);
-            // Booster case
-            cev_personal_coord[2] = E_ExpectedBoos(cev_coor_boos);
-        }
-    }
+    //public void Set_APPRDEAD_Vals()
+    //{
+    //    float appr_dead_avg = 0.75f;
+    //    if (cev_apprdead.Count > 0)
+    //    {
+    //        appr_dead_avg = E_Promedio(cev_apprdead); 
+    //    }
+    //    E_SetPersonalCoop(appr_dead_avg, 1); // 2/6
+    //}
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
@@ -650,85 +622,114 @@ public class PlayersManager : NetworkBehaviour
         return cavg;
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // EXTRA : Funcion que saca promedio de suppdead y lo registra en su posición
+    void E_AvgSupp(List<float> acev)
+    {
+        int clen = acev.Count;
+        float cavg = 0.0f;
+        if(clen > 3)
+        {
+            float cmix = 0.0f;
+            for (int i = 0; i < clen; i++) { cmix += acev[i]; }
+            cavg = cmix / clen;
+        }
+        else
+        {
+            cavg = 0.8f;
+        }
+        E_SetPersonalCoop(cavg, 0); // 1/6
+    }
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+    // EXTRA : Funcion que saca promedio de apprdead y lo registra en su posicion
+    void E_AvgAppr(List<float> acev)
+    {
+        int clen = acev.Count;
+        float cavg = 0.0f;
+        if(clen > 3)
+        {
+            float cmix = 0.0f;
+            for (int i = 0; i < clen; i++) { cmix += acev[i]; }
+            cavg = cmix / clen;
+        }
+        else
+        {
+            cavg = 0.8f;
+        }
+        E_SetPersonalCoop(cavg, 1); // 2/6
+    }
+    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion que devuelve que la cooperacion de pasarse materiales, considerando que tienen la posibilidad de hacer rotacion
-    float E_ExpectedMats(List<int> all_shared_mats)
+    void E_ExpectedMats(List<int> all_shared_mats)
     {
         int a = 0;
-        foreach (int n in all_shared_mats)
-        {
-            a += n;
-        }
+        foreach (int n in all_shared_mats) { a += n; }
         float pavg = (float)a / ((float)n_mins / (float)(10 - playerObjects.Count));
 
         // La cantidad de comida compartida pasa por el proceso <<< AllVals / (Time / 10-NPlayers) >>>
         float cev; // 42mins/6 = 7 // 48 - muy bueno - 36 bueno - 24 media - 12 baja - 0 - muy baja
-        if (pavg > 6.0) { cev = 0.9f; }
-        else if (pavg > 4.5) { cev = 0.7f; }
-        else if (pavg > 3.0) { cev = 0.5f; }
-        else if (pavg > 1.5) { cev = 0.3f; }
+        if (pavg > 3.2) { cev = 0.9f; }
+        else if (pavg > 2.4) { cev = 0.7f; }
+        else if (pavg > 1.6) { cev = 0.5f; }
+        else if (pavg > 0.8) { cev = 0.3f; }
         else { cev = 0.1f; }
 
-        return cev;
+        E_SetPersonalCoop(cev, 3); // 4/6
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion que devuelve que la cooperacion de pasarse materiales, considerando que pueden dividirlas o dejar un encargado
-    //float E_ExpectedStayVariance(List<int> all_finish_times)
-    //{
-
-    //}
-    // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
-    // EXTRA : Funcion que devuelve que la cooperacion de pasarse materiales, considerando que pueden dividirlas o dejar un encargado
-    float E_ExpectedTool(List<int> all_shared_weps)
+    void E_ExpectedTool(List<int> all_shared_tool)
     {
         int a = 0;
-        foreach (int n in all_shared_weps)
-        {
-            a += n;
-        }
+        foreach (int n in all_shared_tool) { a += n; }
         float pavg = (float)a / ((float)n_mins / (float)(10 - playerObjects.Count));
 
         // La cantidad de comida compartida pasa por el proceso <<< AllVals / (Time / 10-NPlayers) >>>
         float cev; // 42mins/6 = 7 // 8 - muy bueno - 6 bueno - 4 media - 2 baja - 0 - muy baja
-        if (pavg > 1.04) { cev = 0.9f; }
-        else if (pavg > 0.78) { cev = 0.7f; }
-        else if (pavg > 0.52) { cev = 0.5f; }
-        else if (pavg > 0.26) { cev = 0.3f; }
+        if (pavg > 0.96) { cev = 0.9f; }
+        else if (pavg > 0.72) { cev = 0.7f; }
+        else if (pavg > 0.48) { cev = 0.5f; }
+        else if (pavg > 0.24) { cev = 0.3f; }
         else { cev = 0.1f; }
 
-        return cev;
+        E_SetPersonalCoop(cev, 4); // 5/6
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion que devuelve que tan efectiva fue la coordinacion de que alguien se dedique a recoger comida
-    float E_ExpectedFood(List<int> all_shared_food)
+    void E_ExpectedFood(List<int> all_shared_food)
     {
         int a = 0;
-        foreach (int n in all_shared_food)
-        {
-            a += n;
-        }
+        foreach (int n in all_shared_food) { a += n; }
         float pavg = (float)a / ((float)n_mins / (float)(10 - playerObjects.Count));
         
         // La cantidad de comida compartida pasa por el proceso <<< AllVals / (Time / 10-NPlayers) >>>
         float cev; // 42mins/6 = 7 // 48 - muy bueno - 36 bueno - 24 media - 12 baja - 0 - muy baja // 6.8 - 5.1 - 3.4 - 1.7 - 0
-        if (pavg > 5.6) { cev = 0.9f; }
-        else if (pavg > 4.2) { cev = 0.7f; }
-        else if (pavg > 2.8) { cev = 0.5f; }
-        else if (pavg > 1.4) { cev = 0.3f; }
+        if (pavg > 4.8) { cev = 0.9f; }
+        else if (pavg > 3.6) { cev = 0.7f; }
+        else if (pavg > 2.4) { cev = 0.5f; }
+        else if (pavg > 1.2) { cev = 0.3f; }
         else { cev = 0.1f; }
 
-        return cev;
+        E_SetPersonalCoor(cev, 0);
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion que devuelve que tan efectiva fue la coordinacion de obtener los objetivos
-    float E_ExpectedUniq(List<int> all_shared_uniq)
+    void E_ExpectedUniq(List<int> all_shared_uniq)
     {
         int a = 0;
         foreach (int n in all_shared_uniq) { a += n; }
 
-        // Si 2 personas trabajasen 8/4 - 12/8 - 16/12 - 20/16 - 24/20
-        // Si 3 personas trabajasen -/- - 12/6 - 16/10 - 20/14 - 24/18
+        //                          EQ2    EQ3    EQ4     EQ5     EQ6     EQ7     EQ8
+        // Si 2 personas trabajasen 8/4 - 12/8 - 16/12 - 20/16 - 24/20 - 28/24 - 32/28
+        //                          50%    66%    75%     80%     83%     85%     87%
+        // Si 3 personas trabajasen -/- - 12/6 - 16/10 - 20/14 - 24/18 - 28/22 - 32/26
+        //                                 50%    62%     70%     75%     78%     81%
+        // Si 4 personas trabajasen -/- - --/- - 16/8  - 20/12 - 24/16 - 28/20 - 32/24
+        //                                        50%     60%     66%     71%     75%
         int b = playerObjects.Count * 4; 
-        float pavg = a / (float)b;
+
+        // 
+        float ptotal = a / (float)b;
+        float pavg = ptotal * 100;
 
         float cev; // 100 < 75 50 30 15 > 0
         if (pavg > 75) { cev = 0.9f; }
@@ -737,61 +738,233 @@ public class PlayersManager : NetworkBehaviour
         else if (pavg > 15) { cev = 0.3f; }
         else { cev = 0.1f; }
 
-        return cev;
+        E_SetPersonalCoor(cev, 1);
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Funcion que devuelve que tan efectiva fue la coordinacion de producir mejoras permanentes
-    float E_ExpectedBoos(List<int> all_shared_boos)
+    void E_ExpectedBoos(List<int> all_shared_boos)
     {
         int a = 0;
-        foreach (int n in all_shared_boos)
-        {
-            a += n;
-        }
+        foreach (int n in all_shared_boos) { a += n; }
 
         int b = cev_historybuffs.Count;
-        float pavg = a / (float)b;
+        float ptotal = a / (float)b;
+        float pavg = ptotal * 100;
+        // 15 creados siendo 5 jugadores
+        // 
 
-        float cev; // 100 75 50 30 15 0
-        if (pavg > 75) { cev = 0.9f; }
-        else if (pavg > 50) { cev = 0.7f; }
-        else if (pavg > 30) { cev = 0.5f; }
-        else if (pavg > 15) { cev = 0.3f; }
+        // n*12 + n-1 * 4
+        float cev;
+        if (pavg > 72) { cev = 0.9f; }
+        else if (pavg > 48) { cev = 0.7f; }
+        else if (pavg > 28) { cev = 0.5f; }
+        else if (pavg > 12) { cev = 0.3f; }
         else { cev = 0.1f; }
 
-        return cev;
+        E_SetPersonalCoor(cev, 2);
     }
 
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Recibe y marca ID e INV
     public void E_SetID(ulong xid) { user_id = xid; }
     public void E_SetINV(INV_ScreenManager xinv) { user_inv = xinv; }
+
+    GameObject enemyOBJ;
+    [ServerRpc]
+    public void E_StartMonsterLoopServerRpc()
+    {
+        Invoke(nameof(E_SpawnNewMonsterServerRpc), 30);
+    }
+    [ServerRpc]
+    public void E_SpawnNewMonsterServerRpc()
+    {
+        enemyOBJ = Instantiate(mEnemy);
+        user_inv.TextMonsterNotification();
+        enemyOBJ.transform.position = new Vector3(516, 76, 121);
+        var refNO = enemyOBJ.GetComponent<NetworkObject>();
+        refNO.Spawn();
+
+        Invoke(nameof(E_KillPrevMonsterServerRpc), 180); // Despawn in 3 minutes
+        Invoke(nameof(E_SpawnNewMonsterServerRpc), 420); // Spawn again in 7 minutes
+    }
+    [ServerRpc]
+    public void E_KillPrevMonsterServerRpc()
+    {
+        if(enemyOBJ != null)
+        {
+            Debug.Log("+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + ENEMY DISAPPEARED");
+            var refNO = enemyOBJ.GetComponent<NetworkObject>();
+            refNO.Despawn();
+        }
+    }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Recibe promedio y lo coloca en posicion correcta
     public void E_SetPersonalCoop(float val, int pos)
     {
         cev_personal_coops[pos] = val; // 0:cev_suppdead // 1:cev_apprdead // 2:cev_variance // 3:cev_materials // 4:cev_ultimatool // 5:cev_stayfriend
     }
+    public void E_SetPersonalCoor(float val, int pos)
+    {
+        cev_personal_coord[pos] = val; // 0:cev_foodbringer // 1:cev_keyitems // 2:cev_idolproducer
+    }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
     // EXTRA : Recibe promedio y lo coloca en posicion correcta
-    public void E_CallMyAverages(ulong n_id)
+    public void E_CallMyAverages(ulong n_id, int matsval, int tolsval, int foodx, int uniqx, int boosx)
     {
-        // SupportPlayerTime : debe obtener SU PROPIO promedio y luego guardarlo en SU POSICION de la lista GLOBAL y SINCRONIZARLO
-        //      LOCAL : cev_personal_coops[0]
-        //      MULTIPLAYER : cev_supp_time[pos]
+        // COOPERACION 1/2
+        // STEP 0 : Promedio personal de SUPP_DEAD y guardar en cev_personal_coops[0], no hay sincronizacion pero espera a que se llenen los otros
+        // user_inv.Set_SUPPDEAD_Vals();
+        // STEP 1 : Promedio personal de APPR_DEAD y guardar en cev_personal_coops[1], no hay sincronizacion pero espera a que se llenen los otros
+        // Set_APPRDEAD_Vals();
 
-        // SupportPlayerSpace : debe obtener SU PROPIO promedio y luego guardarlo en SU POSICION de la lista GLOBAL y SINCRONIZARLO
-        //      LOCAL : cev_personal_coops[1]
-        //      MULTIPLAYER : cev_supp_dist[pos]
+        // STEP 0 : Mis aportes a <<< cev_historysuppdead >>> ya fueron registrados, solo debo esperar
+        // STEP 1 : Mis aportes a <<< cev_historyapprdead >>> ya fueron registrados, solo debo esperar
+        // STEP 2 : Mis aportes a <<< cev_historybuffs >>> ya fueron registrados, solo debo esperar
 
+        // STEP 3 : Agregar mis aportes a <<< cev_historymats[uid] >>> y esperar
+        // STEP 4 : Agregar mis aportes a <<< cev_historytools[uid] >>> y esperar
+        // STEP 5 : Agregar mi minuto de finalizacion a <<< cev_historynostay[uid] >>> y esperar
+        SyncMy345CooperationValsServerRpc((int)n_id, matsval, tolsval, n_mins);
 
-        user_inv.Send_SUPPDEAD_Vals();
-        CEV_ADP_FinalAverage();
-        CEV_RBID_Distribution();
+        // COORDINACION 1/2
+        // STEP 0 : Agregar mis aportes a <<< cev_historyfood[uid] >>> y esperar
+        // STEP 1 : Agregar mis aportes a <<< cev_historyuniq[uid] >>> y esperar
+        // STEP 2 : Agregar mis aportes a <<< cev_historyboos[uid] >>> y esperar
+        SyncMy012CoordinationValsServerRpc((int)n_id, foodx, uniqx, boosx);
 
-        float my_final_avg_coop = E_Promedio(cev_personal_coops);
-        float my_final_avg_coor = E_Promedio(cev_personal_coord);
+        // FINALIZACION 1/2
+        // Marcar que termine el juego en <<< cev_eachfinish[uid] >>>
+        SyncMyFinishServerRpc((int)n_id);
 
-        SyncAllCevValuesServerRpc(n_id, my_final_avg_coop, my_final_avg_coor);
+        // Revisar si todos terminaron el juego
+        bool allfinished = true;
+        foreach (bool val in cev_eachfinish) { if (!val) { allfinished = false; } }
+
+        if (allfinished) // Si todos terminaron llamar al servidor para que haga todos los broadcasteos
+        {
+            SyncCoopNCoordServerRpc();
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncCoopNCoordServerRpc()
+    {
+        SyncCNCClientRpc();
+    }
+    [ClientRpc]
+    public void SyncCNCClientRpc()
+    {
+        // COOPERACION 2/2
+        // STEP 0 : Calcular promedio total de <<< cev_historysuppdead >>> en el servidor y broadcastear a clientes
+        E_AvgSupp(cev_historysuppdead);
+        // STEP 1 : Calcular promedio total de <<< cev_historyapprdead >>> en el servidor y broadcastear a clientes
+        E_AvgAppr(cev_historyapprdead);
+        // STEP 2 : Calcular varianza total de <<< cev_historybuffs >>> en el servidor y broadcastear a clientes
+        Set_ALLBUFFS_Variance();
+        // STEP 3 : Calcular valor total de <<< cev_historymats >>> en el servidor y broadcastear a clientes
+        E_ExpectedMats(cev_historymats);
+        // STEP 4 : Calcular valor total de <<< cev_historytools >>> en el servidor y broadcastear a clientes
+        E_ExpectedTool(cev_historytools);
+        // STEP 5 : Calcular varianza total de <<< cev_historynostay >>> en el servidor y broadcastear a clientes
+        Set_ISTAYBRO_Variance();
+
+        // COORDINACION 2/2
+        // STEP 0 : Calcular valor total de <<< cev_historyfood >>> en el servidor y broadcastear a clientes
+        E_ExpectedFood(cev_historyfood);
+        // STEP 1 : Calcular valor total de <<< cev_historyuniq >>> en el servidor y broadcastear a clientes
+        E_ExpectedUniq(cev_historyuniq);
+        // STEP 2 : Calcular valor total de <<< cev_historyboos >>> en el servidor y broadcastear a clientes
+        E_ExpectedBoos(cev_historyboos);
+
+        // FINALIZACION 2/2
+        // STEP 0 : Transformar los datos flotantes en enteros influenciados sobre 100
+        AllCooperationInfluence(0, cev_personal_coops[0], 12); // 0 : SuppDeadTime influencia en 12%
+        AllCooperationInfluence(1, cev_personal_coops[1], 12); // 1 : ConstantDeadAppr influencia en 12%
+        AllCooperationInfluence(2, cev_personal_coops[2], 16); // 2 : UpgradesVariance influencia en 16%
+        AllCooperationInfluence(3, cev_personal_coops[3], 24); // 3 : MaterialSharing influencia en 24%
+        AllCooperationInfluence(4, cev_personal_coops[4], 24); // 4 : KeepUpTools influencia en 24%
+        AllCooperationInfluence(5, cev_personal_coops[5], 16); // 5 : StayHelping  influencia en 16%
+        // STEP 1 : Transformar los datos flotantes en enteros influenciados sobre 100
+        AllCoordinationInfluence(0, cev_personal_coord[0], 30); // 0 : FoodComplementation influencia en 30%
+        AllCoordinationInfluence(1, cev_personal_coord[1], 40); // 1 : ObjectivesAssigned influencia en 40%
+        AllCoordinationInfluence(2, cev_personal_coord[2], 30); // 2 : UpgradesProducer influencia en 30%
+
+        // STEP 0 : Calcular valor promedio de cooperacion de cada jugador
+        cev_personal_avgs[0] = E_Promedio(cev_big_coops);
+        // STEP 1 : Calcular valor promedio de cordinacion de cada jugador
+        cev_personal_avgs[1] = E_Promedio(cev_big_coord);
+
+        // STEP 2 : Distribuir tus promedios a eachcoop y eachcoor usando tu propio id
+        // cev_eachcooperation[(int)user_id] = cev_personal_avgs[0];
+        // cev_eachcoordination[(int)user_id] = cev_personal_avgs[1];
+        // SyncAllCevValuesServerRpc(user_id, cev_personal_avgs[0], cev_personal_avgs[1]);
+        // global_avg_coop = E_Promedio(cev_eachcooperation);
+        // global_avg_coor = E_Promedio(cev_eachcoordination);
+
+        global_avg_coop = cev_personal_avgs[0];
+        global_avg_coor = cev_personal_avgs[1];
+
+        Debug.Log(": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + global_avg_coop.ToString());
+        Debug.Log(": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + global_avg_coor.ToString());
+
+        final_cooperation = (int)global_avg_coop;
+        final_coordination = (int)global_avg_coor;
+
+        double xval = FinalValue(final_cooperation, final_coordination);
+        user_inv.SetFinalValue((int)xval);
+        Debug.Log("FINISHED");
+    }
+
+    // Cooperation cases [ - | - | - | 3 | 4 | 5 ]
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncMy345CooperationValsServerRpc(int my_id, int matsval, int tolsval, int finishmin)
+    {
+        Sync345CoopClientRpc(my_id, matsval, tolsval, finishmin);
+    }
+    [ClientRpc]
+    public void Sync345CoopClientRpc(int my_id, int matsval, int tolsval, int finishmin)
+    {
+        cev_historymats[my_id] = matsval;
+        cev_historytools[my_id] = tolsval;
+        cev_historynostay[my_id] = finishmin;
+    }
+
+    // Coordination cases [ 0 | 1 | 2 ]
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncMy012CoordinationValsServerRpc(int my_id, int foodx, int uniqx, int boosx)
+    {
+        Sync012CoorClientRpc(my_id, foodx, uniqx, boosx);
+    }
+    [ClientRpc]
+    public void Sync012CoorClientRpc(int my_id, int foodx, int uniqx, int boosx)
+    {
+        cev_historyfood[my_id] = foodx;
+        cev_historyuniq[my_id] = uniqx;
+        cev_historyboos[my_id] = boosx;
+    }
+
+    // Mark finished game
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncMyFinishServerRpc(int p_id)
+    {
+        SyncMyFinishClientRpc(p_id);
+    }
+    [ClientRpc]
+    public void SyncMyFinishClientRpc(int p_id)
+    {
+        cev_eachfinish[p_id] = true;
+    }
+
+    public List<float> cev_big_coops = new() { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+    public void AllCooperationInfluence(int cooppos, float valz, float valinfluence)
+    {
+        float current_val = valz * valinfluence;
+        cev_big_coops[cooppos] = current_val;
+    }
+    public List<float> cev_big_coord = new() { 0.0f, 0.0f, 0.0f };
+    public void AllCoordinationInfluence(int coorpos, float valz, float valinfluence)
+    {
+        float current_val = valz * valinfluence;
+        cev_big_coops[coorpos] = current_val;
     }
 }

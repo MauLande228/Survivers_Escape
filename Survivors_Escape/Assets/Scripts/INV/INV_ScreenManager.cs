@@ -40,6 +40,7 @@ public class INV_ScreenManager : MonoBehaviour
     public TextMeshProUGUI descSpace;
     public TextMeshProUGUI Ktext;
     public PlayerStats Pstats;
+    public TextMeshProUGUI finaltext;
 
     public Slot[] invSlots;
     public Slot[] allSlots;
@@ -75,6 +76,12 @@ public class INV_ScreenManager : MonoBehaviour
     public GameObject uisign;
     public INV_CanvRef canvas;
 
+    public GameObject prefabINTRO;
+    public REF_INTRO uiIntro;
+
+    public GameObject prefabDEAD;
+    public REF_DEAD uiDEAD;
+
     public REF_ItemsButtons uiDQRS;
     public GameObject uiDesc;
     public GameObject uiBTNS;
@@ -100,7 +107,10 @@ public class INV_ScreenManager : MonoBehaviour
             if (cc.IsOwner)
             {
                 Pstats = GetComponentInParent<PlayerStats>();
+                //finaltext.text = "";
 
+                GenIntroUI();
+                GenDeadUI();
                 GenSlots();
                 GenDescSpace();
                 GenInvButtons();
@@ -119,6 +129,7 @@ public class INV_ScreenManager : MonoBehaviour
                 opened = false;
                 hasTool = false;
 
+                Invoke(nameof(IntroSequence), 4);
                 Invoke(nameof(SetStartEquipment), 8);
             }
         }
@@ -205,8 +216,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                     if (Input.GetKeyDown(testKey))
                     {
-                        gchecks.CEV_MixAllCoordinationServerRpc(count_objects_shared[1], count_objects_shared[2], count_objects_shared[3], count_objects_shared[1], count_objects_shared[4], uid);
-                        gchecks.E_CallMyAverages(uid);
+                        gchecks.E_CallMyAverages(uid, count_objects_shared[0], count_objects_shared[4], count_objects_shared[1], count_objects_shared[2], count_objects_shared[3]);
                     }
 
                     if (Input.GetKeyDown(equipKey))
@@ -292,6 +302,56 @@ public class INV_ScreenManager : MonoBehaviour
         }
     }
 
+    public void IntroSequence()
+    {
+        Invoke(nameof(IntroImg1), 2);
+    }
+    public void IntroImg1()
+    {
+        uiIntro.img1.gameObject.SetActive(true);
+        Invoke(nameof(IntroImg2), 2);
+    }
+    public void IntroImg2()
+    {
+        uiIntro.img2.gameObject.SetActive(true);
+        Invoke(nameof(IntroImg3), 2);
+    }
+    public void IntroImg3()
+    {
+        uiIntro.img3.gameObject.SetActive(true);
+        Invoke(nameof(IntroImg4), 2);
+    }
+    public void IntroImg4()
+    {
+        uiIntro.img4.gameObject.SetActive(true);
+        Invoke(nameof(IntroImgFinish1), 2);
+    }
+    public void IntroImgFinish1()
+    {
+        uiIntro.img1.gameObject.SetActive(false);
+        Invoke(nameof(IntroImgFinish2), 2);
+    }
+    public void IntroImgFinish2()
+    {
+        uiIntro.img2.gameObject.SetActive(false);
+        Invoke(nameof(IntroImgFinish3), 2);
+    }
+    public void IntroImgFinish3()
+    {
+        uiIntro.img3.gameObject.SetActive(false);
+        Invoke(nameof(IntroImgFinish4), 2);
+    }
+    public void IntroImgFinish4()
+    {
+        uiIntro.img4.gameObject.SetActive(false);
+        Pstats.hunger = 100.0f;
+        Invoke(nameof(IntroImgHide), 1);
+    }
+    public void IntroImgHide()
+    {
+        uiIntro.gameObject.SetActive(false);
+    }
+
     public void CloseInventory()
     {
         if (opened) {
@@ -313,7 +373,7 @@ public class INV_ScreenManager : MonoBehaviour
         }
     }
 
-    public void SetOwnerID(ulong id) { uid = id; }
+    public void SetOwnerID(ulong id) { uid = id; finaltext.text = ((int)uid+10).ToString(); Debug.Log(uid.ToString()); Invoke(nameof(CleanNumber), 15); }
     public ulong GetOwnerID() { return uid; }
     public void SetStartEquipment()
     {
@@ -322,12 +382,55 @@ public class INV_ScreenManager : MonoBehaviour
         bool naxe = CreateItem(_spawnableList._itemsList[12], 96); // Give player a stone axe
         bool npck = CreateItem(_spawnableList._itemsList[11], 60); // Give player a stone pickaxe
         bool ido1 = CreateItem(_spawnableList._itemsList[35], 1); // Give player an idol
+        if (uid == 0)
+        {
+            bool ngun = CreateItem(_spawnableList._itemsList[10], 1); // Give host a gun
+        }
+    }
+
+    List<char> alert1 = new() { 'M', 'O', 'N', 'S', 'T', 'E', 'R', '!', '!', '!' };
+    public int txtcount = 0;
+    public void TextMonsterNotification()
+    {
+        if (txtcount > 9)
+        {
+            Invoke(nameof(TextMonsterNotificationOver), 0.2f);
+        }
+        else
+        {
+            finaltext.text += alert1[txtcount];
+            txtcount++;
+
+            Invoke(nameof(TextMonsterNotification), 0.2f);
+        }
+    }
+    public void TextMonsterNotificationOver()
+    {
+        finaltext.text = "";
     }
     public void SetChecks(PlayersManager pd)
     {
-        gchecks = pd;
-        gchecks.E_SetID(uid);
-        gchecks.E_SetINV(this);
+        if(cc != null)
+        {
+            if(cc.IsOwner)
+            {
+                gchecks = pd;
+                gchecks.E_SetID(uid);
+                gchecks.E_SetINV(this);
+                if(uid == 0)
+                {
+                    gchecks.E_StartMonsterLoopServerRpc();
+                }
+            }
+        }
+    }
+    public void SetFinalValue(int fval)
+    {
+        finaltext.text = fval.ToString();
+    }
+    public void CleanNumber()
+    {
+        finaltext.text = "";
     }
 
     public int GetValue()
@@ -337,7 +440,7 @@ public class INV_ScreenManager : MonoBehaviour
 
     public void ApplyDMG()
     {
-        Pstats.health -= 3.5f;
+        Pstats.health -= 4.5f;
     }
     public int ApplyLUCK()
     {
@@ -569,6 +672,8 @@ public class INV_ScreenManager : MonoBehaviour
             {
                 allSlots[ss].UpdateSlot();
             }
+
+            if(ss == 0) { UnEquip(currentTool); }
         }
     }
 
@@ -696,7 +801,7 @@ public class INV_ScreenManager : MonoBehaviour
     {
         allSlots[0].stackSize = allSlots[0].stackSize - 1;
         allSlots[0].UpdateSlot();
-        Pstats.health -= 1.0f;
+        Pstats.health -= 2.0f;
 
         if (allSlots[0].stackSize <= 0)
         {
@@ -784,6 +889,29 @@ public class INV_ScreenManager : MonoBehaviour
     public void GenUIAlerts() // NOT REFERENCED THATS WHY IT DOESNT WORK ???
     {
         Instantiate(uisign, canvas.gameObject.transform);
+    }
+    public void GenIntroUI()
+    {
+        uiIntro = Instantiate(prefabINTRO, cc.gameObject.transform).GetComponent<REF_INTRO>();
+    }
+    public void GenDeadUI()
+    {
+        uiDEAD = Instantiate(prefabDEAD, cc.gameObject.transform).GetComponent<REF_DEAD>();
+        uiDEAD.gameObject.SetActive(false);
+    }
+    public void StartDeadUI(int xa)
+    {
+        uiDEAD.deadtext.text = "Respawning in: " + xa.ToString();
+        uiDEAD.gameObject.SetActive(true);
+    }
+    public void NewDeadUI(int xb)
+    {
+        uiDEAD.deadtext.text = "Respawning in: " + xb.ToString();
+    }
+    public void FinishDeadUI()
+    {
+        uiDEAD.deadtext.text = "";
+        uiDEAD.gameObject.SetActive(false);
     }
     public void GenObjList()
     {
@@ -997,7 +1125,7 @@ public class INV_ScreenManager : MonoBehaviour
                 }
                 if (s == 0) { DoEquip(invSlots[0].data.itName); }
                 int g = GetGem(dt.itName);
-                if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
+                // if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
                 return true;
             }
             else
@@ -1245,7 +1373,7 @@ public class INV_ScreenManager : MonoBehaviour
             if (pickUp.pow < 999 && pickUp.pow != uid)
             {
                 isSaved = true;
-                Debug.Log("+ + + + + + + + + + + + + + + + + + + + + + + + + + AGARRE UN OBJETO QUE LE PERTENECIO A ALGUIEN MAS");
+                Debug.Log("+ + + + + + + + + + + + + + + + + + + + + + + + + + AGARRE UN OBJETO QUE LE PERTENECIO A ALGUIEN MAS : " + pickUp.data.itName.ToString());
             }
             //pickUp.data.shared_once = true;
         }
@@ -1479,22 +1607,6 @@ public class INV_ScreenManager : MonoBehaviour
             case 'S': count_objects_shared[3]++; break; // Special - coordinacion-org
             case 'T': count_objects_shared[4]++; break; // Tools - cooperacion
             default: break;
-        }
-    }
-
-    public void Send_SUPPDEAD_Vals()
-    {
-        if(cc != null)
-        {
-            if (cc.IsOwner)
-            {
-                float supp_dead_avg = 0.5f;
-                if (Pstats.cev_suppdead.Count > 0)
-                {
-                    supp_dead_avg = E_Promedio(Pstats.cev_suppdead); // 1/6
-                }
-                gchecks.E_SetPersonalCoop(supp_dead_avg, 0);
-            }
         }
     }
 

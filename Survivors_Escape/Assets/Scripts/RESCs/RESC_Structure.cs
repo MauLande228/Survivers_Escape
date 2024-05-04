@@ -87,6 +87,8 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
                     BrokePlains(rmain, rseco); break; // Break Plains
                 case 6:
                     BrokeFantasy(rmain, rseco); break; // Break Fantasy
+                case 7:
+                    BrokeFlower(rmain); break; // Break Flower
                 default:
                     break;
             }
@@ -104,10 +106,10 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
     public void BrokeStone(int r1, int r2) // 4:Rock // 0:Emerald // 1:Ruby // 2:Diamond //
     {
         // r1 : Cantidad de roca // r2 : Cantidad de gema
-        Spawner.Instace.SpawnObjectServerRpc(4, stonewood[r1], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(4, stonewood[r1], px, py+1f, pz, upow, false);
         // Any Gem
         int r = rnd.Next(10); // Posicion de la gema
-        Spawner.Instace.SpawnObjectServerRpc(gemtype[r], gems[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(gemtype[r], gems[r2], px, py+2f, pz, upow, false);
     }
 
     // Forest A
@@ -115,13 +117,13 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
     {
         // r1 : Cantidad de madera // r2 : Cantidad de hojas // r3 : Cantidad de fruta
         Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1], px, py, pz, upow, false);
-        Spawner.Instace.SpawnObjectServerRpc(7, otherfruit[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(7, otherfruit[r2], px, py+1f, pz, upow, false);
         
         int r = rnd.Next(5); // Posicion de la fruta
         switch (fruitLuck[r])
         {
-            case 0: Spawner.Instace.SpawnObjectServerRpc(23, otherfruit[r3], px, py, pz, upow, false); break;
-            case 1: Spawner.Instace.SpawnObjectServerRpc(24, otherfruit[r3], px, py, pz, upow, false); break;
+            case 0: Spawner.Instace.SpawnObjectServerRpc(23, otherfruit[r3], px, py+2f, pz, upow, false); break;
+            case 1: Spawner.Instace.SpawnObjectServerRpc(24, otherfruit[r3], px, py+2f, pz, upow, false); break;
         }
     }
     // Forest B
@@ -129,13 +131,13 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
     {
         // r1 : Cantidad de madera // r2 : Cantidad de hojas // r3 : Cantidad de fruta
         Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1], px, py, pz, upow, false);
-        Spawner.Instace.SpawnObjectServerRpc(7, otherfruit[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(7, otherfruit[r2], px, py+1f, pz, upow, false);
 
         int r = rnd.Next(5); // Posicion de la fruta
         switch (fruitLuck[r])
         {
-            case 0: Spawner.Instace.SpawnObjectServerRpc(26, otherfruit[r3], px, py, pz, upow, false); break;
-            case 1: Spawner.Instace.SpawnObjectServerRpc(22, otherfruit[r3], px, py, pz, upow, false); break;
+            case 0: Spawner.Instace.SpawnObjectServerRpc(26, otherfruit[r3], px, py+2f, pz, upow, false); break;
+            case 1: Spawner.Instace.SpawnObjectServerRpc(22, otherfruit[r3], px, py+2f, pz, upow, false); break;
         }
     }
     // Density A
@@ -143,13 +145,13 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
     {
         // r1 : Cantidad de madera // r2 : Cantidad de lianas // r3 : Cantidad de fruta
         Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1], px, py, pz, upow, false);
-        Spawner.Instace.SpawnObjectServerRpc(6, otherfruit[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(6, otherfruit[r2], px, py+1f, pz, upow, false);
         
         int r = rnd.Next(5); // Posicion de la fruta
         switch (fruitLuck[r])
         {
-            case 0: Spawner.Instace.SpawnObjectServerRpc(25, otherfruit[r3], px, py, pz, upow, false); break;
-            case 1: Spawner.Instace.SpawnObjectServerRpc(28, otherfruit[r3], px, py, pz, upow, false); break;
+            case 0: Spawner.Instace.SpawnObjectServerRpc(25, otherfruit[r3], px, py+2f, pz, upow, false); break;
+            case 1: Spawner.Instace.SpawnObjectServerRpc(28, otherfruit[r3], px, py+2f, pz, upow, false); break;
         }
     }
     // Pinetree B
@@ -157,20 +159,27 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
     {
         // r1 : Cantidad de madera // r2 : Cantidad de lianas
         Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1], px, py, pz, upow, false);
-        Spawner.Instace.SpawnObjectServerRpc(6, otherfruit[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(6, otherfruit[r2], px, py+1f, pz, upow, false);
     }
     // Plains
     public void BrokePlains(int r1, int r2) // 3:Wood // 5:Cobweb
     {
         // r1 : Cantidad de madera // r2 : Cantidad de telaraña
         Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1], px, py, pz, upow, false);
-        Spawner.Instace.SpawnObjectServerRpc(5, otherfruit[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(5, otherfruit[r2], px, py+1f, pz, upow, false);
     }
     // Fantasy
     public void BrokeFantasy(int r1, int r2)
     {
         // r1 : Cantidad de madera // r2 : Cantidad de roca
         Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1], px, py, pz, upow, false);
-        Spawner.Instace.SpawnObjectServerRpc(4, stonewood[r2], px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(4, stonewood[r2], px, py+1f, pz, upow, false);
+    }
+    // Flower
+    public void BrokeFlower(int r1)
+    {
+        // r1 : Cantidad de madera
+        Spawner.Instace.SpawnObjectServerRpc(3, stonewood[r1]*4, px, py, pz, upow, false);
+        Spawner.Instace.SpawnObjectServerRpc(35, 1, px, py+1f, pz, upow, false);
     }
 }

@@ -19,6 +19,7 @@ public class BulletTarget : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void DestroyEnemyServerRpc()
     {
+        Debug.Log("+ + + + + + + +  EL ENEMIGO HA MUERTO SIUUUU");
         this.GetComponent<NetworkObject>().Despawn();
     }
 }

@@ -66,16 +66,16 @@ public class STR_Objectives : MonoBehaviour
         }
     }
     int nwood = 0;
-    public void UpWood(int n) // 0/200 - Wood
+    public void UpWood(int n) // 0/120 - Wood
     {
         nwood += n;
         if (nwood > 99)
         {
-            o_wood.text = "<color=#1A8DC6>" + nwood.ToString() + "/100 - Wood</color>";
+            o_wood.text = "<color=#1A8DC6>" + nwood.ToString() + "/120 - Wood</color>";
         }
         else
         {
-            o_wood.text = nwood.ToString() + "/100 - Wood";
+            o_wood.text = nwood.ToString() + "/120 - Wood";
         }
     }
     public void UpGear(int n) // 0/4 - Gear
@@ -101,16 +101,16 @@ public class STR_Objectives : MonoBehaviour
         }
     }
     int nstone = 0;
-    public void UpStone(int n) // 0/200 - Stone
+    public void UpStone(int n) // 0/120 - Stone
     {
         nstone += n;
         if (nstone > 149)
         {
-            o_stone.text = "<color=#1A8DC6>" + nstone.ToString() + "/150 - Stone</color>";
+            o_stone.text = "<color=#1A8DC6>" + nstone.ToString() + "/120 - Stone</color>";
         }
         else
         {
-            o_stone.text = nstone.ToString() + "/150 - Stone";
+            o_stone.text = nstone.ToString() + "/120 - Stone";
         }
     }
     public void UpResetWS()

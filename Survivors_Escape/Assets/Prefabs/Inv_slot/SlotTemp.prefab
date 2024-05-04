@@ -308,7 +308,7 @@ MonoBehaviour:
   stackText: {fileID: 1735528830046160422}
   selectC:
     serializedVersion: 2
-    rgba: 4278255615
+    rgba: 4289724160
   unselectC:
     serializedVersion: 2
     rgba: 4294967295

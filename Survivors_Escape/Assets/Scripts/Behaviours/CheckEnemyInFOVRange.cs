@@ -8,6 +8,7 @@ public class CheckEnemyInFOVRange : BT.Node
     private static int _enemyLayerMask = 1 << 8;
     private Transform _transform;
     private Animator _animator;
+    private static readonly System.Random rnd = new();
 
     public CheckEnemyInFOVRange(Transform transform)
     {
@@ -23,7 +24,10 @@ public class CheckEnemyInFOVRange : BT.Node
             Collider[] colliders = Physics.OverlapSphere(_transform.position, GuardBT.fovRange, _enemyLayerMask);
             if (colliders.Length > 0)
             {
-                Parent.Parent.SetData("target", colliders[0].transform);
+                int rmain = rnd.Next(colliders.Length);
+                Debug.Log("LENGHT : " + colliders.Length.ToString());
+                Debug.Log("SELECTED : " + rmain.ToString());
+                Parent.Parent.SetData("target", colliders[rmain].transform);
                 _animator.SetBool("Walking", true);
                 State = NodeState.SUCCESS;
 

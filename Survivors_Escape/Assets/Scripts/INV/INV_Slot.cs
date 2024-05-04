@@ -18,7 +18,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     private Transform _transform;
     private Vector3 _position;
 
-    public Color32 selectC = new(255, 255, 0, 255);
+    public Color32 selectC = new(255, 128, 0, 255);
     public Color32 unselectC = new(255, 255, 255, 255);
 
     public INV_ScreenManager inv;
