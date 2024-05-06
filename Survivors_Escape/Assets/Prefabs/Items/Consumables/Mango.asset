@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Mango
-  itDesc: Obtained from trees in the woods. Heals 18 hunger points!
+  itDesc: Obtained from trees in the forest. Heals 18 health points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 3133355ea1fa29b49bbc04d71be7bd8a, type: 3}
   itPrefab: {fileID: 6167492646647746805, guid: b1303b03ae052e74c8d0027f424f9a24,
@@ -22,9 +22,8 @@ MonoBehaviour:
   isStackable: 1
   maxStack: 50
   value: 4
-  shared_once: 0
-  plusHB: 18
-  plusHP: 10
+  plusHB: 4
+  plusHP: 18
   act: 0
   WepDmg: 0
   StoneDmg: 0

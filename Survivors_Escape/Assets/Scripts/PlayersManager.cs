@@ -63,6 +63,8 @@ public class PlayersManager : NetworkBehaviour
     public int final_coordination = 0; // Valor global en entero
 
     public List<bool> cev_eachfinish = new(); // Variable que guarda si ya terminaron los jugadores
+    public List<ulong> cev_eachuserid = new();
+    public List<INV_ScreenManager> cev_eachinv = new();
 
     void Start()
     {
@@ -72,7 +74,7 @@ public class PlayersManager : NetworkBehaviour
         // UNCOMMENT TO CHECK VARIANCE ACTIVELY
         //Invoke(nameof(CEV_RBID_InvokeCheck), 60);
 
-        double x = FinalValue(85, 80);
+        double x = FinalValue(26, 7);
         //Instantiate(Chest1);
     }
 
@@ -104,18 +106,28 @@ public class PlayersManager : NetworkBehaviour
                 cev_historyboos.Add(0);
 
                 cev_eachfinish.Add(false);
+                cev_eachuserid.Add(0);
+                cev_eachinv.Add(default);
             }
         }
 
         foreach (NetworkObject p in playerObjects)
         {
+            SurvivorsEscape.CharacterController cd = p.GetComponent<SurvivorsEscape.CharacterController>();
+            playerReference.Add(cd);
+            // cd.DisableMyAudio();
+            cd.DisableExtraCanvas();
+
             playerInventory.Add(p.GetComponentInChildren<INV_ScreenManager>());
             playerStatistics.Add(p.GetComponent<PlayerStats>());
         }
         foreach (INV_ScreenManager v in playerInventory)
         {
-            v.SetChecks(this);
-            playerReference.Add(v.GetComponentInParent<SurvivorsEscape.CharacterController>());
+            if(v != null)
+            {
+                v.SetChecks(this);
+                //playerReference.Add(v.GetComponentInParent<SurvivorsEscape.CharacterController>());
+            }
 
             //if(v.GetOwnerID() == 0)
             //{
@@ -412,9 +424,11 @@ public class PlayersManager : NetworkBehaviour
     {
         List<int> proxs = new();
         float prevd = checknearest[0];
-        checknearest.RemoveAt(0);
 
-        if (checknearest.Count > 0)
+        checknearest.RemoveAt(0);
+        int pavg = 100;
+
+        if (checknearest.Count > 3)
         {
             foreach (float d in checknearest)
             {
@@ -429,15 +443,15 @@ public class PlayersManager : NetworkBehaviour
                 }
                 prevd = d;
             }
+            int lenp = proxs.Count;
+            int plus = 0;
+            foreach (int x in proxs)
+            {
+                plus += x;
+            }
+            pavg = plus * 100 / lenp;
         }
 
-        int lenp = proxs.Count;
-        int plus = 0;
-        foreach (int x in proxs)
-        {
-            plus += x;
-        }
-        int pavg = plus * 100 / lenp;
 
         float cev;
         if (pavg > 80) { cev = 0.9f; }
@@ -635,8 +649,14 @@ public class PlayersManager : NetworkBehaviour
         }
         else
         {
-            cavg = 0.8f;
+            if (n_mins > 55) { cavg = 0.5f; }
+            else if (n_mins > 50) { cavg = 0.57f; }
+            else if (n_mins > 45) { cavg = 0.64f; }
+            else if (n_mins > 40) { cavg = 0.71f; }
+            else if (n_mins > 35) { cavg = 0.78f; }
+            else { cavg = 0.85f; }
         }
+
         E_SetPersonalCoop(cavg, 0); // 1/6
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
@@ -653,7 +673,12 @@ public class PlayersManager : NetworkBehaviour
         }
         else
         {
-            cavg = 0.8f;
+            if (n_mins > 55) { cavg = 0.5f; }
+            else if (n_mins > 50) { cavg = 0.57f; }
+            else if (n_mins > 45) { cavg = 0.64f; }
+            else if (n_mins > 40) { cavg = 0.71f; }
+            else if (n_mins > 35) { cavg = 0.78f; }
+            else { cavg = 0.85f; }
         }
         E_SetPersonalCoop(cavg, 1); // 2/6
     }
@@ -703,10 +728,10 @@ public class PlayersManager : NetworkBehaviour
         
         // La cantidad de comida compartida pasa por el proceso <<< AllVals / (Time / 10-NPlayers) >>>
         float cev; // 42mins/6 = 7 // 48 - muy bueno - 36 bueno - 24 media - 12 baja - 0 - muy baja // 6.8 - 5.1 - 3.4 - 1.7 - 0
-        if (pavg > 4.8) { cev = 0.9f; }
-        else if (pavg > 3.6) { cev = 0.7f; }
-        else if (pavg > 2.4) { cev = 0.5f; }
-        else if (pavg > 1.2) { cev = 0.3f; }
+        if (pavg > 4.4) { cev = 0.9f; }
+        else if (pavg > 3.3) { cev = 0.7f; }
+        else if (pavg > 2.2) { cev = 0.5f; }
+        else if (pavg > 1.1) { cev = 0.3f; }
         else { cev = 0.1f; }
 
         E_SetPersonalCoor(cev, 0);
@@ -749,15 +774,16 @@ public class PlayersManager : NetworkBehaviour
 
         int b = cev_historybuffs.Count;
         float ptotal = a / (float)b;
-        float pavg = ptotal * 100;
+        float pavx = ptotal * 100;
+        int pavg = (int)pavx;
         // 15 creados siendo 5 jugadores
         // 
 
         // n*12 + n-1 * 4
         float cev;
-        if (pavg > 72) { cev = 0.9f; }
-        else if (pavg > 48) { cev = 0.7f; }
-        else if (pavg > 28) { cev = 0.5f; }
+        if (pavg > 56) { cev = 0.9f; }
+        else if (pavg > 38) { cev = 0.7f; }
+        else if (pavg > 24) { cev = 0.5f; }
         else if (pavg > 12) { cev = 0.3f; }
         else { cev = 0.1f; }
 
@@ -769,6 +795,8 @@ public class PlayersManager : NetworkBehaviour
     public void E_SetID(ulong xid) { user_id = xid; }
     public void E_SetINV(INV_ScreenManager xinv) { user_inv = xinv; }
 
+    //[ServerRpc] E_SetMyID
+
     GameObject enemyOBJ;
     [ServerRpc]
     public void E_StartMonsterLoopServerRpc()
@@ -779,14 +807,20 @@ public class PlayersManager : NetworkBehaviour
     public void E_SpawnNewMonsterServerRpc()
     {
         enemyOBJ = Instantiate(mEnemy);
-        user_inv.TextMonsterNotification();
+        E_SpawnNewMonsterClientRpc();
         enemyOBJ.transform.position = new Vector3(516, 76, 121);
         var refNO = enemyOBJ.GetComponent<NetworkObject>();
         refNO.Spawn();
 
-        Invoke(nameof(E_KillPrevMonsterServerRpc), 180); // Despawn in 3 minutes
-        Invoke(nameof(E_SpawnNewMonsterServerRpc), 420); // Spawn again in 7 minutes
+        Invoke(nameof(E_KillPrevMonsterServerRpc), 180); // Despawn in 3 minutes (180 seconds)
+        Invoke(nameof(E_SpawnNewMonsterServerRpc), 300); // Spawn again in 7 minutes (420 seconds)
     }
+    [ClientRpc]
+    public void E_SpawnNewMonsterClientRpc()
+    {
+        user_inv.TextMonsterNotification();
+    }
+
     [ServerRpc]
     public void E_KillPrevMonsterServerRpc()
     {
@@ -801,10 +835,12 @@ public class PlayersManager : NetworkBehaviour
     // EXTRA : Recibe promedio y lo coloca en posicion correcta
     public void E_SetPersonalCoop(float val, int pos)
     {
+        Debug.Log(": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : coop : val : " + val.ToString() + " : pos : " + pos.ToString());
         cev_personal_coops[pos] = val; // 0:cev_suppdead // 1:cev_apprdead // 2:cev_variance // 3:cev_materials // 4:cev_ultimatool // 5:cev_stayfriend
     }
     public void E_SetPersonalCoor(float val, int pos)
     {
+        Debug.Log(": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : coor : val : " + val.ToString() + " : pos : " + pos.ToString());
         cev_personal_coord[pos] = val; // 0:cev_foodbringer // 1:cev_keyitems // 2:cev_idolproducer
     }
     // + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
@@ -822,18 +858,25 @@ public class PlayersManager : NetworkBehaviour
         // STEP 2 : Mis aportes a <<< cev_historybuffs >>> ya fueron registrados, solo debo esperar
 
         // STEP 3 : Agregar mis aportes a <<< cev_historymats[uid] >>> y esperar
+        cev_historymats[(int)n_id] = matsval;
         // STEP 4 : Agregar mis aportes a <<< cev_historytools[uid] >>> y esperar
+        cev_historytools[(int)n_id] = tolsval;
         // STEP 5 : Agregar mi minuto de finalizacion a <<< cev_historynostay[uid] >>> y esperar
+        cev_historynostay[(int)n_id] = n_mins;
         SyncMy345CooperationValsServerRpc((int)n_id, matsval, tolsval, n_mins);
 
         // COORDINACION 1/2
         // STEP 0 : Agregar mis aportes a <<< cev_historyfood[uid] >>> y esperar
+        cev_historyfood[(int)n_id] = foodx;
         // STEP 1 : Agregar mis aportes a <<< cev_historyuniq[uid] >>> y esperar
+        cev_historyuniq[(int)n_id] = uniqx;
         // STEP 2 : Agregar mis aportes a <<< cev_historyboos[uid] >>> y esperar
+        cev_historyboos[(int)n_id] = boosx;
         SyncMy012CoordinationValsServerRpc((int)n_id, foodx, uniqx, boosx);
 
         // FINALIZACION 1/2
         // Marcar que termine el juego en <<< cev_eachfinish[uid] >>>
+        cev_eachfinish[(int)n_id] = true;
         SyncMyFinishServerRpc((int)n_id);
 
         // Revisar si todos terminaron el juego
@@ -844,6 +887,7 @@ public class PlayersManager : NetworkBehaviour
         {
             SyncCoopNCoordServerRpc();
         }
+        // Los ServerRpc no son secuenciales, son asincronos, despues de ser llamados, se sigue con las siguientes lineas de codigo, no espera al ServerRpc
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -904,13 +948,17 @@ public class PlayersManager : NetworkBehaviour
         global_avg_coop = cev_personal_avgs[0];
         global_avg_coor = cev_personal_avgs[1];
 
-        Debug.Log(": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + global_avg_coop.ToString());
-        Debug.Log(": : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + global_avg_coor.ToString());
+        Debug.Log(": + + + : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + global_avg_coop.ToString());
+        Debug.Log(": + + + : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + global_avg_coor.ToString());
 
         final_cooperation = (int)global_avg_coop;
         final_coordination = (int)global_avg_coor;
 
+        Debug.Log(": + + + : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + final_cooperation.ToString());
+        Debug.Log(": + + + : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :" + final_coordination.ToString());
+
         double xval = FinalValue(final_cooperation, final_coordination);
+
         user_inv.SetFinalValue((int)xval);
         Debug.Log("FINISHED");
     }
@@ -946,25 +994,32 @@ public class PlayersManager : NetworkBehaviour
     // Mark finished game
     [ServerRpc(RequireOwnership = false)]
     public void SyncMyFinishServerRpc(int p_id)
-    {
-        SyncMyFinishClientRpc(p_id);
-    }
+    { SyncMyFinishClientRpc(p_id); }
+
     [ClientRpc]
     public void SyncMyFinishClientRpc(int p_id)
-    {
-        cev_eachfinish[p_id] = true;
-    }
+    { cev_eachfinish[p_id] = true; }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncMyUserIDServerRpc(ulong p_id)
+    { SyncMyUserIDClientRpc(p_id); }
+
+    [ClientRpc]
+    public void SyncMyUserIDClientRpc(ulong p_id)
+    { cev_eachuserid[(int)p_id] = p_id; }
+
+    // Usar clientrpc, y que el objeto de inv use el "isowner"
 
     public List<float> cev_big_coops = new() { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
     public void AllCooperationInfluence(int cooppos, float valz, float valinfluence)
     {
-        float current_val = valz * valinfluence;
-        cev_big_coops[cooppos] = current_val;
+        float current_valx = valz * valinfluence;
+        cev_big_coops[cooppos] = current_valx;
     }
     public List<float> cev_big_coord = new() { 0.0f, 0.0f, 0.0f };
     public void AllCoordinationInfluence(int coorpos, float valz, float valinfluence)
     {
-        float current_val = valz * valinfluence;
-        cev_big_coops[coorpos] = current_val;
+        float current_valy = valz * valinfluence;
+        cev_big_coord[coorpos] = current_valy;
     }
 }

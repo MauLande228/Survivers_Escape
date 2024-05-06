@@ -186,6 +186,8 @@ public class PlayerStats : MonoBehaviour
             hunger_lock = false;
 
             cc._IsDead = false;
+            cc._proning = false;
+
             cc.RequestStanceChange(CharacterStance.STANDING);
             inv.gchecks.CEV_ADP_AmAlive();
             respawnTime = 18;
@@ -220,11 +222,11 @@ public class PlayerStats : MonoBehaviour
         float cev = 0.0f;
         switch (Lap3) // Finish count
         {
-            case 1: cev = 90.0f; break;
-            case 2: cev = 70.0f; break;
-            case 3: cev = 50.0f; break;
-            case 4: cev = 30.0f; break;
-            default: cev = 10.0f; break;
+            case 1: cev = 0.9f; break;
+            case 2: cev = 0.7f; break;
+            case 3: cev = 0.5f; break;
+            case 4: cev = 0.3f; break;
+            default: cev = 0.1f; break;
         }
         cev_suppdead.Add(cev); // Enviar valor
         inv.gchecks.CEV_RegisterDeadSuppServerRpc(cev);

@@ -170,6 +170,8 @@ public class STR_Main : NetworkBehaviour
                 }
             }
         }
+
+        stob.BigIfTrue();
     }
 
     // 20 Plains -> 1 Gas Barrel ----- Found in Forest

@@ -12,6 +12,7 @@ public class SEHitBox : MonoBehaviour, IHitDetector
     private IHitResponder _hitResponder;
     public INV_ScreenManager inv;
     public bool hitx = true;
+    public AudioSource hitAudio;
 
     public IHitResponder HitResponder { get => _hitResponder; set => _hitResponder = value; }
 
@@ -80,6 +81,7 @@ public class SEHitBox : MonoBehaviour, IHitDetector
 
                             if (hitData.Validate())
                             {
+                                // hitAudio.Play();
                                 hitData.HitDetector.HitResponder?.Response(hitData);
                                 hitData.HurtBox.HurtResponder?.Response(hitData);
                             }

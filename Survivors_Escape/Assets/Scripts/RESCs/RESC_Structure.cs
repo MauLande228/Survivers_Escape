@@ -16,9 +16,9 @@ public class RESC_Structure : NetworkBehaviour, ITargetable, IHurtResponder
     float px, py, pz = 0;
     public NetworkObject no;
 
-    List<int> stonewood = new() { 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6 };
-    List<int> gems = new(){ 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
-    List<int> otherfruit = new() { 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5 };
+    List<int> stonewood = new() { 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6 };
+    List<int> gems = new() { 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6 };
+    List<int> otherfruit = new() { 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5 };
 
     List<int> gemtype = new() { 0, 0, 0, 0, 1, 1, 1, 2, 2, 2 };
     List<int> fruitLuck = new() { 0, 0, 0, 1, 1 };

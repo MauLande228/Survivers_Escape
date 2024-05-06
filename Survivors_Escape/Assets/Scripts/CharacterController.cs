@@ -12,8 +12,9 @@ namespace SurvivorsEscape
     public class CharacterController : NetworkBehaviour, IHitResponder
     {
         private InputManager _inputs;
-        private CameraController _cameraController;
-        private Animator _animator;
+        public CameraController _cameraController;
+        public INV_CanvRef _canvas;
+        public Animator _animator;
         private EventHandler _eventHandler;
         private CapsuleCollider _capsuleCollider;
         private CharacterStance _stance;
@@ -104,9 +105,16 @@ namespace SurvivorsEscape
 
         private void Start()
         {
+            if (IsOwner)
+            {
+                uid = OwnerClientId;
+                inv = GetComponentInChildren<INV_ScreenManager>();
+                inv.SetOwnerID(uid);
+            }
+
             _hasGun = false;
 
-            _animator = GetComponent<Animator>();
+            //_animator = GetComponent<Animator>();
             _cameraController = IsOwner ? GetComponent<CameraController>() : null;
             _inputs = GetComponent<InputManager>();
             _eventHandler = GetComponent<EventHandler>();
@@ -116,38 +124,6 @@ namespace SurvivorsEscape
             PlayerData pData = SurvivorsEscapeMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
             _playerVisual.SetPlayerColor(SurvivorsEscapeMultiplayer.Instance.GetPlayerColor(pData.colorId));
 
-            uid = OwnerClientId;
-            inv = GetComponentInChildren<INV_ScreenManager>();
-            inv.SetOwnerID(uid);
-
-            //_handVessel = GameObject.Find("mixamorig1:RightHand");
-            //if (_handVessel != null)
-            //{
-            //    Debug.Log("GOT THE BONE");
-            //    _handVessel.AddComponent<NetworkObject>();
-
-            //    var nw = _handVessel.GetComponent<NetworkObject>();
-            //    if (nw != null)
-            //    {
-            //       // nw.Spawn(true);
-            //        Debug.Log("Spawned HAND VESSEL");
-            //    }
-            //}
-            
-            //_handBone = GameObject.Find("WeaponAttach");
-            //if (_handBone != null)
-            //{
-            //    Debug.Log("GOT THE HAND BRI");
-            //    var nw = _handBone.GetComponent<NetworkObject>();
-            //    if (nw != null)
-            //    {
-            //        nw.Spawn(true);
-            //        Debug.Log("SPAWNED THE HAND BROSK");
-            //    }
-            //}
-
-            //ReparentHandClientRpc();
-
             _runSpeed = _standingSpeed.x;
             _sprintSpeed = _standingSpeed.y;
             _walkSpeed = _standingSpeed.z;
@@ -156,8 +132,6 @@ namespace SurvivorsEscape
 
             _stance = CharacterStance.STANDING;
             SetCapsuleDimensions(_standingCapsule);
-
-            
 
             int mask = 0;
             for (int i = 0; i < 32; i++)
@@ -170,13 +144,6 @@ namespace SurvivorsEscape
             _layerMask = mask;
 
             _eventHandler.Event.AddListener(OnEvent);
-        }
-
-        [ClientRpc]
-        void ReparentHandClientRpc()
-        {
-
-            //_handBone.transform.SetParent(transform, false);
         }
 
         private void Update()
@@ -305,15 +272,12 @@ namespace SurvivorsEscape
                 hitTransform = raycastHit.transform;
             }
 
-            if (!_hasGun)
+            if (!_inAnimation)
             {
-                if (!_inAnimation)
+                if (_inputs.Attack.PressedDown())
                 {
-                    if (_inputs.Attack.PressedDown())
-                    {
-                        _inAnimation = true;
-                        _animator.CrossFadeInFixedTime(_meleeAtack, 0.1f, 0, 0);
-                    }
+                    _inAnimation = true;
+                    _animator.CrossFadeInFixedTime(_meleeAtack, 0.1f, 0, 0);
                 }
             }
             else
@@ -362,6 +326,22 @@ namespace SurvivorsEscape
             _lifeDamage = ld;
             _woodDamage = wd;
             _rockDamage = rd;
+        }
+
+        public void DisableMyAudio()
+        {
+            if (!IsOwner)
+            {
+                _cameraController._camera.gameObject.SetActive(false);
+
+            }
+        }
+        public void DisableExtraCanvas()
+        {
+            if (!IsOwner)
+            {
+                _canvas.gameObject.SetActive(false);
+            }
         }
 
         private void OnAnimatorMove()

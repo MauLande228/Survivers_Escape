@@ -17,15 +17,21 @@ public class CheckEnemyInAttackRange : BT.Node
     public override NodeState Evaluate()
     {
         object t = GetData("target");
+        // Debug.Log(_transform.position.x.ToString());
+        // Debug.Log(_transform.position.y.ToString());
+        // Debug.Log(_transform.position.z.ToString());
         if (t == null)
         {
+            Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET ES NULO");
             State = NodeState.FAILURE;
             return State;
         }
+        
 
         Transform target = (Transform)t;
         if (Vector3.Distance(_transform.position, target.position) <= GuardBT.attackRange)
         {
+            Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET EN RANGO");
             _animator.SetBool("Attacking", true);
             _animator.SetBool("Walking", false);
 

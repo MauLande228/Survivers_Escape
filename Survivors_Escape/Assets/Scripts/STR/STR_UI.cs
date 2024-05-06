@@ -23,7 +23,6 @@ public class STR_UI : MonoBehaviour
     {
         op = false; inrange = false;
         inv = GetComponentInParent<INV_ScreenManager>();
-        stob = inv.GetComponentInChildren<STR_Objectives>();
     }
 
     // Update is called once per frame
@@ -40,6 +39,10 @@ public class STR_UI : MonoBehaviour
             //inv.strui_op = false;
             transform.localPosition = new Vector3(-10000, 0, 0);
         }
+    }
+    public void SetObj(STR_Objectives obj)
+    {
+        stob = obj;
     }
     public STR_Objectives ReturnObj()
     {

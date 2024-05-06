@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Blueberry
-  itDesc: Obtained from trees in the snowy woods. Heals 10 hunger points!
+  itDesc: Obtained from forest bushes. Heals 10 hunger points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 9654f95bd65260d43b15871aa9e11d04, type: 3}
   itPrefab: {fileID: 7356839056093505147, guid: 016ef67e00bdf1a45921d6d894ce0227,
@@ -22,9 +22,8 @@ MonoBehaviour:
   isStackable: 1
   maxStack: 50
   value: 4
-  shared_once: 0
   plusHB: 10
-  plusHP: 6
+  plusHP: 2
   act: 0
   WepDmg: 0
   StoneDmg: 0

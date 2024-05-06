@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Meat
-  itDesc: Meat from what used to be a living creature. Heals 100 hunger points!
+  itDesc: Meat from what used to be a living creature. Heals 75 hunger and health
+    points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 6b9087095cc897b498f314c5665dd2e7, type: 3}
   itPrefab: {fileID: 1865850895634943623, guid: 5550b6d127702af44aa674c38cbc8b08,
@@ -22,9 +23,8 @@ MonoBehaviour:
   isStackable: 1
   maxStack: 50
   value: 4
-  shared_once: 0
-  plusHB: 100
-  plusHP: 65
+  plusHB: 75
+  plusHP: 75
   act: 0
   WepDmg: 0
   StoneDmg: 0

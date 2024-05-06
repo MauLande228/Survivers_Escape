@@ -15,7 +15,7 @@ public class RESC_BushCollide : NetworkBehaviour
 
     private static readonly System.Random rnd = new();
     
-    List<int> ncant = new() { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
+    List<int> ncant = new() { 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5 };
     // Suerte determinada : { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, x, y, z };
     // Se obtiene la cantidad gracias a "luck + rnd.Next(10)" con minimo 0 y máximo 15
 

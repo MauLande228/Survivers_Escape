@@ -11,7 +11,7 @@ namespace SurvivorsEscape
     public class CameraController : NetworkBehaviour
     {
         [Header("Framing")]
-        [SerializeField] private Camera _camera = null;
+        [SerializeField] public Camera _camera = null;
         [SerializeField] private Transform _followTransform = null;
         [SerializeField] private Vector3 _framing = new Vector3(0.65f, 0, 0);
 

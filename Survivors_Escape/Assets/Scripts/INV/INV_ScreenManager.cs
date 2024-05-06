@@ -94,6 +94,7 @@ public class INV_ScreenManager : MonoBehaviour
     public SurvivorsEscape.CharacterController cc;
     public PlayersManager gchecks;
     public ulong uid;
+    public bool has_finished = false;
 
     public List<float> cevTest = new List<float>();
     public bool hasTool = false;
@@ -119,12 +120,11 @@ public class INV_ScreenManager : MonoBehaviour
 
                 GenFullMap();
                 GenUIAlerts();
-                GenObjList();
+                Invoke(nameof(GenObjList), 6);
 
                 //strui = GetComponentInChildren<STR_UI>();
                 //craftui = GetComponentInChildren<CraftManager>();
                 //objui = GetComponentInChildren<STR_Objectives>();
-                objui.transform.localPosition = new Vector3(-10000, 0, 0);
                 currentTool = 0;
                 opened = false;
                 hasTool = false;
@@ -165,6 +165,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                         strcurrent.Open(strui);
                         strui.op = true;
+                        cc._proning = true;
                     }
                     if (!opened && strui.inrange)
                     {
@@ -174,6 +175,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                         strui.Close(strui);
                         strui.op = false;
+                        cc._proning = false;
                     }
                 }
 
@@ -212,11 +214,6 @@ public class INV_ScreenManager : MonoBehaviour
                         else if (Input.GetKeyDown(KeyCode.Alpha8)) { strui.TakeSlot(7); ChangeSelected(currentSlot); }
                         else if (Input.GetKeyDown(KeyCode.Alpha9)) { strui.TakeSlot(8); ChangeSelected(currentSlot); }
                         else if (Input.GetKeyDown(KeyCode.Alpha0)) { strui.TakeSlot(9); ChangeSelected(currentSlot); }
-                    }
-
-                    if (Input.GetKeyDown(testKey))
-                    {
-                        gchecks.E_CallMyAverages(uid, count_objects_shared[0], count_objects_shared[4], count_objects_shared[1], count_objects_shared[2], count_objects_shared[3]);
                     }
 
                     if (Input.GetKeyDown(equipKey))
@@ -272,6 +269,10 @@ public class INV_ScreenManager : MonoBehaviour
                     {
                         if (!mapOpen){ OpenMap(); }
                         else { CloseMap(); }
+                    }
+                    if (Input.GetKeyDown(testKey) && has_finished)
+                    {
+                        gchecks.E_CallMyAverages(uid, count_objects_shared[0], count_objects_shared[4], count_objects_shared[1], count_objects_shared[2], count_objects_shared[3]);
                     }
 
                     transform.localPosition = new Vector3(-10000, 0, 0);
@@ -370,10 +371,33 @@ public class INV_ScreenManager : MonoBehaviour
             {
                 strui.inrange = false;
             }
+            if (strui.inrange)
+            {
+                strui_op = false;
+                craftui.gameObject.SetActive(true); // Re enables CRAFTING
+                UpdateKeyUse(1); crafton = true;
+
+                strui.Close(strui);
+                strui.op = false;
+            }
         }
     }
 
-    public void SetOwnerID(ulong id) { uid = id; finaltext.text = ((int)uid+10).ToString(); Debug.Log(uid.ToString()); Invoke(nameof(CleanNumber), 15); }
+    public void SetOwnerID(ulong id)
+    {
+        uid = id;
+        finaltext.text = ((int)uid+10).ToString();
+        Debug.Log(uid.ToString());
+        Invoke(nameof(CleanNumber), 15);
+    }
+    public void MarkFinished()
+    {
+        has_finished = true;
+    }
+    public void UnmarkFinished()
+    {
+        has_finished = false;
+    }
     public ulong GetOwnerID() { return uid; }
     public void SetStartEquipment()
     {
@@ -382,30 +406,34 @@ public class INV_ScreenManager : MonoBehaviour
         bool naxe = CreateItem(_spawnableList._itemsList[12], 96); // Give player a stone axe
         bool npck = CreateItem(_spawnableList._itemsList[11], 60); // Give player a stone pickaxe
         bool ido1 = CreateItem(_spawnableList._itemsList[35], 1); // Give player an idol
-        if (uid == 0)
-        {
-            bool ngun = CreateItem(_spawnableList._itemsList[10], 1); // Give host a gun
-        }
+        //if (uid == 0)
+        //{
+        //    bool ngun = CreateItem(_spawnableList._itemsList[10], 1); // Give host a gun
+        //}
     }
 
     List<char> alert1 = new() { 'M', 'O', 'N', 'S', 'T', 'E', 'R', '!', '!', '!' };
     public int txtcount = 0;
     public void TextMonsterNotification()
     {
-        if (txtcount > 9)
+        if (cc.IsOwner)
         {
-            Invoke(nameof(TextMonsterNotificationOver), 0.2f);
-        }
-        else
-        {
-            finaltext.text += alert1[txtcount];
-            txtcount++;
+            if (txtcount > 9)
+            {
+                Invoke(nameof(TextMonsterNotificationOver), 0.2f);
+            }
+            else
+            {
+                finaltext.text += alert1[txtcount];
+                txtcount++;
 
-            Invoke(nameof(TextMonsterNotification), 0.2f);
+                Invoke(nameof(TextMonsterNotification), 0.2f);
+            }
         }
     }
     public void TextMonsterNotificationOver()
     {
+        txtcount = 0;
         finaltext.text = "";
     }
     public void SetChecks(PlayersManager pd)
@@ -417,10 +445,10 @@ public class INV_ScreenManager : MonoBehaviour
                 gchecks = pd;
                 gchecks.E_SetID(uid);
                 gchecks.E_SetINV(this);
-                if(uid == 0)
-                {
-                    gchecks.E_StartMonsterLoopServerRpc();
-                }
+
+                gchecks.SyncMyUserIDServerRpc(uid);
+
+                //if(uid == 0) { gchecks.E_StartMonsterLoopServerRpc(); }
             }
         }
     }
@@ -440,7 +468,7 @@ public class INV_ScreenManager : MonoBehaviour
 
     public void ApplyDMG()
     {
-        Pstats.health -= 4.5f;
+        Pstats.health -= 5.0f;
     }
     public int ApplyLUCK()
     {
@@ -801,7 +829,7 @@ public class INV_ScreenManager : MonoBehaviour
     {
         allSlots[0].stackSize = allSlots[0].stackSize - 1;
         allSlots[0].UpdateSlot();
-        Pstats.health -= 2.0f;
+        Pstats.health -= 1.0f;
 
         if (allSlots[0].stackSize <= 0)
         {
@@ -917,6 +945,9 @@ public class INV_ScreenManager : MonoBehaviour
     {
         STR_Objectives o = Instantiate(pre_objui, this.gameObject.transform).GetComponent<STR_Objectives>();
         objui = o;
+        objui.SetInv(this, (int)uid);
+        strui.SetObj(objui);
+        objui.transform.localPosition = new Vector3(-10000, 0, 0);
     }
     public void GenDescSpace()
     {

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Apple
-  itDesc: Obtained from trees in the woods. Heals 18 hunger points!
+  itDesc: Obtained from trees in the forest. Heals 18 health points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: c293ead9fcad69541b35d885064c4768, type: 3}
   itPrefab: {fileID: 4973692959379176916, guid: 556dcd13dfe254e4a89c44f3309168cd,
@@ -22,9 +22,8 @@ MonoBehaviour:
   isStackable: 1
   maxStack: 50
   value: 4
-  shared_once: 0
-  plusHB: 18
-  plusHP: 10
+  plusHB: 4
+  plusHP: 18
   act: 0
   WepDmg: 0
   StoneDmg: 0
