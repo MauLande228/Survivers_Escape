@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 4
   itName: Frutal Dessert
-  itDesc: A combination of certain fruits. It increases your maximum hunger in 15
+  itDesc: A combination of certain fruits. It increases your maximum hunger in 20
     points
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 2499f6151f6c2884e885269496f4eb14, type: 3}

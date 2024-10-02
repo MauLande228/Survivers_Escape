@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Coconut
-  itDesc: Obtained from fantasy bushes. Heals 10 hunger points!
+  itDesc: Obtained from fantasy bushes. Heals 12 hunger points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 13c6a55c7e3ae9a4aacc3edec27af064, type: 3}
   itPrefab: {fileID: 2025619031032516144, guid: fd2ff4185c1657842893aae46f1eee6e,
@@ -22,8 +22,8 @@ MonoBehaviour:
   isStackable: 1
   maxStack: 50
   value: 4
-  plusHB: 10
-  plusHP: 2
+  plusHB: 12
+  plusHP: 3
   act: 0
   WepDmg: 0
   StoneDmg: 0

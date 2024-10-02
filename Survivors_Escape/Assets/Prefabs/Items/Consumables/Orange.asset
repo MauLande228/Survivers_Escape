@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itType: 3
   itName: Orange
-  itDesc: Obtained from trees in the forest. Heals 15 hunger points!
+  itDesc: Obtained from trees in the forest. Heals 20 hunger points!
   itEqup: 0
   itIcon: {fileID: 21300000, guid: 7dcde0a0784276140b6c572c1efdf573, type: 3}
   itPrefab: {fileID: 5672860074491410910, guid: 7da6ebcd341376543b050271e5ec53e7,
@@ -22,7 +22,7 @@ MonoBehaviour:
   isStackable: 1
   maxStack: 50
   value: 4
-  plusHB: 15
+  plusHB: 20
   plusHP: 3
   act: 0
   WepDmg: 0

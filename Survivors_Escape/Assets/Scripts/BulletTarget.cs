@@ -5,9 +5,21 @@ using UnityEngine;
 
 public class BulletTarget : NetworkBehaviour
 {
-    private int count = 10;
+    private int count = 15;
+    public NetworkObject myno;
     
     public void LoseCount()
+    {
+        TakeDMGServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void TakeDMGServerRpc()
+    {
+        TakeDMGClientRpc();
+    }
+    [ClientRpc]
+    public void TakeDMGClientRpc()
     {
         count -= 1;
         if (count < 1)
@@ -19,7 +31,10 @@ public class BulletTarget : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void DestroyEnemyServerRpc()
     {
-        Debug.Log("+ + + + + + + +  EL ENEMIGO HA MUERTO SIUUUU");
-        this.GetComponent<NetworkObject>().Despawn();
+        if(this != null)
+        {
+            myno.Despawn();
+            Debug.Log("+ + + + + + + +  EL ENEMIGO HA MUERTO SIUUUU");
+        }
     }
 }

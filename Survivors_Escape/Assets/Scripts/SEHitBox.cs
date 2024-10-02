@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Windows.WebCam.VideoCapture;
 
 public class SEHitBox : MonoBehaviour, IHitDetector
 {
@@ -12,7 +13,9 @@ public class SEHitBox : MonoBehaviour, IHitDetector
     private IHitResponder _hitResponder;
     public INV_ScreenManager inv;
     public bool hitx = true;
-    public AudioSource hitAudio;
+
+    public AudioSource AudioWood;
+    public AudioSource AudioSton;
 
     public IHitResponder HitResponder { get => _hitResponder; set => _hitResponder = value; }
 
@@ -81,7 +84,17 @@ public class SEHitBox : MonoBehaviour, IHitDetector
 
                             if (hitData.Validate())
                             {
-                                // hitAudio.Play();
+                                switch (hurtBox.OType)
+                                {
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        AudioWood.Play();
+                                        break;
+                                    case 2:
+                                        AudioSton.Play();
+                                        break;
+                                }
                                 hitData.HitDetector.HitResponder?.Response(hitData);
                                 hitData.HurtBox.HurtResponder?.Response(hitData);
                             }

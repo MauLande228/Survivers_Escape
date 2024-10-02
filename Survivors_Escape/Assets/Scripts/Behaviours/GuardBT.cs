@@ -2,14 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BT;
+using Unity.Netcode;
 
 public class GuardBT : BT.Tree
 {
-    public UnityEngine.Transform[] waypoints;
-
     public static float speed = 3.6f;
-    public static float fovRange = 2000.0f;
-    public static float attackRange = 1.2f;
+    public static float fovRange = 20.0f;
+    public static float attackRange = 0.2f;
 
     protected override Node SetupTree()
     {

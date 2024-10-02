@@ -22,7 +22,7 @@ public class CheckEnemyInAttackRange : BT.Node
         // Debug.Log(_transform.position.z.ToString());
         if (t == null)
         {
-            Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET ES NULO");
+            //Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET ES NULO");
             State = NodeState.FAILURE;
             return State;
         }
@@ -31,7 +31,7 @@ public class CheckEnemyInAttackRange : BT.Node
         Transform target = (Transform)t;
         if (Vector3.Distance(_transform.position, target.position) <= GuardBT.attackRange)
         {
-            Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET EN RANGO");
+            //Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET EN RANGO");
             _animator.SetBool("Attacking", true);
             _animator.SetBool("Walking", false);
 

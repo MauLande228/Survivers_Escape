@@ -56,13 +56,13 @@ public class STR_Objectives : MonoBehaviour
 
     public void UpTitle() // Objectives
     {
-        o_title.text = "<color=#1A8DC6>Objectives Finished</color>";
+        o_title.text = "<color=#FFF0BD>Objectives Finished</color>";
     }
     public void UpGBarrel(int n) // 0/1 - Gas Barrel
     {
         if(n > 0)
         {
-            o_gbarrel.text = "<color=#1A8DC6>" + n.ToString() + "/1 - Gas Barrel</color>";
+            o_gbarrel.text = "<color=#FFF0BD>" + n.ToString() + "/1 - Gas Barrel</color>";
             objectivesfinished[0] = true;
         }
         else
@@ -74,7 +74,7 @@ public class STR_Objectives : MonoBehaviour
     {
         if (n > 0)
         {
-            o_eleceng.text = "<color=#1A8DC6>" + n.ToString() + "/1 - Electric Engine</color>";
+            o_eleceng.text = "<color=#FFF0BD>" + n.ToString() + "/1 - Electric Engine</color>";
             objectivesfinished[1] = true;
         }
         else
@@ -88,7 +88,7 @@ public class STR_Objectives : MonoBehaviour
         nwood += n;
         if (nwood > 124)
         {
-            o_wood.text = "<color=#1A8DC6>" + nwood.ToString() + "/125 - Wood</color>";
+            o_wood.text = "<color=#FFF0BD>" + nwood.ToString() + "/125 - Wood</color>";
             objectivesfinished[2] = true;
         }
         else
@@ -100,7 +100,7 @@ public class STR_Objectives : MonoBehaviour
     {
         if (n > 0)
         {
-            o_gear.text = "<color=#1A8DC6>" + n.ToString() + "/1 - Gear</color>";
+            o_gear.text = "<color=#FFF0BD>" + n.ToString() + "/1 - Gear</color>";
             objectivesfinished[3] = true;
         }
         else
@@ -112,7 +112,7 @@ public class STR_Objectives : MonoBehaviour
     {
         if (n > 0)
         {
-            o_pressg.text = "<color=#1A8DC6>" + n.ToString() + "/1 Pressure Gauge</color>";
+            o_pressg.text = "<color=#FFF0BD>" + n.ToString() + "/1 Pressure Gauge</color>";
             objectivesfinished[4] = true;
         }
         else
@@ -126,7 +126,7 @@ public class STR_Objectives : MonoBehaviour
         nstone += n;
         if (nstone > 124)
         {
-            o_stone.text = "<color=#1A8DC6>" + nstone.ToString() + "/125 - Stone</color>";
+            o_stone.text = "<color=#FFF0BD>" + nstone.ToString() + "/125 - Stone</color>";
             objectivesfinished[5] = true;
         }
         else

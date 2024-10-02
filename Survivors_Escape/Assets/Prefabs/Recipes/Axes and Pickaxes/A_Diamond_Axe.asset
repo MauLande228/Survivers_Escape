@@ -17,8 +17,7 @@ MonoBehaviour:
   reqs:
   - {fileID: 11400000, guid: 0792c1f5a2279b4428c06e1ae16cc782, type: 2}
   - {fileID: 11400000, guid: 134188d0caf4b9e42a78c6bb9f3fb1a3, type: 2}
-  - {fileID: 11400000, guid: 727fa5af26ca3464698d1f80f2ff10b8, type: 2}
-  - {fileID: 11400000, guid: a4413335e02b8f0479885efec79fc662, type: 2}
+  - {fileID: 11400000, guid: 388a93048b7a5ec4dbfbc6d5c88cce66, type: 2}
   - {fileID: 11400000, guid: 9f25596d9fc4762478da26d32830b50b, type: 2}
   out_tm: 8
   out_it: {fileID: 11400000, guid: 6f1ed16b73c2d3c4a9d6393483957bbd, type: 2}

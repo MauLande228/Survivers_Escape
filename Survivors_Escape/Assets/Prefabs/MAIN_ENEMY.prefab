@@ -345,6 +345,8 @@ GameObject:
   - component: {fileID: 7734591664846746104}
   - component: {fileID: 9015776849418826752}
   - component: {fileID: -443532122383081939}
+  - component: {fileID: 4064443065421684000}
+  - component: {fileID: 3148640382141696211}
   m_Layer: 0
   m_Name: MAIN_ENEMY
   m_TagString: Enemy
@@ -367,7 +369,7 @@ Transform:
   - {fileID: 5122250080468472507}
   - {fileID: 6015858846037662530}
   m_Father: {fileID: 0}
-  m_RootOrder: 44
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &4557169275303379683
 Animator:
@@ -435,6 +437,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8f6750d67040124ab4e3dc5c642b942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myno: {fileID: 6333701747414061308}
 --- !u!65 &9015776849418826752
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -482,6 +485,40 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!65 &4064443065421684000
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4462363268145753104}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 2, z: 1.5}
+  m_Center: {x: 0, y: 0.8, z: 0}
+--- !u!114 &3148640382141696211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4462363268145753104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9cc49e52d20994496d08bf84eaed6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bDestroyed: 0
 --- !u!1 &4827904567489093082
 GameObject:
   m_ObjectHideFlags: 0

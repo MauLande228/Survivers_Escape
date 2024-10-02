@@ -100,6 +100,7 @@ namespace SurvivorsEscape
         private GameObject _handBone;
 
         public INV_ScreenManager inv;
+        public PlayerStats ups;
         public ulong uid;
         public GameObject theEnemy;
 
@@ -272,12 +273,15 @@ namespace SurvivorsEscape
                 hitTransform = raycastHit.transform;
             }
 
-            if (!_inAnimation)
+            if (!_hasGun)
             {
-                if (_inputs.Attack.PressedDown())
+                if (!_inAnimation)
                 {
-                    _inAnimation = true;
-                    _animator.CrossFadeInFixedTime(_meleeAtack, 0.1f, 0, 0);
+                    if (_inputs.Attack.PressedDown())
+                    {
+                        _inAnimation = true;
+                        _animator.CrossFadeInFixedTime(_meleeAtack, 0.1f, 0, 0);
+                    }
                 }
             }
             else

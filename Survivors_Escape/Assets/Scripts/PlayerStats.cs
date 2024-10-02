@@ -180,7 +180,7 @@ public class PlayerStats : MonoBehaviour
             playernow.position = respawnPos;
             inv.FinishDeadUI();
             health = 50;
-            hunger = 50;
+            hunger = 100;
 
             life_lock = false;
             hunger_lock = false;
@@ -190,7 +190,7 @@ public class PlayerStats : MonoBehaviour
 
             cc.RequestStanceChange(CharacterStance.STANDING);
             inv.gchecks.CEV_ADP_AmAlive();
-            respawnTime = 18;
+            respawnTime = 30;
         }
         else
         {
@@ -242,13 +242,17 @@ public class PlayerStats : MonoBehaviour
 
     public void ApplyDamage(float dmg)
     {
-        possibledmg = dmg * defense;
-        health -= possibledmg;
-
-        if (health < 0.0f)
+        if (cc != null && cc.IsOwner)
         {
-            hunger = 0;
-            inv.gchecks.E_KillPrevMonsterServerRpc();
+            possibledmg = dmg * defense;
+            health -= possibledmg;
+
+            if (health < 0.0f)
+            {
+                health = 0;
+                hunger = 0;
+                inv.gchecks.E_KillPrevMonsterServerRpc();
+            }
         }
     }
 

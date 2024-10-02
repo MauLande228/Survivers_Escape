@@ -18,6 +18,7 @@ public class INV_ScreenManager : MonoBehaviour
     public KeyCode splitKey = KeyCode.F; // Split
     public KeyCode testKey = KeyCode.P; // Finish game
     public KeyCode mapKey = KeyCode.M; // Show map
+    public KeyCode helpKey = KeyCode.H; // Show help
     private KeyCode[] keyCodes = new KeyCode[] { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8 };
 
     [Header("Settings")]
@@ -31,6 +32,7 @@ public class INV_ScreenManager : MonoBehaviour
 
     [Header("Refs")]
     public Transform dropPos;
+    public Vector3 finalPos = new(516, 257, 120);
 
     public GameObject slotTemp;
     public Transform contentHolder;
@@ -60,9 +62,11 @@ public class INV_ScreenManager : MonoBehaviour
     public GameObject e_pck; // 6
     public GameObject r_pck; // 7
     public GameObject d_pck; // 8
+    public GameObject t_gun; // 9
     public GameObject hitbox;
 
     private bool _bCanBeDestroyed = false;
+    public bool finishlock = false;
 
     public STR_UI strui;
     public STR_Main strcurrent;
@@ -89,7 +93,16 @@ public class INV_ScreenManager : MonoBehaviour
 
     public GameObject uiFMap;
     public Transform mapREF;
+    public GameObject uiHelp;
+    public Transform helpREF;
     public bool mapOpen = false;
+    public bool helpOpen = false;
+
+    public AudioSource sfxSelect;
+    public AudioSource sfxEquip;
+    public AudioSource sfxConsume;
+    public AudioSource sfxLearn;
+    public AudioSource sfxOpenClose;
 
     public SurvivorsEscape.CharacterController cc;
     public PlayersManager gchecks;
@@ -119,6 +132,7 @@ public class INV_ScreenManager : MonoBehaviour
                 GenKeyUses(); UpdateKeyUse(1);
 
                 GenFullMap();
+                GenFullHelp();
                 GenUIAlerts();
                 Invoke(nameof(GenObjList), 6);
 
@@ -144,9 +158,16 @@ public class INV_ScreenManager : MonoBehaviour
             {
                 if (Input.GetKeyDown(invKey))
                 {
+                    sfxOpenClose.Play();
                     if (mapOpen)
                     {
+                        sfxOpenClose.Play();
                         CloseMap();
+                    }
+                    if (helpOpen)
+                    {
+                        sfxOpenClose.Play();
+                        CloseHelp();
                     }
                     opened = !opened;
                     Cursor.lockState = CursorLockMode.None;
@@ -218,6 +239,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                     if (Input.GetKeyDown(equipKey))
                     {
+                        
                         if (strui_op)
                         {
                             StoreSlot(currentSlot);
@@ -231,7 +253,7 @@ public class INV_ScreenManager : MonoBehaviour
                                     switch (currentSlot)
                                     {
                                         case 0: break;
-                                        default: SwapSlots(currentSlot); break;
+                                        default: sfxEquip.Play(); SwapSlots(currentSlot); break;
                                     }
                                 }
                                 else { ConsumeSlot(currentSlot); }
@@ -258,21 +280,42 @@ public class INV_ScreenManager : MonoBehaviour
                     }
                     if (Input.GetKeyDown(mapKey))
                     {
+                        sfxOpenClose.Play();
                         opened = false;
                         if (!mapOpen) { OpenMap(); }
                         else { CloseMap(); }
+                    }
+                    if (Input.GetKeyDown(helpKey))
+                    {
+                        sfxOpenClose.Play();
+                        opened = false;
+                        if(!helpOpen) { OpenHelp(); }
+                        else { CloseHelp(); }
                     }
                 }
                 else
                 {
                     if (Input.GetKeyDown(mapKey))
                     {
+                        sfxOpenClose.Play();
                         if (!mapOpen){ OpenMap(); }
                         else { CloseMap(); }
                     }
-                    if (Input.GetKeyDown(testKey) && has_finished)
+                    if (Input.GetKeyDown(helpKey))
                     {
+                        sfxOpenClose.Play();
+                        if (!helpOpen) { OpenHelp(); }
+                        else { CloseHelp(); }
+                    }
+                    if (Input.GetKeyDown(testKey) && has_finished && !finishlock)
+                    {
+                        finishlock = true;
+                        Pstats.regenhealth = 0.0f;
+                        Pstats.idlehunger = 0.0f;
                         gchecks.E_CallMyAverages(uid, count_objects_shared[0], count_objects_shared[4], count_objects_shared[1], count_objects_shared[2], count_objects_shared[3]);
+                        Transform playernow = cc.GetComponent<Transform>();
+                        playernow.position = finalPos;
+                        SpawnFinalIdols();
                     }
 
                     transform.localPosition = new Vector3(-10000, 0, 0);
@@ -353,6 +396,15 @@ public class INV_ScreenManager : MonoBehaviour
         uiIntro.gameObject.SetActive(false);
     }
 
+    public void FinalTexts(int SDT_V, int CDA_V, int UV_V, int MS_V, int KUT_V, int SH_V, int FS_V, int OA_V, int UP_V, int coops_v, int coord_v, int cohesion_v)
+    {
+        descSpace.text = "SDT:" + SDT_V.ToString() + "- CDA:" + CDA_V.ToString() + "- UV:" + UV_V.ToString() + "- MS:" + MS_V.ToString() + "- KUT:" + KUT_V.ToString() + "- SH:" + SH_V.ToString() + "- FS:" + FS_V.ToString() + "- OA:" + OA_V.ToString() + "- UP:" + UP_V.ToString();
+        Pstats.health = coops_v;
+        Pstats.hunger = coord_v;
+        Qtext.text = cohesion_v.ToString();
+        Ktext.text = cohesion_v.ToString();
+    }
+
     public void CloseInventory()
     {
         if (opened) {
@@ -406,13 +458,13 @@ public class INV_ScreenManager : MonoBehaviour
         bool naxe = CreateItem(_spawnableList._itemsList[12], 96); // Give player a stone axe
         bool npck = CreateItem(_spawnableList._itemsList[11], 60); // Give player a stone pickaxe
         bool ido1 = CreateItem(_spawnableList._itemsList[35], 1); // Give player an idol
-        //if (uid == 0)
-        //{
-        //    bool ngun = CreateItem(_spawnableList._itemsList[10], 1); // Give host a gun
-        //}
+        if (uid == 0)
+        {
+            bool ngun = CreateItem(_spawnableList._itemsList[10], 1); // Give host a gun
+        }
     }
 
-    List<char> alert1 = new() { 'M', 'O', 'N', 'S', 'T', 'E', 'R', '!', '!', '!' };
+    List<char> alert1 = new() { 'W', 'A', 'T', 'C', 'H', ' ', 'O', 'U', 'T', '!' };
     public int txtcount = 0;
     public void TextMonsterNotification()
     {
@@ -448,7 +500,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                 gchecks.SyncMyUserIDServerRpc(uid);
 
-                //if(uid == 0) { gchecks.E_StartMonsterLoopServerRpc(); }
+                if (uid == 0) { gchecks.E_StartMonsterLoopServerRpc(); }
             }
         }
     }
@@ -492,26 +544,16 @@ public class INV_ScreenManager : MonoBehaviour
             }
         }
     }
-
-    public void AddCEVValue(int cevcase, float v)
+    public void OpenHelp()
     {
-        switch (cevcase)
-        {
-            case 0:
-                cevTest.Add(v);
-                Debug.Log(cevTest.ToString());
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-        }
+        helpREF.gameObject.SetActive(true);
+        helpOpen = true;
     }
-
+    public void CloseHelp()
+    {
+        helpREF.gameObject.SetActive(false);
+        helpOpen = false;
+    }
     public void OpenMap()
     {
         mapREF.gameObject.SetActive(true);
@@ -551,6 +593,7 @@ public class INV_ScreenManager : MonoBehaviour
                 d_pck.SetActive(false);
                 break;
             case 9:
+                t_gun.SetActive(false);
                 cc._hasGun = false;
                 break;
             default:
@@ -598,6 +641,7 @@ public class INV_ScreenManager : MonoBehaviour
                 break;
             case "Gun":
                 cc._hasGun = true;
+                t_gun.SetActive(true);
                 currentTool = 9;
                 break;
             default:
@@ -625,6 +669,7 @@ public class INV_ScreenManager : MonoBehaviour
             {
                 if (newSlotPos >= 0 && newSlotPos <= 13)
                 {
+                    sfxSelect.Play();
                     allSlots[currentSlot].UnselectS();
                     allSlots[newSlotPos].SelectS();
                     currentSlot = newSlotPos;
@@ -744,25 +789,29 @@ public class INV_ScreenManager : MonoBehaviour
         switch (ac)
         {
             case 0: //Any normal food
+                sfxConsume.Play();
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
                 break;
 
             case 1: // Frutal Delight : More HP
+                sfxConsume.Play();
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
                 gchecks.CEV_RegisterBuffByIDServerRpc(uid);
-                Pstats.maxhealth += 15.0f;
+                Pstats.maxhealth += 20.0f;
                 break;
 
             case 2: // Frutal Dessert : More HB
+                sfxConsume.Play();
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
                 gchecks.CEV_RegisterBuffByIDServerRpc(uid);
-                Pstats.maxhunger += 15.0f;
+                Pstats.maxhunger += 20.0f;
                 break;
 
             case 3: // Frutal Drink : More luck
+                sfxConsume.Play();
                 Pstats.hunger += allSlots[cs].data.plusHB;
                 Pstats.health += allSlots[cs].data.plusHP;
                 gchecks.CEV_RegisterBuffByIDServerRpc(uid);
@@ -775,6 +824,7 @@ public class INV_ScreenManager : MonoBehaviour
                 break;
 
             case 5: // Idol // 36:Drink // 37:Dessert // 38:Delight
+                sfxConsume.Play();
                 int s = rnd.Next(3);
                 CreateItem(_spawnableList._itemsList[36 + s], 1);
                 break;
@@ -782,6 +832,7 @@ public class INV_ScreenManager : MonoBehaviour
             case 6: // Emerald Recipes
                 if (!lock_emrl)
                 {
+                    sfxLearn.Play();
                     lock_emrl = true;
                     craftui.recs[3] = craftui.allr[3];
                     craftui.recs[4] = craftui.allr[4];
@@ -794,6 +845,7 @@ public class INV_ScreenManager : MonoBehaviour
             case 7: // Ruby Recipes
                 if (!lock_ruby)
                 {
+                    sfxLearn.Play();
                     lock_ruby = true;
                     craftui.recs[5] = craftui.allr[5];
                     craftui.recs[6] = craftui.allr[6];
@@ -806,6 +858,7 @@ public class INV_ScreenManager : MonoBehaviour
             case 8: // Diamond Recipes
                 if (!lock_dmnd)
                 {
+                    sfxLearn.Play();
                     lock_dmnd = true;
                     craftui.recs[7] = craftui.allr[7];
                     craftui.recs[8] = craftui.allr[8];
@@ -972,6 +1025,12 @@ public class INV_ScreenManager : MonoBehaviour
         mapREF = Instantiate(uiFMap, canvas.gameObject.transform).GetComponent<Transform>();
         mapREF.gameObject.SetActive(false);
         mapOpen = false;
+    }
+    public void GenFullHelp()
+    {
+        helpREF = Instantiate(uiHelp, canvas.gameObject.transform).GetComponent<Transform>();
+        helpREF.gameObject.SetActive(false);
+        helpOpen = false;
     }
 
     public void UpdateCurrentSlot(Slot s)
@@ -1214,13 +1273,14 @@ public class INV_ScreenManager : MonoBehaviour
                             }
                             stackableSlot.UpdateSlot();
                             f = true;
+                            sfxEquip.Play();
+
                             return true;
                         }
                     }
                     if (!f)
                     {
-                        stackableSlot.UpdateSlot();
-                        //strui.SetSlot(ss, amountLeft);
+                        stackableSlot.UpdateSlot(); //strui.SetSlot(ss, amountLeft);
                         DropCraftItem(dt, amountLeft);
                         return false;
                     }
@@ -1229,6 +1289,8 @@ public class INV_ScreenManager : MonoBehaviour
                 {
                     stackableSlot.AddStackAmount(st);
                     stackableSlot.UpdateSlot();
+                    sfxEquip.Play();
+
                     return true;
                 }
             }
@@ -1255,6 +1317,8 @@ public class INV_ScreenManager : MonoBehaviour
                     {
                         UpdateCurrentSlot(emptySlot);
                     }
+                    sfxEquip.Play();
+
                     return true;
                 }
                 else
@@ -1294,6 +1358,8 @@ public class INV_ScreenManager : MonoBehaviour
                 if (s == 0) { DoEquip(dt.itName); }
                 int g = GetGem(dt.itName);
                 //if (g < 4) { hasTool = true; gchecks.CEV_NewCraftedTool(g, hasTool); }
+                sfxEquip.Play();
+
                 return true;
             }
             else
@@ -1452,6 +1518,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                             f = true;
                             stackableSlot.UpdateSlot();
+                            sfxEquip.Play();
                             return true;
                         }
                         //else
@@ -1479,6 +1546,7 @@ public class INV_ScreenManager : MonoBehaviour
                     AddValue(pickUp.data.value, pickUp.stackSize);
                     if (isSaved) { AddCountShare(pickUp.data.itType.ToString()[0]); pickUp.shared_once = true; }
                     //Destroy(pickUp.gameObject);
+                    sfxEquip.Play();
                     return true;
                 }
             }
@@ -1508,6 +1576,8 @@ public class INV_ScreenManager : MonoBehaviour
                     //EFX_Applied(e);
                     if (isIn) { UpdateCurrentSlot(emptySlot); }
                     if (isSaved) { AddCountShare(pickUp.data.itType.ToString()[0]); pickUp.shared_once = true; }
+                    sfxEquip.Play();
+
                     return true;
                     //Destroy(pickUp.gameObject);
                 }
@@ -1547,6 +1617,7 @@ public class INV_ScreenManager : MonoBehaviour
 
                 if (s == 0) { DoEquip(invSlots[0].data.itName); }
                 int g = GetGem(pickUp.data.itName);
+                sfxEquip.Play();
 
                 return true;
 
@@ -1590,6 +1661,7 @@ public class INV_ScreenManager : MonoBehaviour
         }
         bool hasPassedOnce = slot.data.itPrefab.GetComponent<INV_PickUp>().shared_once;
 
+        sfxSelect.Play();
         SubValue(slot.data.value, slot.stackSize);
         Spawner.Instace.SpawnObjectServerRpc(i, slot.stackSize, x, y, z, uid, hasPassedOnce);
         //Debug.Log("Here");
@@ -1623,6 +1695,12 @@ public class INV_ScreenManager : MonoBehaviour
 
         //pickup.data = dt;
         //pickup.stackSize = nl;
+    }
+
+    public void SpawnFinalIdols()
+    {
+        Spawner.Instace.SpawnObjectServerRpc(35, 1, 516, 38, 34, 1000, false);
+        Spawner.Instace.SpawnObjectServerRpc(35, 1, 516, 39, 34, 1000, false);
     }
 
     public bool CanBeDestroyed() { return _bCanBeDestroyed; }

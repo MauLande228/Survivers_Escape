@@ -17,20 +17,25 @@ public class CheckEnemyInFOVRange : BT.Node
         _transform = transform;
         _animator = transform.GetComponent<Animator>();
         colliders = Physics.OverlapSphere(_transform.position, GuardBT.fovRange, _enemyLayerMask);
-        rmain = rnd.Next(colliders.Length);
+        //rmain = rnd.Next(colliders.Length);
     }
 
     public override NodeState Evaluate()
     {
         object t = GetData("target");
-        if(t == null) 
+        //Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - EVALUANDO FOV RANGE");
+        if (t == null)
         {
+            colliders = Physics.OverlapSphere(_transform.position, GuardBT.fovRange, _enemyLayerMask);
+            //Debug.Log(colliders.Length.ToString());
             if (colliders.Length > 0)
             {
-                 
-                Debug.Log("LENGHT : " + colliders.Length.ToString());
-                Debug.Log("SELECTED : " + rmain.ToString());
-                Parent.Parent.SetData("target", colliders[rmain].transform);
+                //Debug.Log(colliders.Length.ToString());
+                //Debug.Log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TARGET DETECTADO");
+
+                //Debug.Log("LENGHT : " + colliders.Length.ToString());
+                //Debug.Log("SELECTED : " + rmain.ToString());
+                Parent.Parent.SetData("target", colliders[0].transform);
                 _animator.SetBool("Walking", true);
                 State = NodeState.SUCCESS;
 

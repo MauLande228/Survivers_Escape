@@ -65,6 +65,7 @@ public class PlayersManager : NetworkBehaviour
     public List<bool> cev_eachfinish = new(); // Variable que guarda si ya terminaron los jugadores
     public List<ulong> cev_eachuserid = new();
     public List<INV_ScreenManager> cev_eachinv = new();
+    public bool notcheck = false;
 
     void Start()
     {
@@ -74,7 +75,7 @@ public class PlayersManager : NetworkBehaviour
         // UNCOMMENT TO CHECK VARIANCE ACTIVELY
         //Invoke(nameof(CEV_RBID_InvokeCheck), 60);
 
-        double x = FinalValue(26, 7);
+        double x = FinalValue(69, 54);
         //Instantiate(Chest1);
     }
 
@@ -312,10 +313,10 @@ public class PlayersManager : NetworkBehaviour
 
         variance_buffs = sumSquaredDiff / cev_allvalues.Count;
         float cev;
-        if (variance_buffs > 1.2) { cev = 0.1f; }
-        else if (variance_buffs > 0.9) { cev = 0.3f; }
-        else if (variance_buffs > 0.6) { cev = 0.5f; }
-        else if (variance_buffs > 0.3) { cev = 0.7f; }
+        if (variance_buffs > 1.36) { cev = 0.1f; }
+        else if (variance_buffs > 1.02) { cev = 0.3f; }
+        else if (variance_buffs > 0.68) { cev = 0.5f; }
+        else if (variance_buffs > 0.34) { cev = 0.7f; }
         else { cev = 0.9f; }
 
         E_SetPersonalCoop(cev, 2); // 3/6
@@ -337,10 +338,10 @@ public class PlayersManager : NetworkBehaviour
 
         variance_finish = sumSquaredDiff / cev_historynostay.Count;
         float cev;
-        if (variance_finish > 1.04) { cev = 0.1f; }
-        else if (variance_finish > 0.78) { cev = 0.3f; }
-        else if (variance_finish > 0.52) { cev = 0.5f; }
-        else if (variance_finish > 0.26) { cev = 0.7f; }
+        if (variance_finish > 1.2) { cev = 0.1f; }
+        else if (variance_finish > 0.9) { cev = 0.3f; }
+        else if (variance_finish > 0.6) { cev = 0.5f; }
+        else if (variance_finish > 0.3) { cev = 0.7f; }
         else { cev = 0.9f; }
 
         E_SetPersonalCoop(cev, 5); // 6/6
@@ -757,10 +758,10 @@ public class PlayersManager : NetworkBehaviour
         float pavg = ptotal * 100;
 
         float cev; // 100 < 75 50 30 15 > 0
-        if (pavg > 75) { cev = 0.9f; }
-        else if (pavg > 50) { cev = 0.7f; }
-        else if (pavg > 30) { cev = 0.5f; }
-        else if (pavg > 15) { cev = 0.3f; }
+        if (pavg > 74) { cev = 0.9f; }
+        else if (pavg > 56) { cev = 0.7f; }
+        else if (pavg > 40) { cev = 0.5f; }
+        else if (pavg > 26) { cev = 0.3f; }
         else { cev = 0.1f; }
 
         E_SetPersonalCoor(cev, 1);
@@ -772,7 +773,7 @@ public class PlayersManager : NetworkBehaviour
         int a = 0;
         foreach (int n in all_shared_boos) { a += n; }
 
-        int b = cev_historybuffs.Count;
+        int b = cev_historybuffs.Count - playerObjects.Count;
         float ptotal = a / (float)b;
         float pavx = ptotal * 100;
         int pavg = (int)pavx;
@@ -798,22 +799,22 @@ public class PlayersManager : NetworkBehaviour
     //[ServerRpc] E_SetMyID
 
     GameObject enemyOBJ;
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void E_StartMonsterLoopServerRpc()
     {
         Invoke(nameof(E_SpawnNewMonsterServerRpc), 30);
     }
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void E_SpawnNewMonsterServerRpc()
     {
         enemyOBJ = Instantiate(mEnemy);
         E_SpawnNewMonsterClientRpc();
-        enemyOBJ.transform.position = new Vector3(516, 76, 121);
+        enemyOBJ.transform.position = new Vector3(516, 34, 121);
         var refNO = enemyOBJ.GetComponent<NetworkObject>();
         refNO.Spawn();
 
         Invoke(nameof(E_KillPrevMonsterServerRpc), 180); // Despawn in 3 minutes (180 seconds)
-        Invoke(nameof(E_SpawnNewMonsterServerRpc), 300); // Spawn again in 7 minutes (420 seconds)
+        Invoke(nameof(E_SpawnNewMonsterServerRpc), 360); // Spawn again in 6 minutes (360 seconds)
     }
     [ClientRpc]
     public void E_SpawnNewMonsterClientRpc()
@@ -821,7 +822,7 @@ public class PlayersManager : NetworkBehaviour
         user_inv.TextMonsterNotification();
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void E_KillPrevMonsterServerRpc()
     {
         if(enemyOBJ != null)
@@ -885,9 +886,42 @@ public class PlayersManager : NetworkBehaviour
 
         if (allfinished) // Si todos terminaron llamar al servidor para que haga todos los broadcasteos
         {
+            Debug.Log("ALL FINISHED!");
             SyncCoopNCoordServerRpc();
         }
         // Los ServerRpc no son secuenciales, son asincronos, despues de ser llamados, se sigue con las siguientes lineas de codigo, no espera al ServerRpc
+        notcheck = false;
+        FinalCheckLoop();
+    }
+
+    public void FinalCheckLoop()
+    {
+        bool iffinished = true;
+        foreach (bool val in cev_eachfinish) { if (!val) { iffinished = false; } }
+
+        if (iffinished) // Si todos terminaron llamar al servidor para que haga todos los broadcasteos
+        {
+            notcheck = true;
+            Debug.Log("ALL FINISHED!");
+            SyncCoopNCoordServerRpc();
+            SyncNotCheckServerRpc();
+        }
+
+        if (notcheck == false)
+        {
+            Invoke(nameof(FinalCheckLoop), 5);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncNotCheckServerRpc()
+    {
+        SyncNotCheckClientRpc();
+    }
+    [ClientRpc]
+    public void SyncNotCheckClientRpc()
+    {
+        notcheck = true;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -933,10 +967,20 @@ public class PlayersManager : NetworkBehaviour
         AllCoordinationInfluence(1, cev_personal_coord[1], 40); // 1 : ObjectivesAssigned influencia en 40%
         AllCoordinationInfluence(2, cev_personal_coord[2], 30); // 2 : UpgradesProducer influencia en 30%
 
+        float allcoops = 0;
+        foreach (float coopsx in cev_big_coops)
+        {
+            allcoops += coopsx;
+        }
+        float allcoord = 0;
+        foreach (float coordx in cev_big_coord)
+        {
+            allcoord += coordx;
+        }
         // STEP 0 : Calcular valor promedio de cooperacion de cada jugador
-        cev_personal_avgs[0] = E_Promedio(cev_big_coops);
+        cev_personal_avgs[0] = allcoops;
         // STEP 1 : Calcular valor promedio de cordinacion de cada jugador
-        cev_personal_avgs[1] = E_Promedio(cev_big_coord);
+        cev_personal_avgs[1] = allcoord;
 
         // STEP 2 : Distribuir tus promedios a eachcoop y eachcoor usando tu propio id
         // cev_eachcooperation[(int)user_id] = cev_personal_avgs[0];
@@ -960,6 +1004,7 @@ public class PlayersManager : NetworkBehaviour
         double xval = FinalValue(final_cooperation, final_coordination);
 
         user_inv.SetFinalValue((int)xval);
+        user_inv.FinalTexts((int)cev_big_coops[0], (int)cev_big_coops[1], (int)cev_big_coops[2], (int)cev_big_coops[3], (int)cev_big_coops[4], (int)cev_big_coops[5], (int)cev_big_coord[0], (int)cev_big_coord[1], (int)cev_big_coord[2], final_cooperation, final_coordination, (int)xval);
         Debug.Log("FINISHED");
     }
 
