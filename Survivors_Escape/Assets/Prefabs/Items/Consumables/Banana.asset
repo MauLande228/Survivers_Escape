@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
+  m_Name: Banana
+  m_EditorClassIdentifier: 
+  itType: 3
+  itName: Banana
+  itDesc: Obtained from trees on the density. Heals 20 hunger points!
+  itEqup: 0
+  itIcon: {fileID: 21300000, guid: adb435f96f1f6bb40aba621a198a144b, type: 3}
+  itPrefab: {fileID: 8860763503235664175, guid: 1c1eefc360a7a2a458aec8dc3f278af1,
+    type: 3}
+  isStackable: 1
+  maxStack: 50
+  value: 4
+  plusHB: 20
+  plusHP: 3
+  act: 0
+  WepDmg: 0
+  StoneDmg: 0
+  WoodDmg: 0
+  dropPos: {fileID: 0}
+  efx: 0

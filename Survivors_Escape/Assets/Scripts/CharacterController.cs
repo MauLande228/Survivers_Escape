@@ -3,43 +3,65 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Unity.Netcode;
+using UnityEngine.Networking;
 
 namespace SurvivorsEscape
 {
     public enum CharacterStance { STANDING, CROUCHING}
-    public class CharacterController : MonoBehaviour, IHitResponder
+    public class CharacterController : NetworkBehaviour, IHitResponder
     {
         private InputManager _inputs;
-        private CameraController _cameraController;
-        private Animator _animator;
+        public CameraController _cameraController;
+        public INV_CanvRef _canvas;
+        public Animator _animator;
         private EventHandler _eventHandler;
         private CapsuleCollider _capsuleCollider;
         private CharacterStance _stance;
+        public bool _IsDead = false;
 
         [Header("Speed [Normal Sprint]")]
-        [SerializeField] private Vector3 _standingSpeed = new Vector3(6, 8, 2);
+        [SerializeField] private Vector3 _standingSpeed = new Vector3(6, 9, 2);
         [SerializeField] private Vector2 _crouchingSpeed = new Vector2(0, 0);
-        [SerializeField] private Vector2 _proningSpeed = new Vector2(0, 0);
 
         [Header("Capsule [Radius Height YOffset]")]
         [SerializeField] private Vector3 _standingCapsule = Vector3.zero;
         [SerializeField] private Vector3 _crouchingCapsule = Vector3.zero;
-        [SerializeField] private Vector3 _proningCapsule = Vector3.zero;
 
         [Header("Attacking")]
-        [SerializeField] private int _damage = 10;
+        [SerializeField] private int _lifeDamage = 5;
+        [SerializeField] private int _woodDamage = 12;
+        [SerializeField] private int _rockDamage = 7;
+        [SerializeField] public int _luckyPoint = 0;
         [SerializeField] private SEHitBox _hitBox;
 
         [Header("Sharpness")]
         [SerializeField] private float _moveSharpness = 10f;
         [SerializeField] private float _standingRotationSharpness = 10f;
         [SerializeField] private float _crouchingRotationSharpness = 10f;
-        [SerializeField] private float _proningRotationSharpness = 10f;
+
+        [Header("Body parts")]
+        [SerializeField] private Transform _hand;
+        private GameObject _handVessel;
+
+        [Header("Shootable objects")] 
+        [SerializeField] private LayerMask aimLayerMask = new LayerMask();
+        [SerializeField] private Transform _bullerProjectile;
+        [SerializeField] private Transform _spawnBulletPosition;
+
+        [SerializeField] private Transform _debugTransform;
+
+        [Header("Shooting particles")]
+        [SerializeField] private Transform _vfxParticlesCollition;
+
+        [Header("Color")]
+        [SerializeField] private PlayerVisual _playerVisual;
 
         #region ANIMATOR_STATE_NAMES
         private const string _standToCrouch = "Base Layer.Base Crouching";
         private const string _crouchToStand = "Base Layer.Base Standing";
         private const string _meleeAtack    = "Base Layer.Melee attack horizontal";
+        private const string _shootRifle    = "Base Layer.Shoot rifle";
         #endregion
 
         private bool _inAnimation;
@@ -50,6 +72,7 @@ namespace SurvivorsEscape
 
         private bool _strafing;
         private bool _sprinting;
+        public bool _hasGun;
         private float _strafeParameter;
         private Vector3 _strafeParameterXZ;
 
@@ -68,15 +91,39 @@ namespace SurvivorsEscape
         private Vector3 _newVelocity;
         private Quaternion _newRotation;
 
-        private bool _proning;
+        public bool _proning = false;
+        private bool _isAiming;
+        private bool _bInvOpen = false;
+        private Vector3 _mouseWorldPosition = new Vector3();
+
+        private GameObject _handInt;
+        private GameObject _handBone;
+
+        public INV_ScreenManager inv;
+        public PlayerStats ups;
+        public ulong uid;
+        public GameObject theEnemy;
 
         private void Start()
         {
-            _animator = GetComponent<Animator>();
-            _cameraController = GetComponent<CameraController>();
+            if (IsOwner)
+            {
+                uid = OwnerClientId;
+                inv = GetComponentInChildren<INV_ScreenManager>();
+                inv.SetOwnerID(uid);
+            }
+
+            _hasGun = false;
+
+            //_animator = GetComponent<Animator>();
+            _cameraController = IsOwner ? GetComponent<CameraController>() : null;
             _inputs = GetComponent<InputManager>();
             _eventHandler = GetComponent<EventHandler>();
             _capsuleCollider = GetComponent<CapsuleCollider>();
+            _playerVisual = GetComponent<PlayerVisual>();
+
+            PlayerData pData = SurvivorsEscapeMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+            _playerVisual.SetPlayerColor(SurvivorsEscapeMultiplayer.Instance.GetPlayerColor(pData.colorId));
 
             _runSpeed = _standingSpeed.x;
             _sprintSpeed = _standingSpeed.y;
@@ -97,29 +144,66 @@ namespace SurvivorsEscape
             }
             _layerMask = mask;
 
-            //_animator.applyRootMotion = false;
             _eventHandler.Event.AddListener(OnEvent);
         }
 
         private void Update()
         {
             if (_proning) return;
+            if (!IsOwner) return;
+            if (_IsDead) return;
 
             Vector3 moveInputVector = new Vector3(_inputs.MoveAxisRight, 0, _inputs.MoveAxisForward);
             Vector3 cameraPlanarDirection = _cameraController._cameraPlanarDirection;
-            Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection);
 
+            Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection);
             Vector3 moveInputVectorOrientation = cameraPlanarRotation * moveInputVector.normalized;
+
+            //if (_inputs.CursosrEnable.PressedDown())
+            //{
+            //    if (_bInvOpen)
+            //    {
+            //        Cursor.lockState = CursorLockMode.Locked;
+            //        _bInvOpen = false;
+            //        //Debug.Log("Inv close");
+            //    }
+            //    else
+            //    {
+            //        Cursor.lockState = CursorLockMode.None;
+            //        _bInvOpen = true;
+            //        //Debug.Log("Inv open");
+            //    }
+            //}
+
+            //if (Cursor.lockState != CursorLockMode.Locked)
+            //    return;
+
+            if (_inputs.Aim.Pressed())
+            {
+                if (!_isAiming)
+                {
+                    _cameraController.SetAimView(true);
+                    _isAiming = true;
+                }
+            }
+            else
+            {
+                if (_isAiming)
+                {
+                    _cameraController.SetAimView(false);
+                    _isAiming = false;
+                }
+            }
 
             if(_strafing)
             {
                 _sprinting = _inputs.Sprint.PressedDown() && (moveInputVector != Vector3.zero);
-                _strafing = !_inputs.Aim.PressedDown() && !_sprinting;
+                _strafing = !_inputs.Draw.PressedDown() && !_sprinting;
             }
             else
             {
                 _sprinting = _inputs.Sprint.Pressed() && (moveInputVector != Vector3.zero);
-                _strafing = _inputs.Aim.PressedDown();
+                _strafing = _inputs.Draw.PressedDown();
             }
 
             if (_sprinting)
@@ -166,27 +250,108 @@ namespace SurvivorsEscape
                 _strafeParameterXZ = Vector3.Lerp(_strafeParameterXZ, Vector3.forward * _newSpeed, _moveSharpness * Time.deltaTime);
             }
 
-            _animator.SetFloat("Strifing", _strafeParameter);
+            if (_hasGun)
+            {
+                _animator.SetFloat("Strifing", -_strafeParameter);
+            }
+            else
+            {
+                _animator.SetFloat("Strifing", _strafeParameter);
+            }
+
+
             _animator.SetFloat("StrifingX", Mathf.Round(_strafeParameterXZ.x * 100f) / 100f);
             _animator.SetFloat("StrifingZ", Mathf.Round(_strafeParameterXZ.z * 100f) / 100f);
 
-            if(!_inAnimation)
+            Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+            Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+            Transform hitTransform = null;
+            if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimLayerMask))
             {
-                if(_inputs.Attack.PressedDown())
+                _debugTransform.position = raycastHit.point;
+                _mouseWorldPosition = raycastHit.point;
+                hitTransform = raycastHit.transform;
+            }
+
+            if (!_hasGun)
+            {
+                if (!_inAnimation)
                 {
-                    _inAnimation = true;
-                    _animator.CrossFadeInFixedTime(_meleeAtack, 0.1f, 0, 0);
+                    if (_inputs.Attack.PressedDown())
+                    {
+                        _inAnimation = true;
+                        _animator.CrossFadeInFixedTime(_meleeAtack, 0.1f, 0, 0);
+                    }
+                }
+            }
+            else
+            {
+                if (!_inAnimation)
+                {
+                    if (_inputs.Attack.PressedDown())
+                    {
+                        if (_strafing)
+                        {
+                            _inAnimation = true;
+                            _animator.CrossFadeInFixedTime(_shootRifle, 0.1f, 0, 0);
+
+                            Vector3 aimDir = (_mouseWorldPosition - _spawnBulletPosition.position).normalized;
+
+                            /*Spawner.Instace.SpawnBulletServerRpc(_spawnBulletPosition.position.x,
+                                _spawnBulletPosition.position.y,
+                                _spawnBulletPosition.position.z,
+                                aimDir.x,
+                                aimDir.y,
+                                aimDir.z);*/
+
+                            Instantiate(_bullerProjectile, _spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+
+                            /*if (hitTransform != null)
+                            {
+                                if (hitTransform.GetComponent<BulletTarget>() != null)
+                                {
+                                    Instantiate(_vfxParticlesCollition, transform.position, Quaternion.identity);
+                                }
+                            }*/
+                        }
+                    }
                 }
             }
 
             if(_hitting)
             {
+                //Debug.Log("+ - + - + - + - + - + - + - + Se dio el golpe");
                 _hitBox.CheckHit();
+            }
+        }
+
+        public void SetDMG(int ld, int wd, int rd)
+        {
+            _lifeDamage = ld;
+            _woodDamage = wd;
+            _rockDamage = rd;
+        }
+
+        public void DisableMyAudio()
+        {
+            if (!IsOwner)
+            {
+                _cameraController._camera.gameObject.SetActive(false);
+
+            }
+        }
+        public void DisableExtraCanvas()
+        {
+            if (!IsOwner)
+            {
+                _canvas.gameObject.SetActive(false);
             }
         }
 
         private void OnAnimatorMove()
         {
+            if (!IsOwner) return;
+
             if(_inAnimation)
             {
                 _animatorVelocity = _animator.velocity;
@@ -197,6 +362,7 @@ namespace SurvivorsEscape
         private void LateUpdate()
         {
             if (_proning) return;
+            if (!IsOwner) return;
 
             switch (_stance)
             {
@@ -297,6 +463,8 @@ namespace SurvivorsEscape
 
         public void OnEvent(string eventName)
         {
+            if (!IsOwner) return;
+
             switch(eventName)
             {
                 case "HitStart":
@@ -314,7 +482,36 @@ namespace SurvivorsEscape
             }
         }
 
-        int IHitResponder.Damage { get => _damage; }
+        public void TakeWeapon(INV_PickUp item)
+        {
+            Vector3 newPosition = new Vector3(0.087f, 0.082f, 0.07f);
+            Vector3 newRotation = new Vector3(-162.30f, 71.77f, -29.83f);
+
+            var rb = item.GetComponent<Rigidbody>();
+            if (rb != null)
+                Destroy(rb);
+
+            item.transform.parent = _handBone.transform;
+            item.gameObject.transform.position = _handVessel.transform.position;
+            item.gameObject.transform.eulerAngles = _handVessel.transform.eulerAngles;
+        }
+
+        int IHitResponder.LifeDamage
+        {
+            get => _lifeDamage;
+        }
+        int IHitResponder.WoodDamage
+        {
+            get => _woodDamage;
+        }
+        int IHitResponder.RockDamage
+        {
+            get => _rockDamage;
+        }
+        int IHitResponder.LuckyPoint
+        {
+            get => _luckyPoint;
+        }
 
         bool IHitResponder.CheckHit(HitInteraction data)
         {
@@ -332,6 +529,15 @@ namespace SurvivorsEscape
             _objectsHit.Add(data.HurtBox.Owner);
         }
 
+        public void SetDeathState(bool b)
+        {
+            _IsDead = b;
+        }
+
+        public bool IsPlayerDead()
+        {
+            return _IsDead;
+        }
         public Vector2 GetStandingSpeed() { return _standingSpeed; }
         public float GetMoveSharpness() { return _moveSharpness; }
         public float GetRotationSharpness() { return _rotationSharpness; }
@@ -340,5 +546,15 @@ namespace SurvivorsEscape
         public CameraController GetCameraController() { return _cameraController; }
         public InputManager GetInputManager() { return _inputs; }
         public Transform GetPlayerTransform() { return transform; }
+
+        public bool IsPlayerOwner() { return IsOwner; }
+
+        public void ReviveMe()
+        {
+            if (IsOwner)
+            {
+                inv.Pstats.respawnTime = 0;
+            }
+        }
     }
 }

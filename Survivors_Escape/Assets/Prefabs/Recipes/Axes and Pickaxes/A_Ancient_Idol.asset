@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b6b5ca39e7c894bb0d6fb9e1614176, type: 3}
+  m_Name: A_Ancient_Idol
+  m_EditorClassIdentifier: 
+  ss_ico: {fileID: 21300000, guid: 39d3b47cb6f2e2e48a8a297f6bc90daa, type: 3}
+  srec_name: Ancient Idol
+  reqs:
+  - {fileID: 11400000, guid: 0471f8066e12188429be41eeee19a25f, type: 2}
+  - {fileID: 11400000, guid: 653a68cbdfea6144db1a8b9acde9eb12, type: 2}
+  - {fileID: 11400000, guid: 49a6b161625ebb042b5679d5810a7ab5, type: 2}
+  - {fileID: 11400000, guid: aec7aa17b4028ec4696a453a5c847bb7, type: 2}
+  - {fileID: 11400000, guid: 37626258ce482324bb3159b482131fa3, type: 2}
+  - {fileID: 11400000, guid: a4413335e02b8f0479885efec79fc662, type: 2}
+  out_tm: 5
+  out_it: {fileID: 11400000, guid: e723040ed40fb274bbebce0a995bde30, type: 2}
+  out_nn: 1

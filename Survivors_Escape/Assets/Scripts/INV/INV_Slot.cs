@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Unity.Netcode;
 
-public class Slot : MonoBehaviour
+public class Slot : MonoBehaviour, IPointerClickHandler
 {
     public Inv_itemSO data;
     public int stackSize;
@@ -12,8 +15,13 @@ public class Slot : MonoBehaviour
     public Image icon;
     public TextMeshProUGUI stackText;
 
-    public Color32 selectC = new(255, 255, 0, 255);
+    private Transform _transform;
+    private Vector3 _position;
+
+    public Color32 selectC = new(255, 128, 0, 255);
     public Color32 unselectC = new(255, 255, 255, 255);
+
+    public INV_ScreenManager inv;
 
     //public GameObject mainSlot;
 
@@ -23,6 +31,7 @@ public class Slot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        inv = GetComponentInParent<INV_ScreenManager>();
         UpdateSlot();
     }
 
@@ -54,6 +63,7 @@ public class Slot : MonoBehaviour
     {
         if (stackSize <= 0) {
             data = null;
+            stackSize = 0;
         }
 
         if (data == null)
@@ -86,6 +96,7 @@ public class Slot : MonoBehaviour
     {
         data = data1;
         stackSize = stackSize1;
+        this.UpdateSlot();
     }
 
     public void AddStackAmount(int stackSize1)
@@ -95,7 +106,7 @@ public class Slot : MonoBehaviour
 
     public void Drop()
     {
-        GetComponentInParent<INV_ScreenManager>().DropItem(this);
+        inv.DropItem(this);
     }
 
     public void Clean()
@@ -104,5 +115,31 @@ public class Slot : MonoBehaviour
         stackSize = 0;
 
         UpdateSlot();
+    }
+
+    public void SetDropPos(Transform t)
+    {
+        _transform = t;
+    }
+
+    public Transform GetCurrentDropPos()
+    {
+        return _transform;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (inv.strui_op)
+        {
+            int v = System.Array.IndexOf(inv.allSlots, this);
+            inv.StoreSlot(v);
+        }
+        else
+        {
+            int v = System.Array.IndexOf(inv.allSlots, this);
+            //throw new System.NotImplementedException();
+            inv.UpdateSelected(v);
+            inv.ChangeSelected(v);
+        }
     }
 }

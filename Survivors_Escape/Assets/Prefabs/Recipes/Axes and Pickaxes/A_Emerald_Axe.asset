@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b6b5ca39e7c894bb0d6fb9e1614176, type: 3}
+  m_Name: A_Emerald_Axe
+  m_EditorClassIdentifier: 
+  ss_ico: {fileID: 21300000, guid: c673d87094edf0b43bcbf0c4b7a48607, type: 3}
+  srec_name: Emerald Axe
+  reqs:
+  - {fileID: 11400000, guid: 0792c1f5a2279b4428c06e1ae16cc782, type: 2}
+  - {fileID: 11400000, guid: 134188d0caf4b9e42a78c6bb9f3fb1a3, type: 2}
+  - {fileID: 11400000, guid: 388a93048b7a5ec4dbfbc6d5c88cce66, type: 2}
+  - {fileID: 11400000, guid: bd46646536bedf445bdc4cfa2166216b, type: 2}
+  out_tm: 8
+  out_it: {fileID: 11400000, guid: 708c0d2d2938cf645b620ff3c6e973f0, type: 2}
+  out_nn: 96

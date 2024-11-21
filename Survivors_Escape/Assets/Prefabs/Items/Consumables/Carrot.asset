@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
+  m_Name: Carrot
+  m_EditorClassIdentifier: 
+  itType: 3
+  itName: Carrot
+  itDesc: Obtained from plains bushes. Heals 12 hunger points!
+  itEqup: 0
+  itIcon: {fileID: 21300000, guid: b2d055e188b24d34a8149781a53843cf, type: 3}
+  itPrefab: {fileID: 4267425793877981038, guid: 3d567b8d104d5a6428b126ac87d581e5,
+    type: 3}
+  isStackable: 1
+  maxStack: 50
+  value: 4
+  plusHB: 12
+  plusHP: 3
+  act: 0
+  WepDmg: 0
+  StoneDmg: 0
+  WoodDmg: 0
+  dropPos: {fileID: 0}
+  efx: 0

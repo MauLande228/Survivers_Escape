@@ -12,15 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
   m_Name: Ruby Axe
   m_EditorClassIdentifier: 
-  itType: 0
-  itName: New
-  itDesc: Description
+  itType: 2
+  itName: Ruby Axe
+  itDesc: Axe of medium resistance. Used to get supplies from trees and bushes
+  itEqup: 1
   itIcon: {fileID: 21300000, guid: 340fcebc75b65ed42ae2f5808de5cb38, type: 3}
-  itPrefab: {fileID: 0}
+  itPrefab: {fileID: 2199034743502935498, guid: 5d51467bb9b1bc945a18f3add9845cef,
+    type: 3}
   isStackable: 0
-  maxStack: 1
-  plusHB: 10
-  plusHP: 10
-  Wdmg: 0
-  STdmg: 0
-  WTdmg: 0
+  maxStack: 96
+  value: 0
+  plusHB: 0
+  plusHP: 0
+  act: 0
+  WepDmg: 0
+  StoneDmg: 3
+  WoodDmg: 6
+  dropPos: {fileID: 0}
+  efx: 0

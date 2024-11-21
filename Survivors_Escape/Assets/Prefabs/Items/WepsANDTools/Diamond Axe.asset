@@ -12,15 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
   m_Name: Diamond Axe
   m_EditorClassIdentifier: 
-  itType: 0
-  itName: New
-  itDesc: Description
+  itType: 2
+  itName: Diamond Axe
+  itDesc: Axe of high resistance. Used to get supplies from trees and bushes
+  itEqup: 1
   itIcon: {fileID: 21300000, guid: 0682a9395cc60f74180d37384905174f, type: 3}
-  itPrefab: {fileID: 0}
+  itPrefab: {fileID: 3804339480332281526, guid: 62ece0b87bebba545a8d4a0d3c4f64ef,
+    type: 3}
   isStackable: 0
-  maxStack: 1
-  plusHB: 10
-  plusHP: 10
-  Wdmg: 0
-  STdmg: 0
-  WTdmg: 0
+  maxStack: 96
+  value: 0
+  plusHB: 0
+  plusHP: 0
+  act: 0
+  WepDmg: 0
+  StoneDmg: 4
+  WoodDmg: 12
+  dropPos: {fileID: 0}
+  efx: 0

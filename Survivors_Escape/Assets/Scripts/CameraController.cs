@@ -1,17 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 namespace SurvivorsEscape
 {
-    public class CameraController : MonoBehaviour
+    public class CameraController : NetworkBehaviour
     {
         [Header("Framing")]
-        [SerializeField] private Camera _camera = null;
+        [SerializeField] public Camera _camera = null;
         [SerializeField] private Transform _followTransform = null;
-        [SerializeField] private Vector3 _framing = new Vector3(0, 0, 0);
+        [SerializeField] private Vector3 _framing = new Vector3(0.65f, 0, 0);
 
         [Header("Distance")]
         [SerializeField] private float _zoomSpeed = 10f;
@@ -38,11 +40,12 @@ namespace SurvivorsEscape
         private float _targetVerticalAngle;
         private float _targetDistance;
         private Vector3 _targetPosition;
+        private bool _isAiming = false;
 
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
-        public Vector3 _cameraPlanarDirection { get => _planarDirection; }
+        public Vector3 _cameraPlanarDirection => _planarDirection;
 
         private void OnValidate()
         {
@@ -52,6 +55,12 @@ namespace SurvivorsEscape
 
         private void Start()
         {
+            if (!IsOwner)
+            {
+                _camera.enabled = false;
+                return;
+            }
+
             _ignoreColliders.AddRange(GetComponentsInChildren<Collider>());
             _planarDirection = _followTransform.forward;
             _targetDistance = _defaultDistance;
@@ -65,6 +74,12 @@ namespace SurvivorsEscape
 
         private void Update()
         {
+            if (!IsOwner)
+            {
+                //_camera.enabled = false;
+                return;
+            }
+
             if (Cursor.lockState != CursorLockMode.Locked)
                 return;
 
@@ -78,8 +93,27 @@ namespace SurvivorsEscape
 
             Vector3 focusPosition = _followTransform.position + _camera.transform.TransformDirection(_framing);
             _planarDirection = Quaternion.Euler(0, mouseX, 0) * _planarDirection;
+
+            //Debug.Log(_planarDirection);
+
             _targetVerticalAngle = Mathf.Clamp(_targetVerticalAngle + mouseY, _minVerticalAngle, _maxVerticalAngle);
-            _targetDistance = Mathf.Clamp(_targetDistance + zoom, _minDistance, _maxDistance);
+
+            if (_isAiming)
+            {
+                _framing.x = Mathf.Lerp(_framing.x, 1.5f, Time.deltaTime * _zoomSpeed);
+                _targetDistance = Mathf.Lerp(_targetDistance, 1.5f, Time.deltaTime * _zoomSpeed);
+            }
+            else
+            {
+                _framing.x = Mathf.Lerp(_framing.x, 0.65f, Time.deltaTime * _zoomSpeed);
+                _targetDistance = Mathf.Lerp(_targetDistance, 2.5f, Time.deltaTime * _zoomSpeed);
+            }
+
+            // Enable zoom
+            //_targetDistance = Mathf.Clamp(_targetDistance + zoom, _minDistance, _maxDistance);
+
+            // Disable zoom
+            _targetDistance = Mathf.Clamp(_targetDistance, _minDistance, _maxDistance);
 
             float smallestDistance = _targetDistance;
             RaycastHit[] hits = Physics.SphereCastAll(
@@ -112,6 +146,18 @@ namespace SurvivorsEscape
             _camera.transform.rotation = _newRotation;
             _camera.transform.position = _newPosition;
             #endregion
+        }
+
+        public void AddIgnoreColliders(Collider coll)
+        {
+            //_ignoreColliders.Add(coll);
+            _ignoreColliders.AddRange(GetComponentsInChildren<Collider>());
+            Debug.Log("COLLIDER ADDED");
+        }
+
+        public void SetAimView(bool isAimView)
+        {
+            _isAiming = isAimView;
         }
     }
 }

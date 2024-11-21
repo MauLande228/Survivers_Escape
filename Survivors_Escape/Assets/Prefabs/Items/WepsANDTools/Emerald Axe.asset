@@ -12,15 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
   m_Name: Emerald Axe
   m_EditorClassIdentifier: 
-  itType: 0
-  itName: New
-  itDesc: Description
+  itType: 2
+  itName: Emerald Axe
+  itDesc: Axe of low resistance. Used to get supplies from trees and bushes
+  itEqup: 1
   itIcon: {fileID: 21300000, guid: c673d87094edf0b43bcbf0c4b7a48607, type: 3}
-  itPrefab: {fileID: 0}
+  itPrefab: {fileID: 6018988607588332743, guid: 58f16df66d2bfba499f7774c05cdfaba,
+    type: 3}
   isStackable: 0
-  maxStack: 1
-  plusHB: 10
-  plusHP: 10
-  Wdmg: 0
-  STdmg: 0
-  WTdmg: 0
+  maxStack: 96
+  value: 0
+  plusHB: 0
+  plusHP: 0
+  act: 0
+  WepDmg: 0
+  StoneDmg: 2
+  WoodDmg: 4
+  dropPos: {fileID: 0}
+  efx: 0

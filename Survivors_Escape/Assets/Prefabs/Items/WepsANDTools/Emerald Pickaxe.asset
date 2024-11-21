@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69a98fd73a3bf647aba8ee6bc5f0ed3, type: 3}
+  m_Name: Emerald Pickaxe
+  m_EditorClassIdentifier: 
+  itType: 2
+  itName: Emerald Pickaxe
+  itDesc: Pickaxe of low resistance. Used to get supplies from rocks
+  itEqup: 1
+  itIcon: {fileID: 21300000, guid: 6925a866a6d3cde4d9a8372b28e2b98f, type: 3}
+  itPrefab: {fileID: 7644431110507390997, guid: de48e8166e0358940a953581e0a39d6d,
+    type: 3}
+  isStackable: 0
+  maxStack: 60
+  value: 0
+  plusHB: 0
+  plusHP: 0
+  act: 0
+  WepDmg: 0
+  StoneDmg: 4
+  WoodDmg: 2
+  dropPos: {fileID: 0}
+  efx: 0
